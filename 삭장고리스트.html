@@ -361,44 +361,33 @@
     .status.err { display: block; background: var(--error-bg); color: var(--error); border: 1px solid #F5B5B5; }
 
     /* ── Photo upload ── */
-    .upload-area {
-      border: 2.5px dashed var(--border);
-      border-radius: 16px;
-      padding: 38px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color .2s, background .2s;
-      background: #fff;
-      margin-bottom: 14px;
+    .photo-slots { display: flex; gap: 10px; margin-bottom: 12px; }
+    .photo-slot {
+      flex: 1; border: 2.5px dashed var(--border); border-radius: 14px;
+      min-height: 130px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; cursor: pointer;
+      transition: border-color .2s, background .2s; background: #fff;
+      overflow: hidden; position: relative;
     }
-    .upload-area:hover { border-color: var(--red); background: rgba(123,30,30,.02); }
-    .upload-area.drag-over { border-color: var(--red); background: rgba(123,30,30,.05); }
-    .upload-icon { font-size: 46px; margin-bottom: 10px; }
-    .upload-text { font-size: 15px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
-    .upload-sub  { font-size: 12.5px; color: #B0937A; }
-    #file-input  { display: none; }
-    .preview-wrap { margin-bottom: 14px; position: relative; }
-    #preview-img {
-      width: 100%;
-      max-height: 250px;
-      object-fit: contain;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      display: block;
-      background: #f5f0e8;
+    .photo-slot:hover { border-color: var(--red); background: rgba(123,30,30,.02); }
+    .photo-slot.drag-over { border-color: var(--red); background: rgba(123,30,30,.05); }
+    .photo-slot.filled { border-style: solid; border-color: #C8A882; }
+    .slot-icon { font-size: 30px; }
+    .slot-label { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 5px; }
+    .slot-preview-img { width: 100%; height: 130px; object-fit: cover; display: block; }
+    .slot-remove {
+      position: absolute; top: 5px; right: 5px;
+      background: rgba(0,0,0,.6); color: #fff; border: none;
+      border-radius: 50%; width: 24px; height: 24px;
+      font-size: 13px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; line-height: 1;
     }
-    .preview-reset {
-      position: absolute;
-      top: 8px; right: 8px;
-      background: rgba(0,0,0,.55);
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      padding: 5px 11px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+    .analyze-btn {
+      width: 100%; padding: 13px; background: var(--red); color: #fff;
+      border: none; border-radius: 12px; font-size: 15px; font-weight: 700;
+      cursor: pointer; margin-bottom: 14px; transition: opacity .2s;
     }
+    .analyze-btn:disabled { opacity: .4; cursor: not-allowed; }
     .analyzing { text-align: center; padding: 26px; color: var(--muted); font-size: 15px; font-weight: 500; }
     .analyzing .spinner { display: block; width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--red); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px; }
     .extracted-badge {
@@ -637,18 +626,23 @@
 
     <!-- 사진 섹션 -->
     <div id="section-photo" style="display:none">
-      <div id="upload-area" class="upload-area"
-           onclick="document.getElementById('file-input').click()"
-           ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
-        <div class="upload-icon">📷</div>
-        <div class="upload-text">사진을 클릭하거나 드래그해서 업로드</div>
-        <div class="upload-sub">사케 라벨·병 사진에서 정보를 자동 추출합니다</div>
+      <div class="photo-slots">
+        <div class="photo-slot" id="slot-0"
+             onclick="document.getElementById('file-0').click()"
+             ondragover="slotDragOver(event,0)" ondragleave="slotDragLeave(0)" ondrop="slotDrop(event,0)">
+          <span class="slot-icon">📷</span>
+          <span class="slot-label">앞면 라벨</span>
+        </div>
+        <div class="photo-slot" id="slot-1"
+             onclick="document.getElementById('file-1').click()"
+             ondragover="slotDragOver(event,1)" ondragleave="slotDragLeave(1)" ondrop="slotDrop(event,1)">
+          <span class="slot-icon">📷</span>
+          <span class="slot-label">뒷면 라벨</span>
+        </div>
       </div>
-      <input type="file" id="file-input" accept="image/*" capture="environment" onchange="onFileSelect(event)">
-      <div id="preview-wrap" class="preview-wrap" style="display:none">
-        <img id="preview-img" alt="사케 사진">
-        <button class="preview-reset" onclick="resetPhoto()">✕ 다시 선택</button>
-      </div>
+      <input type="file" id="file-0" accept="image/*" onchange="slotFileSelect(event,0)" style="display:none">
+      <input type="file" id="file-1" accept="image/*" onchange="slotFileSelect(event,1)" style="display:none">
+      <button class="analyze-btn" id="analyze-btn" onclick="analyzePhotos()" disabled>🔍 분석 시작 (사진 선택 후 클릭)</button>
       <div id="analyzing" style="display:none">
         <div class="analyzing"><span class="spinner"></span>AI가 라벨 정보를 분석 중입니다…</div>
       </div>
@@ -942,41 +936,80 @@ function switchMethod(m) {
 }
 
 // ── Photo upload (추가 탭) ────────────────────
-function onDragOver(e)  { e.preventDefault(); document.getElementById('upload-area').classList.add('drag-over'); }
-function onDragLeave()  { document.getElementById('upload-area').classList.remove('drag-over'); }
-function onDrop(e) {
+const slotFiles = [null, null]; // [앞면, 뒷면]
+
+function slotDragOver(e, i)  { e.preventDefault(); document.getElementById('slot-'+i).classList.add('drag-over'); }
+function slotDragLeave(i)    { document.getElementById('slot-'+i).classList.remove('drag-over'); }
+function slotDrop(e, i) {
   e.preventDefault();
-  document.getElementById('upload-area').classList.remove('drag-over');
+  document.getElementById('slot-'+i).classList.remove('drag-over');
   const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) processPhoto(f);
+  if (f && f.type.startsWith('image/')) setSlotFile(i, f);
 }
-function onFileSelect(e) { const f = e.target.files[0]; if (f) processPhoto(f); }
+function slotFileSelect(e, i) { const f = e.target.files[0]; if (f) setSlotFile(i, f); }
+
+function setSlotFile(i, file) {
+  slotFiles[i] = file;
+  const slot = document.getElementById('slot-'+i);
+  const url = URL.createObjectURL(file);
+  slot.innerHTML = `<img class="slot-preview-img" src="${url}" alt="사진">
+    <button class="slot-remove" onclick="removeSlot(event,${i})">✕</button>`;
+  slot.classList.add('filled');
+  updateAnalyzeBtn();
+}
+
+function removeSlot(e, i) {
+  e.stopPropagation();
+  slotFiles[i] = null;
+  const slot = document.getElementById('slot-'+i);
+  slot.classList.remove('filled');
+  slot.innerHTML = `<span class="slot-icon">📷</span><span class="slot-label">${i === 0 ? '앞면 라벨' : '뒷면 라벨'}</span>`;
+  document.getElementById('file-'+i).value = '';
+  updateAnalyzeBtn();
+}
+
+function updateAnalyzeBtn() {
+  const hasAny = slotFiles[0] || slotFiles[1];
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = !hasAny;
+  btn.textContent = hasAny ? '🔍 분석 시작' : '🔍 분석 시작 (사진 선택 후 클릭)';
+}
 
 function resetPhoto() {
-  document.getElementById('upload-area').style.display     = 'block';
-  document.getElementById('preview-wrap').style.display    = 'none';
+  for (let i = 0; i < 2; i++) {
+    slotFiles[i] = null;
+    const slot = document.getElementById('slot-'+i);
+    if (slot) {
+      slot.classList.remove('filled');
+      slot.innerHTML = `<span class="slot-icon">📷</span><span class="slot-label">${i === 0 ? '앞면 라벨' : '뒷면 라벨'}</span>`;
+    }
+    const fi = document.getElementById('file-'+i);
+    if (fi) fi.value = '';
+  }
   document.getElementById('analyzing').style.display       = 'none';
   document.getElementById('extracted-badge').style.display = 'none';
-  document.getElementById('file-input').value              = '';
+  updateAnalyzeBtn();
   analyzedPhoto = null;
 }
 
-async function processPhoto(file) {
-  document.getElementById('preview-img').src = URL.createObjectURL(file);
-  document.getElementById('upload-area').style.display     = 'none';
-  document.getElementById('preview-wrap').style.display    = 'block';
+async function analyzePhotos() {
+  const files = slotFiles.filter(Boolean);
+  if (!files.length) return;
+
   document.getElementById('analyzing').style.display       = 'block';
   document.getElementById('extracted-badge').style.display = 'none';
+  document.getElementById('analyze-btn').disabled = true;
 
   if (GEMINI_API_KEY.startsWith('YOUR_')) {
     document.getElementById('analyzing').style.display = 'none';
     showFormStatus('Gemini API 키가 미설정되어 있습니다. 직접입력 탭을 이용해주세요.', 'err');
+    document.getElementById('analyze-btn').disabled = false;
     return;
   }
   try {
-    const base64 = await resizeEncode(file);
-    analyzedPhoto = { base64, mimeType: 'image/jpeg' };
-    const info = await callGemini(base64, 'image/jpeg');
+    const encoded = await Promise.all(files.map(f => resizeEncode(f)));
+    analyzedPhoto = { base64: encoded[0], mimeType: 'image/jpeg' };
+    const info = await callGemini(encoded, 'image/jpeg');
     fillForm(info);
     document.getElementById('extracted-badge').style.display = 'flex';
     document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -984,6 +1017,7 @@ async function processPhoto(file) {
     showFormStatus('분석 실패: ' + err.message, 'err');
   } finally {
     document.getElementById('analyzing').style.display = 'none';
+    updateAnalyzeBtn();
   }
 }
 
@@ -1008,32 +1042,42 @@ function resizeEncode(file, maxPx = 1280) {
   });
 }
 
-async function callGemini(base64, mimeType) {
-  const prompt = `이 사케 라벨/병 사진에서 정보를 추출해주세요.
-없는 정보는 빈 문자열로 두세요. 마크다운 없이 JSON만 응답하세요:
-{"name":"","category":"","date":"","region":"","smv":"","heat":""}
-- name: 사케 제품명 (한글 음역 또는 일본어)
-- category: 준마이다이긴죠/준마이긴죠/다이긴죠/긴죠/도쿠베츠준마이/준마이/혼죠죠/보통주/무라벨 중 하나
-- date: 제조년월 YY.MM 형식
-- region: 생산 지역 한글 (예: 야마구치)
-- smv: 일본주도 (예: +3 ~ +4)
-- heat: 열처리 방법`;
+async function callGemini(base64Arr, mimeType) {
+  // base64Arr: string[] — 1개(앞면만) 또는 2개(앞면+뒷면)
+  const prompt = `당신은 일본 사케 전문가입니다. 첨부된 사케 라벨 사진(앞면, 뒷면 순서)을 분석하여 아래 JSON을 채워주세요.
+반드시 마크다운 없이 JSON 객체만 응답하세요. 확인할 수 없는 항목은 빈 문자열 ""로 두세요.
 
+{"name":"","category":"","date":"","region":"","smv":"","heat":""}
+
+각 항목 추출 규칙:
+- name: 사케 브랜드/제품명을 한글 발음으로 표기 (예: 닷사이23, 쿠헤이지, 죠코엔). 일본어 병기도 허용
+- category: 라벨에서 주류 구분을 찾아 아래 중 정확히 하나 선택
+    준마이다이긴죠 (純米大吟醸) | 준마이긴죠 (純米吟醸) | 다이긴죠 (大吟醸) | 긴죠 (吟醸)
+    도쿠베츠준마이 (特別純米) | 준마이 (純米) | 혼죠죠 (本醸造) | 보통주 | 무라벨
+- date: 제조년월 또는 출하년월 — YY.MM 형식으로 변환 (예: 令和6年3月→24.03, 2024.03→24.03)
+- region: 양조장 소재 일본 도도부현을 한글로 (예: 야마구치, 니이가타, 아키타, 교토)
+- smv: 日本酒度(일본주도) 수치 (예: +3, -2, +3〜+4)
+- heat: 열처리 방식
+    2회 열처리 (히이레) | 1회 열처리 (나마즈메) | 생주 (나마) | 생주 (나마/무여과)
+    또는 라벨 표기 그대로`;
+
+  const imageParts = base64Arr.map(b64 => ({ inline_data: { mime_type: mimeType, data: b64 } }));
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: base64 } }] }],
-        generationConfig: { temperature: 0.1 }
+        contents: [{ parts: [{ text: prompt }, ...imageParts] }],
+        generationConfig: { temperature: 0.1, responseMimeType: 'application/json' }
       })
     }
   );
   if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || `HTTP ${res.status}`); }
   const data = await res.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-  return JSON.parse(text.replace(/```json\n?|\n?```/g, '').trim());
+  try { return JSON.parse(text.replace(/```json\n?|\n?```/g, '').trim()); }
+  catch { return {}; }
 }
 
 function fillForm(info) {
