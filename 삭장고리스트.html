@@ -4,15 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🍶 삭장고리스트</title>
-  <script src="config.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async></script>
   <style>
     :root {
-      --red: #7B1E1E; --red-light: #A52525; --gold: #C49A3C;
-      --bg: #FAF6EF; --card: #FFFFFF; --text: #1A1009;
-      --muted: #7A6050; --border: #E5D4BC;
-      --success-bg: #EDF7F1; --success: #1B5E35;
-      --error-bg: #FFF0F0; --error: #8B0000;
+      --red: #7B1E1E; --gold: #C49A3C;
+      --bg: #F7F2EA; --card: #FFFFFF;
+      --text: #1A1009; --muted: #7A6050;
+      --border: #E5D4BC;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -22,1402 +19,454 @@
       min-height: 100vh;
     }
 
-    /* ── Background pattern ── */
-    #bg-pattern {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    #bg-pattern span {
-      position: absolute;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      color: var(--red);
-      white-space: nowrap;
-      user-select: none;
-      transform-origin: center;
-      line-height: 1;
-    }
-    header, .tabs, #auth-screen, #app, .modal-wrap, .notice, #setup-area {
-      position: relative;
-      z-index: 1;
-    }
-
     /* ── Header ── */
     header {
       background: var(--red);
       color: #fff;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      box-shadow: 0 2px 12px rgba(0,0,0,.3);
+      padding: 14px 20px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 16px rgba(0,0,0,.3);
     }
-    .header-title { font-size: 18px; font-weight: 700; }
-    .header-title em { font-style: normal; margin-right: 5px; }
-    .hbtn {
+    .header-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: baseline; gap: 10px; }
+    .header-title { font-size: 20px; font-weight: 700; letter-spacing: -.3px; }
+    .header-sub { font-size: 12px; opacity: .65; }
+    .header-count {
+      font-size: 13px; font-weight: 600;
       background: rgba(255,255,255,.18);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.35);
-      padding: 6px 13px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .hbtn:active { opacity: .75; }
-
-    /* ── Tabs ── */
-    .tabs {
-      display: flex;
-      background: #fff;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 47px;
-      z-index: 100;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 12px 0 10px;
-      border: none;
-      background: none;
-      font-size: 14.5px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: color .2s, border-color .2s;
-    }
-    .tab-btn.active { color: var(--red); border-bottom-color: var(--red); }
-
-    /* ── Layout ── */
-    .wrap { max-width: 980px; margin: 0 auto; padding: 16px 14px 50px; }
-
-    /* ── Notices ── */
-    .notice {
-      margin: 10px 14px;
-      padding: 12px 14px;
-      background: #FFF8E1;
-      border: 1px solid #FFD54F;
-      border-radius: 10px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .notice strong { display: block; margin-bottom: 3px; font-size: 13.5px; }
-    .notice code {
-      background: rgba(0,0,0,.08);
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 12px;
+      padding: 4px 12px; border-radius: 20px;
     }
 
-    /* ── Search ── */
-    .search-box { position: relative; margin-bottom: 14px; }
-    .search-box input {
-      width: 100%;
-      padding: 11px 14px 11px 38px;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      font-size: 15px;
-      font-family: inherit;
-      background: #fff;
-      color: var(--text);
+    /* ── Controls ── */
+    .controls {
+      max-width: 1120px; margin: 20px auto; padding: 0 16px;
+      display: flex; flex-direction: column; gap: 12px;
     }
-    .search-box input:focus { outline: none; border-color: var(--red); }
+    .search-wrap { position: relative; }
+    .search-wrap input {
+      width: 100%; padding: 13px 18px 13px 46px;
+      border: 1.5px solid var(--border); border-radius: 16px;
+      font-size: 15px; font-family: inherit;
+      background: #fff; color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      transition: border-color .2s;
+    }
+    .search-wrap input:focus { outline: none; border-color: var(--red); }
     .search-icon {
-      position: absolute;
-      left: 12px; top: 50%;
+      position: absolute; left: 15px; top: 50%;
       transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 16px;
-      pointer-events: none;
+      font-size: 18px; pointer-events: none;
     }
-    .list-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .list-count { font-size: 13px; color: var(--muted); font-weight: 600; }
 
-    /* ── Table ── */
-    .table-wrap {
-      overflow-x: auto;
-      overflow-y: auto;
-      max-height: calc(100vh - 160px);
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 12px rgba(123,30,30,.08);
-      background: #fff;
-    }
-    .sake-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 680px;
-    }
-    .sake-table thead { position: sticky; top: 0; z-index: 50; }
-    .sake-table th {
-      background: var(--red);
-      color: #fff;
-      padding: 11px 14px;
-      font-size: 12px;
-      font-weight: 700;
-      text-align: left;
+    /* ── Filters ── */
+    .filters { display: flex; gap: 7px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 6px 15px;
+      border: 1.5px solid var(--border); border-radius: 20px;
+      background: #fff; font-size: 12.5px; font-weight: 600;
+      color: var(--muted); cursor: pointer; transition: all .18s;
       white-space: nowrap;
-      letter-spacing: .3px;
     }
-    .sake-table th:first-child { border-radius: 13px 0 0 0; text-align: center; }
-    .sake-table th:last-child  { border-radius: 0 13px 0 0; }
-    .sake-table td {
-      padding: 9px 14px;
-      font-size: 13.5px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-    .sake-table tr:last-child td { border-bottom: none; }
-    .sake-table tbody tr { transition: background .15s; }
-    .sake-table tbody tr:hover td { background: rgba(123,30,30,.04); }
-    .col-img { width: 72px; text-align: center; padding: 8px 6px !important; }
-    .col-name { font-weight: 700; min-width: 130px; }
-    .col-cat  { min-width: 120px; }
-    .col-date { min-width: 80px; color: var(--muted); }
-    .col-region { min-width: 80px; }
-    .col-smv  { min-width: 90px; font-family: monospace; font-size: 12.5px; }
-    .col-heat { min-width: 160px; font-size: 12.5px; color: var(--muted); }
+    .filter-btn:hover { border-color: var(--red); color: var(--red); }
+    .filter-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
 
-    /* ── Label image in table ── */
-    .label-wrap {
-      width: 52px; height: 66px;
-      margin: 0 auto;
-      position: relative;
-      cursor: pointer;
-      border-radius: 7px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .label-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .label-ph {
-      font-size: 26px;
-      opacity: 0.35;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-    }
-    .label-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(123,30,30,.65);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      opacity: 0;
-      transition: opacity .2s;
-    }
-    .label-wrap:hover .label-overlay { opacity: 1; }
-
-    /* ── Method toggle ── */
-    .method-toggle {
-      display: flex;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 16px;
-    }
-    .method-btn {
-      flex: 1;
-      padding: 9px;
-      border: none;
-      background: none;
-      border-radius: 9px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .method-btn.active {
-      background: var(--card);
-      color: var(--red);
-      box-shadow: 0 1px 5px rgba(0,0,0,.13);
+    /* ── Grid ── */
+    .grid {
+      max-width: 1120px; margin: 4px auto 0;
+      padding: 0 16px 60px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 13px;
     }
 
     /* ── Card ── */
     .card {
-      background: var(--card);
+      background: var(--card); border-radius: 18px;
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 14px;
       box-shadow: 0 2px 10px rgba(123,30,30,.07);
+      display: flex; overflow: hidden;
+      transition: box-shadow .2s, transform .2s;
+      cursor: default;
     }
-    .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--red);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .card:hover {
+      box-shadow: 0 8px 28px rgba(123,30,30,.16);
+      transform: translateY(-3px);
     }
 
-    /* ── Form ── */
-    .field { margin-bottom: 13px; }
-    label {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: .7px;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-    input[type=text], select {
-      width: 100%;
-      padding: 11px 13px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 16px;
-      font-family: inherit;
-      background: #fff;
-      color: var(--text);
-      transition: border-color .2s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    input[type=text]:focus, select:focus { outline: none; border-color: var(--red); }
-    select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237A6050' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 11px center;
-      padding-right: 36px;
-    }
-    .custom-input { margin-top: 7px; }
-    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
-    @media (max-width: 380px) { .row2 { grid-template-columns: 1fr; gap: 0; } }
-
-    /* ── Buttons ── */
-    .submit-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--red);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background .2s, transform .1s;
-      margin-top: 4px;
-    }
-    .submit-btn:active { transform: scale(.98); background: var(--red-light); }
-    .submit-btn:disabled { background: #C4AE98; cursor: not-allowed; transform: none; }
-    .outline-btn {
-      width: 100%;
-      padding: 11px;
-      background: none;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      margin-top: 8px;
-    }
-    .outline-btn:active { background: var(--bg); }
-
-    /* ── Status ── */
-    .status {
-      padding: 11px 14px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      margin-top: 10px;
-      display: none;
-      line-height: 1.4;
-    }
-    .status.ok  { display: block; background: var(--success-bg); color: var(--success); border: 1px solid #A8D5BC; }
-    .status.err { display: block; background: var(--error-bg); color: var(--error); border: 1px solid #F5B5B5; }
-
-    /* ── Photo upload ── */
-    .photo-slots { display: flex; gap: 10px; margin-bottom: 12px; }
-    .photo-slot {
-      flex: 1; border: 2.5px dashed var(--border); border-radius: 14px;
-      min-height: 130px; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; cursor: pointer;
-      transition: border-color .2s, background .2s; background: #fff;
+    /* Label image column */
+    .card-img {
+      width: 82px; flex-shrink: 0;
+      background: #F0E8D8;
+      border-right: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
       overflow: hidden; position: relative;
     }
-    .photo-slot:hover { border-color: var(--red); background: rgba(123,30,30,.02); }
-    .photo-slot.drag-over { border-color: var(--red); background: rgba(123,30,30,.05); }
-    .photo-slot.filled { border-style: solid; border-color: #C8A882; }
-    .slot-icon { font-size: 30px; }
-    .slot-label { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 5px; }
-    .slot-preview-img { width: 100%; height: 130px; object-fit: cover; display: block; }
-    .slot-remove {
-      position: absolute; top: 5px; right: 5px;
-      background: rgba(0,0,0,.6); color: #fff; border: none;
-      border-radius: 50%; width: 24px; height: 24px;
-      font-size: 13px; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; line-height: 1;
+    .card-img img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
     }
-    .analyze-btn {
-      width: 100%; padding: 13px; background: var(--red); color: #fff;
-      border: none; border-radius: 12px; font-size: 15px; font-weight: 700;
-      cursor: pointer; margin-bottom: 14px; transition: opacity .2s;
-    }
-    .analyze-btn:disabled { opacity: .4; cursor: not-allowed; }
-    .analyzing { text-align: center; padding: 26px; color: var(--muted); font-size: 15px; font-weight: 500; }
-    .analyzing .spinner { display: block; width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--red); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px; }
-    .extracted-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--success-bg);
-      color: var(--success);
-      border: 1px solid #A8D5BC;
-      border-radius: 8px;
-      padding: 5px 10px;
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-bottom: 14px;
+    .card-img-ph {
+      font-size: 38px; opacity: .22;
     }
 
-    /* ── Image Modal ── */
-    .modal-wrap {
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+    /* Info column */
+    .card-body {
+      flex: 1; padding: 13px 15px;
+      display: flex; flex-direction: column; gap: 6px; min-width: 0;
     }
-    .modal-wrap.open { display: flex; }
-    .modal-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,.55);
+    .card-name {
+      font-size: 15px; font-weight: 700; line-height: 1.35;
+      color: var(--text);
     }
-    .modal-box {
-      position: relative;
-      background: #fff;
-      border-radius: 20px;
-      width: 100%;
-      max-width: 400px;
-      max-height: 92vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    .cat-badge {
+      display: inline-block; align-self: flex-start;
+      padding: 3px 9px; border-radius: 10px;
+      font-size: 11px; font-weight: 700;
     }
-    .modal-head {
-      padding: 18px 18px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .card-tags {
+      display: flex; flex-wrap: wrap; gap: 5px 10px; margin-top: 2px;
     }
-    .modal-title { font-size: 16px; font-weight: 700; color: var(--red); }
-    .modal-close {
-      background: none; border: none; cursor: pointer;
-      font-size: 22px; color: var(--muted); line-height: 1;
-      padding: 0 2px;
+    .tag {
+      font-size: 12px; color: var(--muted);
+      display: flex; align-items: center; gap: 3px;
     }
-    .modal-body { padding: 14px 18px 20px; }
-    .modal-preview {
-      width: 100%;
-      height: 180px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+    .tag-icon { font-size: 11px; }
+
+    /* ── States ── */
+    .state-wrap {
+      max-width: 1120px; margin: 70px auto;
+      text-align: center; padding: 0 16px;
+    }
+    .spinner {
+      display: inline-block; width: 40px; height: 40px;
+      border: 3px solid var(--border); border-top-color: var(--red);
+      border-radius: 50%; animation: spin .7s linear infinite;
       margin-bottom: 16px;
     }
-    .modal-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: none;
-    }
-    .modal-preview .modal-ph { font-size: 56px; opacity: .3; }
-    .modal-tabs {
-      display: flex;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 3px;
-      margin-bottom: 14px;
-    }
-    .modal-tab {
-      flex: 1;
-      padding: 8px;
-      border: none;
-      background: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .modal-tab.active { background: #fff; color: var(--red); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
-    .upload-btn-sm {
-      display: block;
-      width: 100%;
-      padding: 13px;
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      background: var(--bg);
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      margin-bottom: 8px;
-    }
-    .upload-btn-sm:hover { border-color: var(--red); color: var(--red); }
-    .modal-hint { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
-    #modal-file { display: none; }
-    .modal-status {
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13.5px;
-      font-weight: 500;
-      margin-bottom: 10px;
-      display: none;
-    }
-    .modal-status.ok  { display: block; background: var(--success-bg); color: var(--success); }
-    .modal-status.err { display: block; background: var(--error-bg);   color: var(--error); }
-    .modal-status.loading { display: block; background: #EEF3FF; color: #3747A0; }
-
-    /* ── Auth screen ── */
-    #auth-screen { text-align: center; padding: 80px 24px 40px; }
-    .auth-icon { font-size: 70px; line-height: 1; margin-bottom: 14px; }
-    .auth-title { font-size: 26px; font-weight: 800; color: var(--red); margin-bottom: 8px; }
-    .auth-sub { color: var(--muted); font-size: 15px; line-height: 1.7; margin-bottom: 32px; }
-    .google-btn {
-      background: var(--red);
-      color: #fff;
-      border: none;
-      padding: 14px 28px;
-      border-radius: 50px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 4px 14px rgba(123,30,30,.3);
-    }
-
-    /* ── Spinner ── */
-    .spinner-wrap { text-align: center; padding: 40px; color: var(--muted); }
-    .spinner {
-      display: inline-block;
-      width: 22px; height: 22px;
-      border: 2.5px solid var(--border);
-      border-top-color: var(--red);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .state-msg { color: var(--muted); font-size: 15px; }
+
+    .error-box {
+      background: #fff8f8; border: 1px solid #f0cece;
+      border-radius: 16px; padding: 28px 24px;
+      max-width: 480px; margin: 0 auto;
+      font-size: 14px; line-height: 1.8; color: #7B1E1E;
+      text-align: left;
+    }
+    .error-box strong { font-size: 16px; display: block; margin-bottom: 8px; }
+    .error-box code {
+      background: rgba(123,30,30,.1); padding: 2px 6px;
+      border-radius: 5px; font-size: 12px; font-family: monospace;
+    }
+
+    .no-result {
+      grid-column: 1 / -1; text-align: center;
+      padding: 60px 0; color: var(--muted); font-size: 15px;
+    }
+
+    /* ── PIN screen ── */
+    #pin-screen {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--red);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 32px;
+    }
+    .pin-logo { font-size: 52px; line-height: 1; }
+    .pin-title { color: rgba(255,255,255,.9); font-size: 20px; font-weight: 700; letter-spacing: -.3px; }
+    .pin-sub   { color: rgba(255,255,255,.5); font-size: 13px; margin-top: -22px; }
+    .pin-dots  { display: flex; gap: 16px; }
+    .pin-dot {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: rgba(255,255,255,.25);
+      transition: background .15s;
+    }
+    .pin-dot.filled { background: #fff; }
+    .pin-pad {
+      display: grid; grid-template-columns: repeat(3, 72px);
+      gap: 12px;
+    }
+    .pin-key {
+      height: 72px; border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      border: none; color: #fff;
+      font-size: 22px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      font-family: inherit;
+    }
+    .pin-key:active, .pin-key:hover { background: rgba(255,255,255,.3); }
+    .pin-key.del { font-size: 18px; }
+    .pin-key.empty { background: none; pointer-events: none; }
+    .pin-error {
+      color: #FFB3B3; font-size: 13px; font-weight: 600;
+      height: 18px; text-align: center;
+      animation: shake .3s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-8px); }
+      75%      { transform: translateX(8px); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .grid { grid-template-columns: 1fr; }
+      .card-img { width: 70px; }
+      .header-title { font-size: 17px; }
+    }
   </style>
 </head>
 <body>
 
-<!-- ════ BACKGROUND PATTERN ════ -->
-<div id="bg-pattern"></div>
-
-<!-- ════ AUTH SCREEN ════ -->
-<div id="auth-screen">
-  <div class="auth-icon">🍶</div>
-  <div class="auth-title">삭장고리스트</div>
-  <div class="auth-sub">소장 사케를 기록하고 관리하세요<br>Google 계정으로 로그인하면 시작됩니다</div>
-  <button class="google-btn" onclick="signIn()">
-    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-    Google로 로그인
-  </button>
-</div>
-
-<!-- ════ SETUP NOTICES ════ -->
-<div id="setup-area">
-  <div id="notice-client" class="notice" style="display:none">
-    <strong>⚙️ Google OAuth 설정 필요</strong>
-    HTML 상단 <code>CLIENT_ID</code>를 Google Cloud Console에서 발급한 값으로 교체하세요.
+<!-- ── PIN Screen ── -->
+<div id="pin-screen">
+  <div class="pin-logo">🍶</div>
+  <div class="pin-title">삭장고리스트</div>
+  <div class="pin-sub">PIN을 입력하세요</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
   </div>
-  <div id="notice-gemini" class="notice" style="display:none">
-    <strong>📷 Gemini API 키 미설정</strong>
-    사진 분석 기능 사용 시 <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>에서 무료 API 키를 발급 후 <code>GEMINI_API_KEY</code>에 입력하세요.
-  </div>
-</div>
-
-<!-- ════ APP ════ -->
-<div id="app" style="display:none">
-  <header>
-    <div class="header-title"><em>🍶</em>삭장고리스트</div>
-    <button class="hbtn" onclick="signOut()">로그아웃</button>
-  </header>
-
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-list" onclick="switchTab('list')">📋 목록</button>
-    <button class="tab-btn"        id="tab-add"  onclick="switchTab('add')">➕ 추가</button>
-  </div>
-
-  <!-- ── 목록 탭 ── -->
-  <div id="content-list" class="wrap">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="이름 · 지역 · 구분으로 검색…" oninput="filterList()">
-    </div>
-    <div class="list-meta">
-      <span id="list-count" class="list-count">-</span>
-      <span style="font-size:12px;color:var(--muted)">라벨 이미지를 클릭하면 변경 가능</span>
-    </div>
-    <div class="table-wrap">
-      <table class="sake-table">
-        <thead>
-          <tr>
-            <th class="col-img">라벨</th>
-            <th class="col-name">이름</th>
-            <th class="col-cat">구분</th>
-            <th class="col-date">제조년월</th>
-            <th class="col-region">지역</th>
-            <th class="col-smv">일본주도</th>
-            <th class="col-heat">열처리</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-          <tr><td colspan="7"><div class="spinner-wrap"><span class="spinner"></span>불러오는 중…</div></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ── 추가 탭 ── -->
-  <div id="content-add" class="wrap" style="display:none">
-    <div class="method-toggle">
-      <button class="method-btn active" id="btn-direct" onclick="switchMethod('direct')">✏️ 직접입력</button>
-      <button class="method-btn"        id="btn-photo"  onclick="switchMethod('photo')">📷 사진 업로드</button>
-    </div>
-
-    <!-- 사진 섹션 -->
-    <div id="section-photo" style="display:none">
-      <div class="photo-slots">
-        <div class="photo-slot" id="slot-0"
-             onclick="document.getElementById('file-0').click()"
-             ondragover="slotDragOver(event,0)" ondragleave="slotDragLeave(0)" ondrop="slotDrop(event,0)">
-          <span class="slot-icon">📷</span>
-          <span class="slot-label">앞면 라벨</span>
-        </div>
-        <div class="photo-slot" id="slot-1"
-             onclick="document.getElementById('file-1').click()"
-             ondragover="slotDragOver(event,1)" ondragleave="slotDragLeave(1)" ondrop="slotDrop(event,1)">
-          <span class="slot-icon">📷</span>
-          <span class="slot-label">뒷면 라벨</span>
-        </div>
-      </div>
-      <input type="file" id="file-0" accept="image/*" onchange="slotFileSelect(event,0)" style="display:none">
-      <input type="file" id="file-1" accept="image/*" onchange="slotFileSelect(event,1)" style="display:none">
-      <button class="analyze-btn" id="analyze-btn" onclick="analyzePhotos()" disabled>🔍 분석 시작 (사진 선택 후 클릭)</button>
-      <div id="analyzing" style="display:none">
-        <div class="analyzing"><span class="spinner"></span>AI가 라벨 정보를 분석 중입니다…</div>
-      </div>
-      <div id="extracted-badge" class="extracted-badge" style="display:none">
-        ✅ 정보 추출 완료 — 아래 내용을 확인·수정 후 추가하세요
-      </div>
-    </div>
-
-    <!-- 폼 -->
-    <div class="card" id="form-card">
-      <div class="card-title">📝 사케 정보</div>
-      <form id="sake-form" onsubmit="handleSubmit(event)" autocomplete="off">
-        <div class="field">
-          <label>이름 *</label>
-          <input type="text" id="f-name" placeholder="예: 닷사이23" required>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label>구분</label>
-            <select id="f-cat" onchange="toggleCustom('f-cat','f-cat-c')">
-              <option value="">— 선택 —</option>
-              <option>준마이다이긴죠</option><option>준마이긴죠</option>
-              <option>다이긴죠</option><option>긴죠</option>
-              <option>도쿠베츠준마이</option><option>준마이</option>
-              <option>혼죠죠</option><option>보통주</option><option>무라벨</option>
-              <option value="__c__">직접 입력</option>
-            </select>
-            <input type="text" id="f-cat-c" class="custom-input" placeholder="구분 입력" style="display:none">
-          </div>
-          <div class="field">
-            <label>제조년월</label>
-            <input type="text" id="f-date" placeholder="예: 25.12">
-          </div>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label>지역</label>
-            <input type="text" id="f-region" placeholder="예: 야마구치" list="region-list">
-            <datalist id="region-list">
-              <option>야마구치</option><option>야마가타</option><option>이시카와</option>
-              <option>니이가타</option><option>시가</option><option>카가와</option>
-              <option>와카야마</option><option>사가</option><option>미야기</option>
-              <option>나라</option><option>시즈오카</option><option>고치</option>
-              <option>나가사키</option><option>이바라키</option><option>아이치현</option>
-              <option>후쿠이</option><option>치바현</option>
-            </datalist>
-          </div>
-          <div class="field">
-            <label>일본주도 (SMV)</label>
-            <input type="text" id="f-smv" placeholder="예: +3 ~ +4">
-          </div>
-        </div>
-        <div class="field">
-          <label>열처리</label>
-          <select id="f-heat" onchange="toggleCustom('f-heat','f-heat-c')">
-            <option value="">— 선택 —</option>
-            <option>2회 열처리 (히이레)</option><option>1회 열처리 (나마즈메)</option>
-            <option>생주 (나마)</option><option>생주 (나마/무여과)</option>
-            <option>생주 (나마/계절한정)</option><option>생주 (나마/활성)</option>
-            <option>1회 열처리 (저알코올)</option><option>1회 열처리 (빙온숙성)</option>
-            <option value="__c__">직접 입력</option>
-          </select>
-          <input type="text" id="f-heat-c" class="custom-input" placeholder="열처리 방식 입력" style="display:none">
-        </div>
-        <div id="form-status" class="status"></div>
-        <button type="submit" class="submit-btn" id="submit-btn">🍶 추가하기</button>
-        <button type="button" class="outline-btn" onclick="resetForm()">초기화</button>
-      </form>
-    </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <button class="pin-key empty"></button>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
   </div>
 </div>
 
-<!-- ════ IMAGE MODAL ════ -->
-<div class="modal-wrap" id="img-modal">
-  <div class="modal-backdrop" onclick="closeModal()"></div>
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-title" id="modal-sake-name">라벨 이미지 변경</div>
-      <button class="modal-close" onclick="closeModal()">×</button>
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <span class="header-title">🍶 삭장고리스트</span>
+      <span class="header-sub">사케 컬렉션</span>
     </div>
-    <div class="modal-body">
-      <div class="modal-preview">
-        <img id="modal-img" src="" alt="">
-        <div class="modal-ph">🍶</div>
-      </div>
-
-      <div class="modal-tabs">
-        <button class="modal-tab active" data-tab="upload" onclick="switchModalTab('upload')">📷 사진 업로드</button>
-        <button class="modal-tab"        data-tab="url"    onclick="switchModalTab('url')">🔗 URL 입력</button>
-      </div>
-
-      <!-- 업로드 탭 -->
-      <div id="mtab-upload">
-        <input type="file" id="modal-file" accept="image/*" onchange="onModalFile(event)">
-        <button class="upload-btn-sm" onclick="document.getElementById('modal-file').click()">
-          📷 기기에서 사진 선택
-        </button>
-        <p class="modal-hint">선택한 사진을 Google Drive에 업로드하여 저장합니다</p>
-      </div>
-
-      <!-- URL 탭 -->
-      <div id="mtab-url" style="display:none">
-        <div class="field">
-          <label>이미지 URL</label>
-          <input type="text" id="modal-url" placeholder="https://...">
-        </div>
-        <p class="modal-hint">💡 구글 이미지 검색 후 이미지 우클릭 → '이미지 주소 복사' 후 붙여넣기</p>
-      </div>
-
-      <div class="modal-status" id="modal-status"></div>
-      <button class="submit-btn" id="modal-save-btn" onclick="saveImage()">저장</button>
-    </div>
+    <span class="header-count" id="count">—</span>
   </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="이름, 지역, 구분으로 검색…" oninput="render()">
+  </div>
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-cat="" onclick="setFilter(this)">전체</button>
+  </div>
+</div>
+
+<div id="grid" class="grid" style="display:none"></div>
+
+<div id="state" class="state-wrap">
+  <div class="spinner"></div>
+  <div class="state-msg">목록을 불러오는 중…</div>
 </div>
 
 <script>
-/* ══════════════════════════════════════════════
-   ⚙️  키는 config.js에서 불러옵니다 (GitHub에 올라가지 않음)
-   ══════════════════════════════════════════════ */
-const CLIENT_ID      = (window.SAKE_CONFIG && window.SAKE_CONFIG.CLIENT_ID)      || '101879058594-gcj1dcavmo50270heqg2d3s2h2s1mrku.apps.googleusercontent.com';
-const GEMINI_API_KEY = (window.SAKE_CONFIG && window.SAKE_CONFIG.GEMINI_API_KEY) || 'AIzaSyCo-lFuPb0v4jgh-ZB4GXXiMIEPCpojVGE';
-/* ══════════════════════════════════════════════ */
+const SHEET_ID = '1Lv1di5KmV3UbzeD-VfI_KXWFnm5Hrgftd4WL0UUU_nI';
+const CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
-const SPREADSHEET_ID = '1Lv1di5KmV3UbzeD-VfI_KXWFnm5Hrgftd4WL0UUU_nI';
-const SHEET_NAME     = '시트1';
-const SCOPE = [
-  'https://www.googleapis.com/auth/spreadsheets',
-  'https://www.googleapis.com/auth/drive.file'
-].join(' ');
-const SHEETS = 'https://sheets.googleapis.com/v4/spreadsheets';
+// ── PIN ──────────────────────────────────────────
+const CORRECT_PIN = '1124';
+let pinInput = '';
 
-// ── State ─────────────────────────────────────
-let accessToken = null;
-let tokenClient;
-let allRows = []; // [{data:[], sheetRow:n}, ...]
-let modalSheetRow = null;
-let analyzedPhoto = null; // {base64, mimeType}
+(function checkSession() {
+  if (sessionStorage.getItem('sake_pin') === 'ok') unlockApp();
+})();
 
-// ── Background ────────────────────────────────
-const BRANDS = [
-  '獺祭','久保田','八海山','十四代','新政','而今',
-  '鍋島','飛露喜','磯自慢','九平次','射美','風の森',
-  '田酒','写楽','作','貴','黒龍','七賢','村祐','英勲',
-  '雨後の月','豊盃','雁木','菊正宗','白鶴','灘五郷'
-];
+function pinKey(n) {
+  if (pinInput.length >= 4) return;
+  pinInput += n;
+  updateDots();
+  if (pinInput.length === 4) checkPin();
+}
 
-// ── 브랜드별 라벨 뱃지 SVG 생성 ──────────────────
-const BADGE_DEFS = [
-  { kanji:'獺祭',  color:'#8B0000', style:'double' },
-  { kanji:'久保田', color:'#1B3A6E', style:'double' },
-  { kanji:'八海山', color:'#1A5C2A', style:'double' },
-  { kanji:'十四代', color:'#7A5A00', style:'oval'   },
-  { kanji:'新政',  color:'#1B3A6E', style:'oval'   },
-  { kanji:'而今',  color:'#8B0000', style:'stamp'  },
-  { kanji:'鍋島',  color:'#1B3A6E', style:'double' },
-  { kanji:'飛露喜', color:'#1A5C2A', style:'double' },
-  { kanji:'磯自慢', color:'#005C5C', style:'double' },
-  { kanji:'九平次', color:'#4A1A6E', style:'oval'   },
-  { kanji:'風の森', color:'#2A6E2A', style:'double' },
-  { kanji:'田酒',  color:'#5C3200', style:'oval'   },
-  { kanji:'写楽',  color:'#8B0000', style:'stamp'  },
-  { kanji:'作',   color:'#1B3A6E', style:'stamp'  },
-  { kanji:'貴',   color:'#7A5A00', style:'stamp'  },
-  { kanji:'黒龍',  color:'#1A1A3E', style:'double' },
-  { kanji:'射美',  color:'#4A1A6E', style:'oval'   },
-  { kanji:'七賢',  color:'#2A5C1A', style:'double' },
-  { kanji:'村祐',  color:'#8B0000', style:'oval'   },
-  { kanji:'英勲',  color:'#5C3200', style:'stamp'  },
-];
+function pinDel() {
+  pinInput = pinInput.slice(0, -1);
+  updateDots();
+  document.getElementById('pin-error').textContent = '';
+}
 
-function makeBadgeSVG({ kanji, color, style }) {
-  const n  = kanji.length;
-  const w  = n <= 2 ? 62 : n <= 3 ? 80 : 104;
-  const h  = 46;
-  const cx = w / 2, cy = h / 2;
-  const fs = n <= 2 ? 22 : n <= 3 ? 18 : 14;
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinInput.length);
+  }
+}
 
-  let shape = '';
-  if (style === 'stamp') {
-    const r = Math.min(cx, cy) - 2;
-    shape = `<circle cx='${cx}' cy='${cy}' r='${r}' fill='${color}' opacity='0.9'/>
-             <circle cx='${cx}' cy='${cy}' r='${r - 4}' fill='none' stroke='#fff' stroke-width='0.8' opacity='0.6'/>`;
-  } else if (style === 'oval') {
-    shape = `<ellipse cx='${cx}' cy='${cy}' rx='${cx-2}' ry='${cy-2}' fill='none' stroke='${color}' stroke-width='1.8'/>
-             <ellipse cx='${cx}' cy='${cy}' rx='${cx-6}' ry='${cy-6}' fill='none' stroke='${color}' stroke-width='0.6'/>`;
+function checkPin() {
+  if (pinInput === CORRECT_PIN) {
+    sessionStorage.setItem('sake_pin', 'ok');
+    document.getElementById('pin-screen').style.opacity = '0';
+    document.getElementById('pin-screen').style.transition = 'opacity .3s';
+    setTimeout(unlockApp, 300);
   } else {
-    shape = `<rect x='2'  y='2'  width='${w-4}'  height='${h-4}'  rx='3' fill='none' stroke='${color}' stroke-width='1.8'/>
-             <rect x='6'  y='6'  width='${w-12}' height='${h-12}' rx='1' fill='none' stroke='${color}' stroke-width='0.6'/>`;
+    const err = document.getElementById('pin-error');
+    err.textContent = '잘못된 PIN입니다';
+    err.style.animation = 'none';
+    requestAnimationFrame(() => { err.style.animation = 'shake .3s ease'; });
+    pinInput = '';
+    setTimeout(updateDots, 300);
   }
-
-  const textColor = style === 'stamp' ? '#fff' : color;
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
-    ${shape}
-    <text x='${cx}' y='${cy + fs * 0.36}' font-family='Georgia,serif' font-size='${fs}' fill='${textColor}' text-anchor='middle' font-weight='bold'>${kanji}</text>
-  </svg>`;
-  return 'data:image/svg+xml,' + encodeURIComponent(svg);
 }
 
-const BADGE_URLS = BADGE_DEFS.map(d => ({ url: makeBadgeSVG(d), w: d.kanji.length <= 2 ? 62 : d.kanji.length <= 3 ? 80 : 104 }));
+function unlockApp() {
+  document.getElementById('pin-screen').style.display = 'none';
+  load();
+}
 
-function buildBackground() {
-  const bg = document.getElementById('bg-pattern');
-  const W  = window.innerWidth  + 200;
-  const H  = window.innerHeight + 200;
-  const colW = 130, rowH = 88;
-  const cols = Math.ceil(W / colW) + 1;
-  const rows = Math.ceil(H / rowH) + 1;
-  const frag = [];
+let allRows = [];
+let activeFilter = '';
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const idx  = (r * 7 + c * 3) % BADGE_URLS.length;
-      const b    = BADGE_URLS[idx];
-      const x    = c * colW + (r % 2) * 65 - 30;
-      const y    = r * rowH - 20;
-      const rot  = -25 + (idx % 9) * 4;
-      const op   = (0.055 + (idx % 4) * 0.018).toFixed(3);
-      frag.push(`<img src="${b.url}" width="${b.w}" height="46" style="position:absolute;left:${x}px;top:${y}px;transform:rotate(${rot}deg);opacity:${op};pointer-events:none;user-select:none">`);
+// ── CSV parser ──────────────────────────────────
+function parseCSV(text) {
+  const rows = [];
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    const cells = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; continue; }
+      if (c === ',' && !inQ) { cells.push(cur.trim()); cur = ''; continue; }
+      cur += c;
     }
+    cells.push(cur.trim());
+    rows.push(cells);
   }
-  bg.innerHTML = frag.join('');
-}
-window.addEventListener('load', buildBackground);
-window.addEventListener('resize', buildBackground);
-
-// ── Auth ──────────────────────────────────────
-function waitGIS(cb) {
-  if (typeof google !== 'undefined' && google.accounts) cb();
-  else setTimeout(() => waitGIS(cb), 300);
-}
-
-window.addEventListener('load', () => {
-  if (CLIENT_ID.startsWith('YOUR_'))      document.getElementById('notice-client').style.display = 'block';
-  if (GEMINI_API_KEY.startsWith('YOUR_')) document.getElementById('notice-gemini').style.display = 'block';
-
-  const tok = sessionStorage.getItem('sake_tok');
-  const exp = sessionStorage.getItem('sake_tok_exp');
-  if (tok && exp && Date.now() < +exp) accessToken = tok;
-
-  waitGIS(() => {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPE,
-      callback: onToken,
-    });
-    if (accessToken) showApp();
-  });
-});
-
-function onToken(res) {
-  if (res.error) { alert('로그인 실패: ' + res.error); return; }
-  accessToken = res.access_token;
-  sessionStorage.setItem('sake_tok', accessToken);
-  sessionStorage.setItem('sake_tok_exp', Date.now() + res.expires_in * 1000);
-  showApp();
-}
-
-function signIn() {
-  if (CLIENT_ID.startsWith('YOUR_')) { alert('CLIENT_ID를 설정해주세요.'); return; }
-  tokenClient.requestAccessToken({ prompt: '' });
-}
-
-function signOut() {
-  if (accessToken) google.accounts.oauth2.revoke(accessToken, () => {});
-  accessToken = null; allRows = [];
-  sessionStorage.clear();
-  document.getElementById('app').style.display         = 'none';
-  document.getElementById('auth-screen').style.display = 'block';
-}
-
-function showApp() {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app').style.display         = 'block';
-  switchTab('list');
-  loadList();
-}
-
-// ── Tabs ──────────────────────────────────────
-function switchTab(tab) {
-  document.getElementById('tab-list').classList.toggle('active', tab === 'list');
-  document.getElementById('tab-add').classList.toggle('active',  tab === 'add');
-  document.getElementById('content-list').style.display = tab === 'list' ? 'block' : 'none';
-  document.getElementById('content-add').style.display  = tab === 'add'  ? 'block' : 'none';
-}
-
-function switchMethod(m) {
-  document.getElementById('btn-direct').classList.toggle('active', m === 'direct');
-  document.getElementById('btn-photo').classList.toggle('active',  m === 'photo');
-  document.getElementById('section-photo').style.display = m === 'photo' ? 'block' : 'none';
-  if (m === 'direct') document.getElementById('extracted-badge').style.display = 'none';
-}
-
-// ── Photo upload (추가 탭) ────────────────────
-const slotFiles = [null, null]; // [앞면, 뒷면]
-
-function slotDragOver(e, i)  { e.preventDefault(); document.getElementById('slot-'+i).classList.add('drag-over'); }
-function slotDragLeave(i)    { document.getElementById('slot-'+i).classList.remove('drag-over'); }
-function slotDrop(e, i) {
-  e.preventDefault();
-  document.getElementById('slot-'+i).classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) setSlotFile(i, f);
-}
-function slotFileSelect(e, i) { const f = e.target.files[0]; if (f) setSlotFile(i, f); }
-
-function setSlotFile(i, file) {
-  slotFiles[i] = file;
-  const slot = document.getElementById('slot-'+i);
-  const url = URL.createObjectURL(file);
-  slot.innerHTML = `<img class="slot-preview-img" src="${url}" alt="사진">
-    <button class="slot-remove" onclick="removeSlot(event,${i})">✕</button>`;
-  slot.classList.add('filled');
-  updateAnalyzeBtn();
-}
-
-function removeSlot(e, i) {
-  e.stopPropagation();
-  slotFiles[i] = null;
-  const slot = document.getElementById('slot-'+i);
-  slot.classList.remove('filled');
-  slot.innerHTML = `<span class="slot-icon">📷</span><span class="slot-label">${i === 0 ? '앞면 라벨' : '뒷면 라벨'}</span>`;
-  document.getElementById('file-'+i).value = '';
-  updateAnalyzeBtn();
-}
-
-function updateAnalyzeBtn() {
-  const hasAny = slotFiles[0] || slotFiles[1];
-  const btn = document.getElementById('analyze-btn');
-  btn.disabled = !hasAny;
-  btn.textContent = hasAny ? '🔍 분석 시작' : '🔍 분석 시작 (사진 선택 후 클릭)';
-}
-
-function resetPhoto() {
-  for (let i = 0; i < 2; i++) {
-    slotFiles[i] = null;
-    const slot = document.getElementById('slot-'+i);
-    if (slot) {
-      slot.classList.remove('filled');
-      slot.innerHTML = `<span class="slot-icon">📷</span><span class="slot-label">${i === 0 ? '앞면 라벨' : '뒷면 라벨'}</span>`;
-    }
-    const fi = document.getElementById('file-'+i);
-    if (fi) fi.value = '';
-  }
-  document.getElementById('analyzing').style.display       = 'none';
-  document.getElementById('extracted-badge').style.display = 'none';
-  updateAnalyzeBtn();
-  analyzedPhoto = null;
-}
-
-async function analyzePhotos() {
-  const files = slotFiles.filter(Boolean);
-  if (!files.length) return;
-
-  document.getElementById('analyzing').style.display       = 'block';
-  document.getElementById('extracted-badge').style.display = 'none';
-  document.getElementById('analyze-btn').disabled = true;
-
-  if (GEMINI_API_KEY.startsWith('YOUR_')) {
-    document.getElementById('analyzing').style.display = 'none';
-    showFormStatus('Gemini API 키가 미설정되어 있습니다. 직접입력 탭을 이용해주세요.', 'err');
-    document.getElementById('analyze-btn').disabled = false;
-    return;
-  }
-  try {
-    const encoded = await Promise.all(files.map(f => resizeEncode(f)));
-    analyzedPhoto = { base64: encoded[0], mimeType: 'image/jpeg' };
-    const info = await callGemini(encoded, 'image/jpeg');
-    fillForm(info);
-    document.getElementById('extracted-badge').style.display = 'flex';
-    document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } catch (err) {
-    showFormStatus('분석 실패: ' + err.message, 'err');
-  } finally {
-    document.getElementById('analyzing').style.display = 'none';
-    updateAnalyzeBtn();
-  }
-}
-
-function resizeEncode(file, maxPx = 1280) {
-  return new Promise((res, rej) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      let { width: w, height: h } = img;
-      if (w > maxPx || h > maxPx) {
-        if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
-        else       { w = Math.round(w * maxPx / h); h = maxPx; }
-      }
-      const c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      c.getContext('2d').drawImage(img, 0, 0, w, h);
-      res(c.toDataURL('image/jpeg', 0.85).split(',')[1]);
-    };
-    img.onerror = rej;
-    img.src = url;
-  });
-}
-
-async function callGemini(base64Arr, mimeType) {
-  // base64Arr: string[] — 1개(앞면만) 또는 2개(앞면+뒷면)
-  const prompt = `당신은 일본 사케 전문가입니다. 첨부된 사케 라벨 사진(앞면, 뒷면 순서)을 분석하여 아래 JSON을 채워주세요.
-반드시 마크다운 없이 JSON 객체만 응답하세요. 확인할 수 없는 항목은 빈 문자열 ""로 두세요.
-
-{"name":"","category":"","date":"","region":"","smv":"","heat":""}
-
-각 항목 추출 규칙:
-- name: 사케 브랜드/제품명을 한글 발음으로 표기 (예: 닷사이23, 쿠헤이지, 죠코엔). 일본어 병기도 허용
-- category: 라벨에서 주류 구분을 찾아 아래 중 정확히 하나 선택
-    준마이다이긴죠 (純米大吟醸) | 준마이긴죠 (純米吟醸) | 다이긴죠 (大吟醸) | 긴죠 (吟醸)
-    도쿠베츠준마이 (特別純米) | 준마이 (純米) | 혼죠죠 (本醸造) | 보통주 | 무라벨
-- date: 제조년월 또는 출하년월 — YY.MM 형식으로 변환 (예: 令和6年3月→24.03, 2024.03→24.03)
-- region: 양조장 소재 일본 도도부현을 한글로 (예: 야마구치, 니이가타, 아키타, 교토)
-- smv: 日本酒度(일본주도) 수치 (예: +3, -2, +3〜+4)
-- heat: 열처리 방식
-    2회 열처리 (히이레) | 1회 열처리 (나마즈메) | 생주 (나마) | 생주 (나마/무여과)
-    또는 라벨 표기 그대로`;
-
-  const imageParts = base64Arr.map(b64 => ({ inline_data: { mime_type: mimeType, data: b64 } }));
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }, ...imageParts] }],
-        generationConfig: { temperature: 0.1, responseMimeType: 'application/json' }
-      })
-    }
-  );
-  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || `HTTP ${res.status}`); }
-  const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-  try { return JSON.parse(text.replace(/```json\n?|\n?```/g, '').trim()); }
-  catch { return {}; }
-}
-
-function fillForm(info) {
-  document.getElementById('f-name').value   = info.name   || '';
-  document.getElementById('f-date').value   = info.date   || '';
-  document.getElementById('f-region').value = info.region || '';
-  document.getElementById('f-smv').value    = info.smv    || '';
-  setSelect('f-cat',  'f-cat-c',  info.category || '');
-  setSelect('f-heat', 'f-heat-c', info.heat     || '');
-}
-
-function setSelect(selId, customId, val) {
-  const sel = document.getElementById(selId);
-  const inp = document.getElementById(customId);
-  const hasOpt = Array.from(sel.options).some(o => o.value === val);
-  if (hasOpt && val) {
-    sel.value = val; inp.style.display = 'none';
-  } else if (val) {
-    sel.value = '__c__'; inp.value = val; inp.style.display = 'block';
-  } else {
-    sel.value = ''; inp.style.display = 'none';
-  }
-}
-
-function toggleCustom(selId, customId) {
-  const inp = document.getElementById(customId);
-  const isC = document.getElementById(selId).value === '__c__';
-  inp.style.display = isC ? 'block' : 'none';
-  if (isC) inp.focus();
-}
-
-function getVal(selId, customId) {
-  const sel = document.getElementById(selId);
-  return sel.value === '__c__' ? document.getElementById(customId).value.trim() : sel.value;
-}
-
-// ── Submit ────────────────────────────────────
-async function handleSubmit(e) {
-  e.preventDefault();
-  if (!accessToken) { showFormStatus('로그인이 필요합니다.', 'err'); return; }
-  const name = document.getElementById('f-name').value.trim();
-  if (!name) { showFormStatus('이름을 입력해주세요.', 'err'); return; }
-
-  const row = [
-    name,
-    getVal('f-cat', 'f-cat-c'),
-    document.getElementById('f-date').value.trim(),
-    document.getElementById('f-region').value.trim(),
-    document.getElementById('f-smv').value.trim(),
-    getVal('f-heat', 'f-heat-c'),
-    '' // G: 이미지 URL (나중에 채워짐)
-  ];
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.textContent = '추가 중…';
-
-  try {
-    const appendRes = await apiAppend(row);
-    let newRowNum = null;
-    const updatedRange = appendRes.updates?.updatedRange;
-    if (updatedRange) {
-      const m = updatedRange.match(/(\d+)(?::\w+\d+)?$/);
-      if (m) newRowNum = parseInt(m[1]);
-    }
-
-    // 사진 업로드 방식이면 Drive에 라벨 이미지 저장
-    if (analyzedPhoto && newRowNum) {
-      try {
-        btn.textContent = '이미지 저장 중…';
-        const imgUrl = await uploadToDrive(analyzedPhoto.base64, analyzedPhoto.mimeType, `sake_${name}_r${newRowNum}.jpg`);
-        await updateCell(`${SHEET_NAME}!G${newRowNum}`, imgUrl);
-      } catch (imgErr) {
-        console.warn('이미지 업로드 실패:', imgErr);
-      }
-    }
-
-    showFormStatus(`✅ "${name}" 추가 완료!`, 'ok');
-    resetForm(); resetPhoto();
-    allRows = [];
-    await loadList();
-    setTimeout(() => switchTab('list'), 800);
-  } catch (err) {
-    if (err.status === 401) { showFormStatus('인증 만료. 다시 로그인해주세요.', 'err'); signOut(); }
-    else showFormStatus('오류: ' + err.message, 'err');
-  } finally {
-    btn.disabled = false; btn.textContent = '🍶 추가하기';
-  }
-}
-
-function resetForm() {
-  document.getElementById('sake-form').reset();
-  document.getElementById('f-cat-c').style.display     = 'none';
-  document.getElementById('f-heat-c').style.display    = 'none';
-  document.getElementById('extracted-badge').style.display = 'none';
-  document.getElementById('form-status').className     = 'status';
-}
-
-// ── Sheets API ────────────────────────────────
-async function apiAppend(values) {
-  const range = encodeURIComponent(SHEET_NAME + '!A:G');
-  const url = `${SHEETS}/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [values] }),
-  });
-  if (!res.ok) {
-    const d = await res.json().catch(() => ({}));
-    const err = new Error(d.error?.message || res.statusText);
-    err.status = res.status; throw err;
-  }
-  return res.json();
-}
-
-async function apiFetch() {
-  const range = encodeURIComponent(SHEET_NAME + '!A:G');
-  const res = await fetch(`${SHEETS}/${SPREADSHEET_ID}/values/${range}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!res.ok) throw new Error(res.statusText);
-  return (await res.json()).values || [];
-}
-
-async function updateCell(range, value) {
-  const url = `${SHEETS}/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=RAW`;
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [[value]] }),
-  });
-  if (!res.ok) {
-    const d = await res.json().catch(() => ({}));
-    throw new Error(d.error?.message || res.statusText);
-  }
-}
-
-// ── Drive upload ──────────────────────────────
-async function uploadToDrive(base64, mimeType, filename) {
-  const boundary = 'sake_' + Date.now();
-  const meta = JSON.stringify({ name: filename, mimeType });
-
-  // binary from base64
-  const bin = atob(base64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-
-  const body = new Blob([
-    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`,
-    meta,
-    `\r\n--${boundary}\r\nContent-Type: ${mimeType}\r\n\r\n`,
-    bytes,
-    `\r\n--${boundary}--`
-  ]);
-
-  const uploadRes = await fetch(
-    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': `multipart/related; boundary=${boundary}`,
-      },
-      body,
-    }
-  );
-  if (!uploadRes.ok) {
-    const errBody = await uploadRes.json().catch(() => ({}));
-    const msg = errBody?.error?.message || `HTTP ${uploadRes.status}`;
-    throw new Error(`Drive 업로드 실패 (${msg})`);
-  }
-  const { id } = await uploadRes.json();
-
-  // 공개 설정
-  await fetch(`https://www.googleapis.com/drive/v3/files/${id}/permissions`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'anyone', role: 'reader' }),
-  });
-
-  return `https://drive.google.com/thumbnail?id=${id}&sz=w400`;
-}
-
-// ── List ──────────────────────────────────────
-async function loadList() {
-  document.getElementById('table-body').innerHTML =
-    '<tr><td colspan="7"><div class="spinner-wrap"><span class="spinner"></span>불러오는 중…</div></td></tr>';
-  try {
-    const rows = await apiFetch();
-    allRows = rows.slice(1).map((data, i) => ({ data, sheetRow: i + 2 }));
-    document.getElementById('list-count').textContent = `총 ${allRows.length}개`;
-    renderTable(allRows);
-    buildBackground(); // 높이 변경에 맞게 배경 재생성
-  } catch (err) {
-    document.getElementById('table-body').innerHTML =
-      `<tr><td colspan="7" style="text-align:center;color:var(--error);padding:30px">로딩 실패: ${h(err.message)}</td></tr>`;
-  }
-}
-
-function filterList() {
-  const q = document.getElementById('search-input').value.toLowerCase();
-  const filtered = q ? allRows.filter(item => item.data.join(' ').toLowerCase().includes(q)) : allRows;
-  document.getElementById('list-count').textContent = `${filtered.length}개${q ? ' (검색결과)' : ''}`;
-  renderTable(filtered);
-}
-
-function renderTable(items) {
-  if (!items.length) {
-    document.getElementById('table-body').innerHTML =
-      '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:36px">항목이 없습니다.</td></tr>';
-    return;
-  }
-
-  const sorted = [...items].sort((a, b) => {
-    const na = (a.data[0] || '').localeCompare(b.data[0] || '', 'ja', { sensitivity: 'base' });
-    if (na !== 0) return na;
-    return (a.data[3] || '').localeCompare(b.data[3] || '', 'ja', { sensitivity: 'base' });
-  });
-
-  document.getElementById('table-body').innerHTML = sorted.map(item => {
-    const r = item.data;
-    const imgUrl = r[6] || '';
-    const imgHtml = imgUrl
-      ? `<img src="${h(imgUrl)}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<div class=label-ph>🍶</div><div class=label-overlay>✏️<br>수정</div>'">`
-      : `<div class="label-ph">🍶</div>`;
-
-    return `<tr>
-      <td class="col-img">
-        <div class="label-wrap" onclick="openModal(${item.sheetRow})" title="클릭하여 이미지 변경">
-          ${imgHtml}
-          <div class="label-overlay">✏️<br>수정</div>
-        </div>
-      </td>
-      <td class="col-name">${h(r[0] || '—')}</td>
-      <td class="col-cat">${h(r[1] || '—')}</td>
-      <td class="col-date">${h(r[2] || '—')}</td>
-      <td class="col-region">${h(r[3] || '—')}</td>
-      <td class="col-smv">${h(r[4] || '—')}</td>
-      <td class="col-heat">${h(r[5] || '—')}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ── Image Modal ───────────────────────────────
-function openModal(sheetRow) {
-  const item = allRows.find(r => r.sheetRow === sheetRow);
-  if (!item) return;
-  modalSheetRow = sheetRow;
-
-  document.getElementById('modal-sake-name').textContent = item.data[0] || '이름 없음';
-  const imgUrl = item.data[6] || '';
-  const modalImg = document.getElementById('modal-img');
-  const ph = document.querySelector('.modal-ph');
-  if (imgUrl) {
-    modalImg.src = imgUrl; modalImg.style.display = 'block'; ph.style.display = 'none';
-  } else {
-    modalImg.style.display = 'none'; ph.style.display = 'flex';
-  }
-  document.getElementById('modal-url').value = imgUrl;
-  document.getElementById('modal-status').className = 'modal-status';
-  document.getElementById('modal-file').value = '';
-  switchModalTab('upload');
-  document.getElementById('img-modal').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('img-modal').classList.remove('open');
-  modalSheetRow = null;
-}
-
-function switchModalTab(tab) {
-  document.querySelectorAll('.modal-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  document.getElementById('mtab-upload').style.display = tab === 'upload' ? 'block' : 'none';
-  document.getElementById('mtab-url').style.display    = tab === 'url'    ? 'block' : 'none';
-}
-
-function onModalFile(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  const img = document.getElementById('modal-img');
-  img.src = url; img.style.display = 'block';
-  document.querySelector('.modal-ph').style.display = 'none';
-}
-
-async function saveImage() {
-  if (!modalSheetRow) return;
-  const activeTab = document.querySelector('.modal-tab.active').dataset.tab;
-  let imageUrl = '';
-  const saveBtn = document.getElementById('modal-save-btn');
-  saveBtn.disabled = true; saveBtn.textContent = '저장 중…';
-
-  try {
-    if (activeTab === 'url') {
-      imageUrl = document.getElementById('modal-url').value.trim();
-      if (!imageUrl) { setModalStatus('URL을 입력해주세요.', 'err'); return; }
-    } else {
-      const file = document.getElementById('modal-file').files[0];
-      if (!file) { setModalStatus('사진을 선택해주세요.', 'err'); return; }
-      setModalStatus('Google Drive에 업로드 중…', 'loading');
-      const base64 = await resizeEncode(file, 600);
-      const sakeName = document.getElementById('modal-sake-name').textContent;
-      imageUrl = await uploadToDrive(base64, 'image/jpeg', `sake_${sakeName}_r${modalSheetRow}.jpg`);
-    }
-
-    await updateCell(`${SHEET_NAME}!G${modalSheetRow}`, imageUrl);
-
-    // 로컬 데이터 업데이트
-    const item = allRows.find(r => r.sheetRow === modalSheetRow);
-    if (item) {
-      while (item.data.length < 7) item.data.push('');
-      item.data[6] = imageUrl;
-    }
-    setModalStatus('✅ 저장 완료!', 'ok');
-    filterList();
-    setTimeout(closeModal, 1200);
-  } catch (err) {
-    setModalStatus('저장 실패: ' + err.message, 'err');
-  } finally {
-    saveBtn.disabled = false; saveBtn.textContent = '저장';
-  }
-}
-
-// ── Helpers ───────────────────────────────────
-function showFormStatus(msg, type) {
-  const el = document.getElementById('form-status');
-  el.textContent = msg; el.className = 'status ' + type;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.className = 'status', 6000);
-}
-
-function setModalStatus(msg, type) {
-  const el = document.getElementById('modal-status');
-  el.textContent = msg; el.className = 'modal-status ' + type;
+  return rows;
 }
 
 function h(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+// ── Category → color ────────────────────────────
+const CAT_COLOR = {
+  '준마이다이긴죠': ['#6B0F1A', '#FFF0F0'],
+  '준마이긴죠':     ['#8B1A2A', '#FFF3F0'],
+  '다이긴죠':       ['#8B6914', '#FFFBF0'],
+  '긴죠':           ['#9C6B2A', '#FFF8F0'],
+  '도쿠베츠준마이': ['#1B5E37', '#F0FFF6'],
+  '준마이':         ['#2E7D4F', '#F2FFF5'],
+  '혼죠죠':         ['#4A5C3A', '#F5FFF0'],
+  '보통주':         ['#5A5A5A', '#F5F5F5'],
+  '무라벨':         ['#7A7A7A', '#FAFAFA'],
+};
+
+function catStyle(cat) {
+  const [fg, bg] = CAT_COLOR[cat] || ['#7A6050', '#F5F0E8'];
+  return `color:${fg};background:${bg}`;
+}
+
+// ── Load from Google Sheets CSV ─────────────────
+async function load() {
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status} — 시트가 공개(뷰어) 설정인지 확인해주세요`);
+    const text = await res.text();
+    const rows = parseCSV(text).slice(1).filter(r => r[0]);
+    allRows = rows;
+    buildFilters();
+    render();
+    document.getElementById('state').style.display = 'none';
+    document.getElementById('grid').style.display  = 'grid';
+  } catch (err) {
+    document.getElementById('state').innerHTML = `
+      <div class="error-box">
+        <strong>⚠️ 시트를 불러올 수 없습니다</strong>
+        구글 시트 공유 설정을 변경해야 합니다.<br><br>
+        구글 시트 → <strong>공유</strong> → <strong>링크가 있는 모든 사용자</strong> →
+        <strong>뷰어</strong> 로 설정 후 새로고침 해주세요.<br><br>
+        <small style="color:#B06060">오류: ${h(err.message)}</small>
+      </div>`;
+  }
+}
+
+// ── Build category filter buttons ───────────────
+function buildFilters() {
+  const cats = [...new Set(allRows.map(r => r[1]).filter(Boolean))];
+  const order = ['준마이다이긴죠','준마이긴죠','다이긴죠','긴죠','도쿠베츠준마이','준마이','혼죠죠','보통주','무라벨'];
+  cats.sort((a, b) => {
+    const ai = order.indexOf(a), bi = order.indexOf(b);
+    return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+  });
+  const wrap = document.getElementById('filters');
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.cat = cat;
+    btn.textContent = cat;
+    btn.onclick = () => setFilter(btn);
+    wrap.appendChild(btn);
+  });
+}
+
+function setFilter(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = btn.dataset.cat;
+  render();
+}
+
+// ── Render cards ────────────────────────────────
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let rows = allRows;
+  if (activeFilter) rows = rows.filter(r => r[1] === activeFilter);
+  if (q) rows = rows.filter(r => r.join(' ').toLowerCase().includes(q));
+  rows = [...rows].sort((a, b) => a[0].localeCompare(b[0], 'ko'));
+
+  document.getElementById('count').textContent = `${rows.length}종`;
+
+  const grid = document.getElementById('grid');
+  if (!rows.length) {
+    grid.innerHTML = '<div class="no-result">🔍 검색 결과가 없습니다</div>';
+    return;
+  }
+
+  grid.innerHTML = rows.map(r => {
+    const [name, cat, date, region, smv, heat, imgUrl] = r;
+    const imgHtml = imgUrl
+      ? `<img src="${h(imgUrl)}" alt="" loading="lazy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+
+    const tags = [
+      region && `<span class="tag"><span class="tag-icon">📍</span>${h(region)}</span>`,
+      date   && `<span class="tag"><span class="tag-icon">📅</span>${h(date)}</span>`,
+      smv    && `<span class="tag"><span class="tag-icon">💧</span>${h(smv)}</span>`,
+      heat   && `<span class="tag"><span class="tag-icon">🌡️</span>${h(heat)}</span>`,
+    ].filter(Boolean).join('');
+
+    return `
+    <div class="card">
+      <div class="card-img">
+        ${imgHtml}
+        <div class="card-img-ph" style="${imgUrl ? 'display:none' : ''}">🍶</div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${h(name)}</div>
+        ${cat ? `<span class="cat-badge" style="${catStyle(cat)}">${h(cat)}</span>` : ''}
+        ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// load() is called by unlockApp() after PIN check
 </script>
 </body>
 </html>

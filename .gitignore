@@ -1,6 +1,10 @@
 # API 키 포함 설정 파일 — GitHub에 올리지 않음
 config.js
 
+# 로컬 전용 파일 — GitHub에 올리지 않음
+삭장고리스트_입력.html
+뷰어.html
+
 # Windows
 Thumbs.db
 Desktop.ini
