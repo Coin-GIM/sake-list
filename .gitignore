@@ -1,0 +1,8 @@
+# API 키 포함 설정 파일 — GitHub에 올리지 않음
+config.js
+
+# Windows
+Thumbs.db
+Desktop.ini
+*.tmp
+*.log
