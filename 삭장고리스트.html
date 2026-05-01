@@ -104,6 +104,70 @@
       .pref-tile { font-size: 7px; border-radius: 4px; }
       .pref-badge { font-size: 8px; padding: 0 3px; top: -5px; right: -5px; min-width: 14px; }
     }
+
+    /* ===== 가이드 탭 ===== */
+    .g-nav { background: #fff; border-bottom: 1.5px solid var(--border); position: sticky; top: 87px; z-index: 99; }
+    .g-nav-inner { max-width: 780px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 8px; }
+    .g-nav-inner::-webkit-scrollbar { display: none; }
+    .g-nav-btn { flex-shrink: 0; padding: 9px 14px 7px; border: none; background: none; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: color .2s, border-color .2s; white-space: nowrap; }
+    .g-nav-btn:hover { color: var(--red); }
+    .g-nav-btn.active { color: var(--red); border-bottom-color: var(--red); }
+    .g-page { max-width: 780px; margin: 0 auto; padding: 24px 16px 80px; display: flex; flex-direction: column; gap: 28px; }
+    .g-sec { background: var(--card); border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(123,30,30,.06); overflow: hidden; }
+    .g-sec-hd { background: var(--red); color: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 10px; }
+    .g-sec-hd h3 { font-size: 17px; font-weight: 700; margin: 0; }
+    .g-sec-hd .jp { font-size: 13px; opacity: .75; font-weight: 400; }
+    .g-sec-bd { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .g-muted { font-size: 14px; line-height: 1.7; color: var(--muted); }
+    .g-tip { font-size: 12.5px; color: var(--muted); line-height: 1.6; background: #FBF7F0; border-radius: 12px; padding: 12px 14px; border-left: 3px solid var(--gold); }
+    .rice-wrap { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+    .rice-svg-box { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .rice-svg-box p { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; }
+    .rice-legend { display: flex; flex-direction: column; gap: 7px; flex: 1; min-width: 180px; padding-top: 4px; }
+    .g-legend-row { display: flex; align-items: center; gap: 9px; font-size: 13px; }
+    .g-legend-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+    .polish-grid { display: flex; flex-direction: column; gap: 10px; }
+    .polish-row { display: flex; align-items: center; gap: 12px; }
+    .polish-bar-wrap { flex: 1; height: 22px; background: #F0E8D8; border-radius: 11px; overflow: hidden; }
+    .polish-bar { height: 100%; border-radius: 11px; background: var(--red); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+    .polish-bar span { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; }
+    .polish-label { width: 110px; font-size: 13px; font-weight: 600; text-align: right; }
+    .polish-pct { width: 50px; font-size: 13px; color: var(--muted); }
+    .grade-list { display: flex; flex-direction: column; gap: 8px; }
+    .grade-item { border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+    .grade-item-hd { padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+    .grade-badge2 { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
+    .grade-req { font-size: 12px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+    .grade-item-bd { padding: 8px 14px 12px; font-size: 13px; color: var(--muted); line-height: 1.7; border-top: 1px solid var(--border); background: #FDFAF5; }
+    .smv-bar-wrap { position: relative; height: 44px; margin: 8px 0 4px; }
+    .smv-track { height: 12px; border-radius: 6px; background: linear-gradient(to right,#4A90D9 0%,#A8C8F0 35%,#E8E8E8 50%,#F5C0A0 65%,#D94A4A 100%); position: absolute; top: 50%; transform: translateY(-50%); width: 100%; }
+    .smv-center { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #999; transform: translateX(-50%); }
+    .smv-lbl-l { position: absolute; left: 0; bottom: -2px; font-size: 11px; color: #4A90D9; font-weight: 700; }
+    .smv-lbl-r { position: absolute; right: 0; bottom: -2px; font-size: 11px; color: #D94A4A; font-weight: 700; }
+    .smv-lbl-m { position: absolute; left: 50%; bottom: -2px; transform: translateX(-50%); font-size: 11px; color: #888; font-weight: 700; }
+    .smv-tbl { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
+    .smv-tbl th { background: #F0E8D8; padding: 8px 12px; text-align: center; font-weight: 700; border: 1px solid var(--border); }
+    .smv-tbl td { padding: 8px 12px; text-align: center; border: 1px solid var(--border); }
+    .smv-tbl tr:nth-child(even) td { background: #FDFAF5; }
+    .heat-list { display: flex; flex-direction: column; gap: 10px; }
+    .heat-item { border-radius: 12px; border: 1px solid var(--border); padding: 12px 16px; display: flex; flex-direction: column; gap: 5px; }
+    .heat-item-hd { display: flex; align-items: center; gap: 8px; }
+    .heat-name { font-size: 14px; font-weight: 700; }
+    .heat-tag { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+    .tag-fresh { background: #E3F2FD; color: #1565C0; }
+    .tag-once  { background: #E8F5E9; color: #2E7D32; }
+    .tag-twice { background: #FFF3E0; color: #E65100; }
+    .heat-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .heat-flow-diag { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin: 6px 0 2px; font-size: 12px; }
+    .flow-step { background: #F0E8D8; border: 1px solid var(--border); border-radius: 7px; padding: 4px 10px; font-weight: 600; white-space: nowrap; }
+    .flow-step.red { background: #FDE8E8; border-color: #F5C0C0; color: var(--red); }
+    .flow-arrow { color: var(--muted); font-size: 14px; }
+    @media (max-width:520px){
+      .polish-label{width:82px;font-size:12px;}
+      .smv-tbl{font-size:12px;}
+      .smv-tbl th,.smv-tbl td{padding:6px 8px;}
+      .grade-req{display:none;}
+    }
   </style>
 </head>
 <body>
@@ -144,8 +208,9 @@
 
 <!-- Tab bar -->
 <div class="tab-bar">
-  <button class="tab-btn active" id="tb-list" onclick="showTab('list')">📋 목록</button>
-  <button class="tab-btn"        id="tb-map"  onclick="showTab('map')">🗾 지도</button>
+  <button class="tab-btn active" id="tb-list"  onclick="showTab('list')">📋 목록</button>
+  <button class="tab-btn"        id="tb-map"   onclick="showTab('map')">🗾 지도</button>
+  <button class="tab-btn"        id="tb-guide" onclick="showTab('guide')">📖 가이드</button>
 </div>
 
 <!-- LIST TAB -->
@@ -183,6 +248,162 @@
       <span id="map-result-count"></span>
     </div>
     <div class="map-card-grid" id="map-card-grid"></div>
+  </div>
+</div>
+
+<!-- GUIDE TAB -->
+<div id="tab-guide" style="display:none">
+  <div class="g-nav">
+    <div class="g-nav-inner">
+      <button class="g-nav-btn active" onclick="gScroll('g-polish')">🌾 정미율</button>
+      <button class="g-nav-btn" onclick="gScroll('g-grade')">🏅 사케 등급</button>
+      <button class="g-nav-btn" onclick="gScroll('g-smv')">💧 일본주도</button>
+      <button class="g-nav-btn" onclick="gScroll('g-heat')">🌡️ 열처리</button>
+    </div>
+  </div>
+  <div class="g-page">
+
+    <!-- 정미율 -->
+    <div class="g-sec" id="g-polish">
+      <div class="g-sec-hd"><h3>정미율 (精米歩合)</h3><span class="jp">Seimaibuai</span></div>
+      <div class="g-sec-bd">
+        <p class="g-muted">쌀을 깎아낸 후 남은 비율. 숫자가 낮을수록 더 많이 깎은 것으로 잡미가 적고 깨끗한 향미가 나온다.</p>
+        <div class="rice-wrap">
+          <div class="rice-svg-box">
+            <svg width="150" height="200" viewBox="0 0 160 210" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="80" cy="105" rx="62" ry="98" fill="#C8A96E" stroke="#A0784A" stroke-width="1.5"/>
+              <ellipse cx="80" cy="105" rx="49" ry="78" fill="#E8D5A0" stroke="#C4A055" stroke-width="1"/>
+              <ellipse cx="80" cy="105" rx="40" ry="64" fill="#F5E8C0" stroke="#D4B060" stroke-width="1"/>
+              <ellipse cx="80" cy="105" rx="30" ry="49" fill="#FDF5E0" stroke="#DFC070" stroke-width="1"/>
+              <ellipse cx="80" cy="105" rx="18" ry="30" fill="#FFFDF5" stroke="#E8D88A" stroke-width="1"/>
+              <line x1="142" y1="68" x2="118" y2="82" stroke="#A0784A" stroke-width="1" stroke-dasharray="3,2"/>
+              <text x="145" y="66" font-size="11" fill="#A0784A" font-weight="700" font-family="sans-serif">100%</text>
+              <line x1="136" y1="96" x2="112" y2="100" stroke="#B08840" stroke-width="1" stroke-dasharray="3,2"/>
+              <text x="138" y="94" font-size="11" fill="#9A7030" font-weight="700" font-family="sans-serif">70%</text>
+              <line x1="128" y1="120" x2="105" y2="116" stroke="#C49A3C" stroke-width="1" stroke-dasharray="3,2"/>
+              <text x="130" y="118" font-size="11" fill="#A07820" font-weight="700" font-family="sans-serif">60%</text>
+              <line x1="120" y1="143" x2="98" y2="133" stroke="#7B1E1E" stroke-width="1" stroke-dasharray="3,2"/>
+              <text x="122" y="141" font-size="11" fill="#7B1E1E" font-weight="700" font-family="sans-serif">50%</text>
+              <line x1="30" y1="88" x2="58" y2="98" stroke="#888" stroke-width="1" stroke-dasharray="3,2"/>
+              <text x="2" y="82" font-size="10" fill="#888" font-family="sans-serif">전분</text>
+              <text x="4" y="93" font-size="10" fill="#888" font-family="sans-serif">(심백)</text>
+            </svg>
+            <p>쌀의 단면<br>숫자 = 남은 비율</p>
+          </div>
+          <div class="rice-legend">
+            <div class="g-legend-row"><div class="g-legend-dot" style="background:#C8A96E;border:1px solid #A0784A"></div><span><strong>외피·쌀겨층</strong> — 잡미·지방·단백질</span></div>
+            <div class="g-legend-row"><div class="g-legend-dot" style="background:#E8D5A0"></div><span><strong>70% 이하</strong> — 도쿠베츠준마이·혼죠조</span></div>
+            <div class="g-legend-row"><div class="g-legend-dot" style="background:#F5E8C0"></div><span><strong>60% 이하</strong> — 긴죠·준마이긴죠</span></div>
+            <div class="g-legend-row"><div class="g-legend-dot" style="background:#FDF5E0;border:1px solid #ddd"></div><span><strong>50% 이하</strong> — 다이긴죠·준마이다이긴죠</span></div>
+            <div class="g-legend-row"><div class="g-legend-dot" style="background:#FFFDF5;border:1px solid #E8D88A"></div><span><strong>심백(전분 핵심)</strong> — 깨끗한 향미의 원천</span></div>
+            <p class="g-muted" style="font-size:12.5px;margin-top:4px">깎을수록 화려한 향이 나오지만 쌀 고유의 진한 맛도 줄어든다. 정미율이 높아도 개성 있는 사케가 많다.</p>
+          </div>
+        </div>
+        <div class="polish-grid">
+          <div class="polish-row"><span class="polish-label">준마이다이긴죠</span><div class="polish-bar-wrap"><div class="polish-bar" style="width:50%"><span>50% 이하</span></div></div><span class="polish-pct">≤50%</span></div>
+          <div class="polish-row"><span class="polish-label">다이긴죠</span><div class="polish-bar-wrap"><div class="polish-bar" style="width:50%"><span>50% 이하</span></div></div><span class="polish-pct">≤50%</span></div>
+          <div class="polish-row"><span class="polish-label">준마이긴죠</span><div class="polish-bar-wrap"><div class="polish-bar" style="width:60%"><span>60% 이하</span></div></div><span class="polish-pct">≤60%</span></div>
+          <div class="polish-row"><span class="polish-label">긴죠</span><div class="polish-bar-wrap"><div class="polish-bar" style="width:60%"><span>60% 이하</span></div></div><span class="polish-pct">≤60%</span></div>
+          <div class="polish-row"><span class="polish-label">도쿠베츠준마이</span><div class="polish-bar-wrap"><div class="polish-bar" style="width:70%"><span>70% 이하</span></div></div><span class="polish-pct">≤70%</span></div>
+          <div class="polish-row"><span class="polish-label">준마이·혼죠조</span><div class="polish-bar-wrap"><div class="polish-bar" style="width:85%"><span>규정 없음</span></div></div><span class="polish-pct">제한없음</span></div>
+        </div>
+        <div class="g-tip">예) 정미율 <strong>40%</strong>라면 쌀의 <strong>60%를 깎아낸 것</strong>. 닷사이23은 정미율 23%로 쌀의 77%를 제거한 최고급 수준.</div>
+      </div>
+    </div>
+
+    <!-- 사케 등급 -->
+    <div class="g-sec" id="g-grade">
+      <div class="g-sec-hd"><h3>사케 등급</h3><span class="jp">特定名称酒</span></div>
+      <div class="g-sec-bd">
+        <div class="grade-list">
+          <div class="grade-item">
+            <div class="grade-item-hd"><span class="grade-badge2" style="background:#D7BDE2;color:#4A235A">준마이다이긴죠</span><span style="font-size:12px;color:var(--muted)">純米大吟醸</span><span class="grade-req">정미율 50% 이하 · 양조알코올 무첨가</span></div>
+            <div class="grade-item-bd">화려하고 섬세한 과일 향. 쌀·쌀누룩만 사용. 가장 높은 등급으로 향긋하고 깨끗한 마무리.</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-item-hd"><span class="grade-badge2" style="background:#FADBD8;color:#922B21">준마이긴죠</span><span style="font-size:12px;color:var(--muted)">純米吟醸</span><span class="grade-req">정미율 60% 이하 · 양조알코올 무첨가</span></div>
+            <div class="grade-item-bd">과일·꽃 향이 있으며 준마이다이긴죠보다 쌀의 풍미가 강하다. 균형이 좋아 식중주로도 적합.</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-item-hd"><span class="grade-badge2" style="background:#FCF3CF;color:#7D6608">다이긴죠</span><span style="font-size:12px;color:var(--muted)">大吟醸</span><span class="grade-req">정미율 50% 이하 · 양조알코올 소량 가능</span></div>
+            <div class="grade-item-bd">화려하고 향긋하며 가볍고 깔끔한 마무리. 양조알코올 첨가로 향을 더 살린 스타일.</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-item-hd"><span class="grade-badge2" style="background:#FAE5D3;color:#9C6B2A">긴죠</span><span style="font-size:12px;color:var(--muted)">吟醸</span><span class="grade-req">정미율 60% 이하 · 양조알코올 소량 가능</span></div>
+            <div class="grade-item-bd">긴죠 향(과일·꽃 향)이 나며 부드럽고 마시기 쉽다.</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-item-hd"><span class="grade-badge2" style="background:#A9DFBF;color:#1A5C2A">도쿠베츠준마이</span><span style="font-size:12px;color:var(--muted)">特別純米</span><span class="grade-req">정미율 70% 이하 · 양조알코올 무첨가</span></div>
+            <div class="grade-item-bd">특별한 제법을 사용한 준마이슈. 쌀의 진한 감칠맛과 볼륨감이 특징.</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-item-hd"><span class="grade-badge2" style="background:#D5F5E3;color:#196F3D">준마이</span><span style="font-size:12px;color:var(--muted)">純米酒</span><span class="grade-req">정미율 제한없음 · 양조알코올 무첨가</span></div>
+            <div class="grade-item-bd">쌀 본연의 진하고 풍부한 맛. 온도에 따라 다양한 표정을 내며 온술(燗)로도 잘 어울린다.</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-item-hd"><span class="grade-badge2" style="background:#D6EAD6;color:#4A5C3A">혼죠조</span><span style="font-size:12px;color:var(--muted)">本醸造</span><span class="grade-req">정미율 70% 이하 · 양조알코올 10% 이하 첨가</span></div>
+            <div class="grade-item-bd">가볍고 깔끔하며 식중주로 마시기 좋다. 양조알코올이 향과 맛을 다듬어 준다.</div>
+          </div>
+        </div>
+        <div class="g-tip">준마이(純米) 계열은 양조알코올 무첨가, 그 외는 소량 첨가 가능. 첨가 여부가 우열을 뜻하지 않으며 스타일의 차이다.</div>
+      </div>
+    </div>
+
+    <!-- 일본주도 -->
+    <div class="g-sec" id="g-smv">
+      <div class="g-sec-hd"><h3>일본주도 (日本酒度)</h3><span class="jp">Nihonshu-do / SMV</span></div>
+      <div class="g-sec-bd">
+        <p class="g-muted">사케의 당도를 나타내는 지표. 물과 비교한 비중으로, 당분이 많을수록 수치가 낮아진다(달다).</p>
+        <div class="smv-bar-wrap">
+          <div class="smv-track"></div>
+          <div class="smv-center"></div>
+          <span class="smv-lbl-l">← 달다 (甘口)</span>
+          <span class="smv-lbl-m">±0</span>
+          <span class="smv-lbl-r">드라이 (辛口) →</span>
+        </div>
+        <table class="smv-tbl">
+          <tr><th>수치</th><th>표현</th><th>느낌</th></tr>
+          <tr><td>+6 이상</td><td>대辛口</td><td>매우 드라이, 깔끔</td></tr>
+          <tr><td>+3 ~ +5</td><td>辛口</td><td>드라이, 쌉싸름</td></tr>
+          <tr><td>±0 ~ +2</td><td>普通</td><td>균형, 중간</td></tr>
+          <tr><td>-3 ~ -1</td><td>やや甘口</td><td>약간 달콤</td></tr>
+          <tr><td>-4 이하</td><td>甘口</td><td>달콤하고 부드러움</td></tr>
+        </table>
+        <div class="g-tip">일본주도만으로 맛을 단정하기 어렵다. 산도(酸度)가 높으면 같은 주도라도 더 드라이하게 느껴진다. 두 수치를 함께 보는 것이 정확하다.</div>
+      </div>
+    </div>
+
+    <!-- 열처리 -->
+    <div class="g-sec" id="g-heat">
+      <div class="g-sec-hd"><h3>열처리 (火入れ)</h3><span class="jp">Hiire</span></div>
+      <div class="g-sec-bd">
+        <p class="g-muted">사케는 출하 전 60~65℃로 가열 살균하는 <strong>히이레(火入れ)</strong> 공정을 거친다. 횟수와 타이밍에 따라 맛과 보관 방법이 달라진다.</p>
+        <div class="heat-list">
+          <div class="heat-item">
+            <div class="heat-item-hd"><span class="heat-name">생주 (生酒)</span><span class="heat-tag tag-fresh">나마 · 열처리 없음</span></div>
+            <div class="heat-flow-diag"><span class="flow-step">압착</span><span class="flow-arrow">→</span><span class="flow-step">저장</span><span class="flow-arrow">→</span><span class="flow-step">병입</span><span class="flow-arrow">→</span><span class="flow-step" style="background:#E3F2FD;border-color:#90CAF9;color:#1565C0">출하 (열처리 없음)</span></div>
+            <div class="heat-desc">한 번도 가열하지 않은 사케. 신선하고 생생한 향미. 반드시 냉장 보관, 유통기한이 짧다.</div>
+          </div>
+          <div class="heat-item">
+            <div class="heat-item-hd"><span class="heat-name">나마즈메 (生詰め)</span><span class="heat-tag tag-once">1회 열처리</span></div>
+            <div class="heat-flow-diag"><span class="flow-step">압착</span><span class="flow-arrow">→</span><span class="flow-step">저장</span><span class="flow-arrow">→</span><span class="flow-step red">병입 시 히이레</span><span class="flow-arrow">→</span><span class="flow-step">출하</span></div>
+            <div class="heat-desc">저장 전은 생 상태, 병입 시 한 번 가열. 생주의 신선함과 숙성 풍미를 함께 지닌다. 냉장 보관 권장.</div>
+          </div>
+          <div class="heat-item">
+            <div class="heat-item-hd"><span class="heat-name">나마쵸조 (生貯蔵酒)</span><span class="heat-tag tag-once">1회 열처리</span></div>
+            <div class="heat-flow-diag"><span class="flow-step red">압착 후 히이레</span><span class="flow-arrow">→</span><span class="flow-step">저장</span><span class="flow-arrow">→</span><span class="flow-step">병입</span><span class="flow-arrow">→</span><span class="flow-step">출하</span></div>
+            <div class="heat-desc">압착 직후 한 번 가열하고 생 상태로 저장. 신선하고 가벼운 맛. 냉장 보관 권장.</div>
+          </div>
+          <div class="heat-item">
+            <div class="heat-item-hd"><span class="heat-name">히이레 (火入れ)</span><span class="heat-tag tag-twice">2회 열처리</span></div>
+            <div class="heat-flow-diag"><span class="flow-step red">압착 후 히이레</span><span class="flow-arrow">→</span><span class="flow-step">저장</span><span class="flow-arrow">→</span><span class="flow-step red">병입 시 히이레</span><span class="flow-arrow">→</span><span class="flow-step">출하</span></div>
+            <div class="heat-desc">가장 일반적인 방식. 2회 가열로 안정적이고 상온 보관 가능. 균형 잡힌 맛으로 장기 보관에 유리하다.</div>
+          </div>
+        </div>
+        <div class="g-tip">생주(나마) 계열은 맛의 변화가 빠르므로 구입 후 최대한 빨리 마시는 것이 좋다. 개봉 후엔 냉장 보관하고 1~2주 내 음용 권장.</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -299,11 +520,28 @@ async function loadData(){
 
 /* Tab */
 function showTab(tab){
-  document.getElementById('tb-list').classList.toggle('active',tab==='list');
-  document.getElementById('tb-map').classList.toggle('active',tab==='map');
-  document.getElementById('tab-list').style.display=tab==='list'?'block':'none';
-  document.getElementById('tab-map').style.display=tab==='map'?'block':'none';
+  ['list','map','guide'].forEach(function(t){
+    document.getElementById('tb-'+t).classList.toggle('active',tab===t);
+    document.getElementById('tab-'+t).style.display=tab===t?'block':'none';
+  });
 }
+
+/* Guide nav */
+var gSecs=['g-polish','g-grade','g-smv','g-heat'];
+function gScroll(id){
+  var el=document.getElementById(id); if(!el)return;
+  window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-130,behavior:'smooth'});
+  document.querySelectorAll('.g-nav-btn').forEach(function(b){b.classList.remove('active');});
+  var i=gSecs.indexOf(id);
+  var btns=document.querySelectorAll('.g-nav-btn');
+  if(btns[i])btns[i].classList.add('active');
+}
+window.addEventListener('scroll',function(){
+  if(document.getElementById('tab-guide').style.display==='none')return;
+  var btns=document.querySelectorAll('.g-nav-btn'); var cur=0;
+  gSecs.forEach(function(id,i){ var el=document.getElementById(id); if(el&&el.getBoundingClientRect().top<=130)cur=i; });
+  btns.forEach(function(b,i){b.classList.toggle('active',i===cur);});
+});
 
 /* Category color */
 var CAT_COLOR={'준마이다이긴죠':['#4A235A','#D7BDE2'],'준마이긴죠':['#922B21','#FADBD8'],'다이긴죠':['#7D6608','#FCF3CF'],'긴죠':['#9C6B2A','#FAE5D3'],'도쿠베츠준마이':['#1A5C2A','#A9DFBF'],'준마이':['#196F3D','#D5F5E3'],'혼죠죠':['#4A5C3A','#D6EAD6'],'보통주':['#5A5A5A','#E8E8E8'],'무라벨':['#7A7A7A','#F0F0F0']};
