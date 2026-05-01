@@ -287,7 +287,8 @@ async function loadData(){
     if(!res.ok) throw new Error('HTTP '+res.status);
     var rows=parseCSV(await res.text()).slice(1).filter(function(r){return r[0];});
     allRows=rows;
-    document.getElementById('hd-count').textContent=rows.length+'종';
+    var totalStock=rows.reduce(function(sum,r){var s=parseInt(r[7]);return sum+(isNaN(s)||s<=0?0:s);},0);
+    document.getElementById('hd-count').textContent=totalStock+'병';
     buildFilters(); renderList(); renderMap();
     document.getElementById('state').style.display='none';
     document.getElementById('card-grid').style.display='grid';
