@@ -310,7 +310,8 @@ function catStyle(cat){ var c=CAT_COLOR[cat]||['#7A6050','#F5F0E8']; return 'col
 
 /* Card HTML */
 function cardHTML(r){
-  var name=r[0],cat=r[1],date=r[2],region=r[3],smvRaw=r[4],heat=r[5],imgUrl=r[6],stock=parseInt(r[7])||1;
+  var name=r[0],cat=r[1],date=r[2],region=r[3],smvRaw=r[4],heat=r[5],imgUrl=r[6];
+  var stockVal=parseInt(r[7]); var stock=isNaN(stockVal)?1:stockVal;
   var smv=(!smvRaw||/^#/.test(smvRaw))?'-':(/^\d+$/.test(smvRaw.trim())?'+'+smvRaw.trim():smvRaw);
   var imgHtml=imgUrl?'<img src="'+h(imgUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';
   var isEmpty=stock===0;
