@@ -32,7 +32,11 @@
     header { background: var(--red); color: #fff; padding: 13px 18px; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 14px rgba(0,0,0,.28); }
     .header-inner { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-title { font-size: 19px; font-weight: 700; }
-    .header-count { font-size: 13px; font-weight: 600; background: rgba(255,255,255,.18); padding: 4px 12px; border-radius: 20px; }
+    .header-count { font-size: 13px; font-weight: 600; background: rgba(255,255,255,.18); padding: 4px 12px; border-radius: 20px; cursor: pointer; user-select: none; transition: background .2s; }
+    .header-count:hover { background: rgba(255,255,255,.3); }
+    .header-count.filter-on { background: var(--gold); color: #fff; }
+    #img-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,.88); display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
+    #img-modal img { max-width: 92vw; max-height: 90vh; border-radius: 10px; box-shadow: 0 8px 40px rgba(0,0,0,.6); object-fit: contain; }
 
     /* Tab bar */
     .tab-bar { background: #fff; border-bottom: 1.5px solid var(--border); display: flex; position: sticky; top: 47px; z-index: 100; }
@@ -62,9 +66,9 @@
     .card.empty .tag { color: #bbb; }
     .card.empty .card-img { background: #E4E4E4; filter: grayscale(1); }
     .card:hover { box-shadow: 0 7px 24px rgba(123,30,30,.16); transform: translateY(-3px); }
-    .card-img { width: 80px; flex-shrink: 0; background: #F0E8D8; border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 108px; }
-    .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .card-img-ph { font-size: 36px; opacity: .22; }
+    .card-img { width: 64px; flex-shrink: 0; background: #F0E8D8; border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; align-self: stretch; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
+    .card-img-ph { font-size: 30px; opacity: .22; }
     .card-body { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
     .card-name { font-size: 15px; font-weight: 700; line-height: 1.35; }
     .cat-badge { display: inline-block; align-self: flex-start; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; }
@@ -99,7 +103,7 @@
 
     @media (max-width: 520px) {
       .grid { grid-template-columns: 1fr; }
-      .card-img { width: 68px; }
+      .card-img { width: 56px; }
       .pref-grid { grid-template-columns: repeat(12, 28px); grid-template-rows: repeat(16, 24px); gap: 2px; }
       .pref-tile { font-size: 7px; border-radius: 4px; }
       .pref-badge { font-size: 8px; padding: 0 3px; top: -5px; right: -5px; min-width: 14px; }
@@ -198,11 +202,16 @@
   </div>
 </div>
 
+<!-- 이미지 확대 모달 -->
+<div id="img-modal" style="display:none" onclick="this.style.display='none'">
+  <img id="img-modal-img" src="" alt="">
+</div>
+
 <!-- Header -->
 <header>
   <div class="header-inner">
     <span class="header-title">🍶 삭장고리스트</span>
-    <span class="header-count" id="hd-count">&#8212;</span>
+    <span class="header-count" id="hd-count" onclick="toggleStockFilter()" title="클릭: 보유중 필터">&#8212;</span>
   </div>
 </header>
 
@@ -463,7 +472,7 @@ const PREFS = [
   ['오키나와',['오키나와'],                            15, 0],
 ];
 
-let allRows = [], activeFilter = '', selectedPref = null, pinInput = '';
+let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', stockFilter = false;
 
 /* PIN */
 (function(){ if (sessionStorage.getItem('sake_pin')==='ok') unlockApp(); })();
@@ -547,12 +556,19 @@ window.addEventListener('scroll',function(){
 var CAT_COLOR={'준마이다이긴죠':['#4A235A','#D7BDE2'],'준마이긴죠':['#922B21','#FADBD8'],'다이긴죠':['#7D6608','#FCF3CF'],'긴죠':['#9C6B2A','#FAE5D3'],'도쿠베츠준마이':['#1A5C2A','#A9DFBF'],'준마이':['#196F3D','#D5F5E3'],'혼죠죠':['#4A5C3A','#D6EAD6'],'보통주':['#5A5A5A','#E8E8E8'],'무라벨':['#7A7A7A','#F0F0F0']};
 function catStyle(cat){ var c=CAT_COLOR[cat]||['#7A6050','#F5F0E8']; return 'color:'+c[0]+';background:'+c[1]; }
 
+function showImg(url){ document.getElementById('img-modal-img').src=url; document.getElementById('img-modal').style.display='flex'; }
+function toggleStockFilter(){
+  stockFilter=!stockFilter;
+  document.getElementById('hd-count').classList.toggle('filter-on',stockFilter);
+  renderList();
+}
+
 /* Card HTML */
 function cardHTML(r){
   var name=r[0],cat=r[1],date=r[2],region=r[3],smvRaw=r[4],heat=r[5],imgUrl=r[6];
   var stockVal=parseInt(r[7]); var stock=isNaN(stockVal)?1:stockVal;
   var smv=(!smvRaw||/^#/.test(smvRaw))?'-':(/^\d+$/.test(smvRaw.trim())?'+'+smvRaw.trim():smvRaw);
-  var imgHtml=imgUrl?'<img src="'+h(imgUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';
+  var imgHtml=imgUrl?'<img src="'+h(imgUrl)+'" alt="" loading="lazy" onclick="showImg(\''+h(imgUrl)+'\')" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';
   var isEmpty=stock===0;
   var badgeCls=isEmpty?' zero':stock>1?' multi':'';
   var stockBadge='<div class="stock-badge'+badgeCls+'">보유 '+stock+'</div>';
@@ -575,6 +591,7 @@ function setFilter(btn){ document.querySelectorAll('.filter-btn').forEach(functi
 function renderList(){
   var q=document.getElementById('search').value.toLowerCase();
   var rows=allRows.slice();
+  if(stockFilter) rows=rows.filter(function(r){var s=parseInt(r[7]);return !isNaN(s)&&s>0;});
   if(activeFilter) rows=rows.filter(function(r){return r[1]===activeFilter;});
   if(q) rows=rows.filter(function(r){return r.join(' ').toLowerCase().includes(q);});
   rows.sort(function(a,b){return a[0].localeCompare(b[0],'ko');});
