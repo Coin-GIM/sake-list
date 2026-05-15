@@ -1,0 +1,13 @@
+{
+  "name": "삭장고 입력",
+  "short_name": "삭장고",
+  "description": "사케 정보를 구글 시트에 입력하는 앱",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#7B1E1E",
+  "theme_color": "#7B1E1E",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
