@@ -730,7 +730,7 @@ function closeWriteModal(){
   document.getElementById('write-form').reset();
   document.getElementById('write-msg').textContent='';
 }
-async function submitWrite(e){
+function submitWrite(e){
   e.preventDefault();
   var name=document.getElementById('w-name').value.trim();
   if(!name) return;
@@ -747,17 +747,17 @@ async function submitWrite(e){
   var btn=document.getElementById('write-submit');
   var msg=document.getElementById('write-msg');
   btn.disabled=true; btn.textContent='저장 중...'; msg.textContent='';
-  try{
-    var token=sessionStorage.getItem('sake_token')||'';
-    var url=new URL(APPS_SCRIPT_URL);
-    url.searchParams.set('token',token);
-    url.searchParams.set('data',JSON.stringify(row));
-    await fetch(url.toString(),{mode:'no-cors'});
-    msg.style.color='#196F3D'; msg.textContent='✓ 저장 완료!';
-    setTimeout(function(){ closeWriteModal(); loadData(); },1500);
-  } catch(err){
-    msg.style.color='#922B21'; msg.textContent='오류: '+err.message;
-  }
+  var token=sessionStorage.getItem('sake_token')||'';
+  var qs='?token='+encodeURIComponent(token)+'&data='+encodeURIComponent(JSON.stringify(row));
+  var iframe=document.createElement('iframe');
+  iframe.style.display='none';
+  iframe.src=APPS_SCRIPT_URL+qs;
+  document.body.appendChild(iframe);
+  msg.style.color='#196F3D'; msg.textContent='✓ 저장 완료!';
+  setTimeout(function(){
+    if(iframe.parentNode) document.body.removeChild(iframe);
+    closeWriteModal(); loadData();
+  },2500);
   btn.disabled=false; btn.textContent='저장';
 }
 </script>
