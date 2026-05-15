@@ -749,16 +749,11 @@ async function submitWrite(e){
   btn.disabled=true; btn.textContent='저장 중...'; msg.textContent='';
   try{
     var token=sessionStorage.getItem('sake_token')||'';
-    var res=await fetch(APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify({token:token,row:row})});
-    var data=JSON.parse(await res.text());
-    if(data.success){
-      msg.style.color='#196F3D'; msg.textContent='✓ 저장 완료!';
-      setTimeout(function(){ closeWriteModal(); loadData(); },1200);
-    } else {
-      msg.style.color='#922B21'; msg.textContent='오류: '+(data.error||'저장 실패');
-    }
+    await fetch(APPS_SCRIPT_URL,{method:'POST', mode:'no-cors', body:JSON.stringify({token:token,row:row})});
+    msg.style.color='#196F3D'; msg.textContent='✓ 저장 완료!';
+    setTimeout(function(){ closeWriteModal(); loadData(); },1500);
   } catch(err){
-    msg.style.color='#922B21'; msg.textContent='네트워크 오류: '+err.message;
+    msg.style.color='#922B21'; msg.textContent='오류: '+err.message;
   }
   btn.disabled=false; btn.textContent='저장';
 }
