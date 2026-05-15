@@ -27,6 +27,29 @@
     .pin-key.empty { background: none; pointer-events: none; }
     .pin-error { color: #FFB3B3; font-size: 13px; font-weight: 600; height: 18px; text-align: center; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+    /* PIN text mode */
+    #pin-text-mode { display:none; flex-direction:column; align-items:center; gap:12px; width:260px; }
+    #pin-text-input { width:100%; padding:12px 16px; border-radius:12px; border:none; font-size:16px; text-align:center; font-family:inherit; background:rgba(255,255,255,.95); outline:none; letter-spacing:.05em; }
+    #pin-text-btn { width:100%; padding:12px; border-radius:12px; border:none; background:rgba(255,255,255,.25); color:#fff; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; }
+    #pin-text-btn:hover { background:rgba(255,255,255,.4); }
+    #pin-mode-toggle { background:none; border:none; color:rgba(255,255,255,.4); font-size:12px; cursor:pointer; font-family:inherit; text-decoration:underline; padding:0; }
+    #pin-mode-toggle:hover { color:rgba(255,255,255,.7); }
+    /* FAB */
+    #write-fab { position:fixed; bottom:24px; right:24px; width:56px; height:56px; border-radius:50%; background:var(--red); color:#fff; font-size:26px; border:none; cursor:pointer; display:none; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,.3); z-index:500; transition:background .2s; line-height:1; }
+    #write-fab:hover { background:var(--red2); }
+    /* Write modal */
+    #write-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:800; display:none; }
+    #write-panel { position:fixed; bottom:0; left:0; right:0; background:#fff; border-radius:20px 20px 0 0; padding:20px 20px 36px; z-index:801; max-height:88vh; overflow-y:auto; display:none; }
+    #write-panel h3 { font-size:17px; font-weight:700; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; }
+    #write-panel h3 button { background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); line-height:1; }
+    .w-field { display:flex; flex-direction:column; gap:5px; margin-bottom:13px; }
+    .w-field label { font-size:12px; font-weight:700; color:var(--muted); letter-spacing:.04em; }
+    .w-field input, .w-field select { padding:10px 12px; border:1.5px solid var(--border); border-radius:10px; font-size:15px; font-family:inherit; background:#fff; color:var(--text); }
+    .w-field input:focus, .w-field select:focus { outline:none; border-color:var(--red); }
+    #write-submit { width:100%; padding:14px; background:var(--red); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:4px; font-family:inherit; transition:background .2s; }
+    #write-submit:hover { background:var(--red2); }
+    #write-submit:disabled { background:var(--muted); cursor:default; }
+    #write-msg { text-align:center; font-size:13px; height:18px; margin-top:8px; font-weight:600; }
 
     /* Header */
     header { background: var(--red); color: #fff; padding: 13px 18px; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 14px rgba(0,0,0,.28); }
@@ -185,25 +208,33 @@
   <div class="pin-logo">🍶</div>
   <div class="pin-title">삭장고리스트</div>
   <div class="pin-sub">PIN을 입력하세요</div>
-  <div class="pin-dots">
-    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+  <div id="pin-numpad-section">
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key empty"></button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key" onclick="pinDel()">&#x232B;</button>
+    </div>
   </div>
-  <div class="pin-error" id="pin-error"></div>
-  <div class="pin-pad">
-    <button class="pin-key" onclick="pinKey('1')">1</button>
-    <button class="pin-key" onclick="pinKey('2')">2</button>
-    <button class="pin-key" onclick="pinKey('3')">3</button>
-    <button class="pin-key" onclick="pinKey('4')">4</button>
-    <button class="pin-key" onclick="pinKey('5')">5</button>
-    <button class="pin-key" onclick="pinKey('6')">6</button>
-    <button class="pin-key" onclick="pinKey('7')">7</button>
-    <button class="pin-key" onclick="pinKey('8')">8</button>
-    <button class="pin-key" onclick="pinKey('9')">9</button>
-    <button class="pin-key empty"></button>
-    <button class="pin-key" onclick="pinKey('0')">0</button>
-    <button class="pin-key" onclick="pinDel()">&#x232B;</button>
+  <div id="pin-text-mode">
+    <div class="pin-error" id="pin-error-text"></div>
+    <input id="pin-text-input" type="password" placeholder="쓰기 권한 비밀번호" onkeydown="if(event.key==='Enter')checkTextPin()">
+    <button id="pin-text-btn" onclick="checkTextPin()">확인</button>
   </div>
+  <button id="pin-mode-toggle" onclick="switchPinMode()">관리자 로그인</button>
 </div>
 
 <!-- 이미지 확대 모달 -->
@@ -424,9 +455,11 @@
 </div>
 
 <script>
-const SHEET_ID    = '1Lv1di5KmV3UbzeD-VfI_KXWFnm5Hrgftd4WL0UUU_nI';
-const CSV_URL     = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv';
-const CORRECT_PIN = '1124';
+const SHEET_ID         = '1Lv1di5KmV3UbzeD-VfI_KXWFnm5Hrgftd4WL0UUU_nI';
+const CSV_URL          = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv';
+const VIEWER_PINS      = ['1124'];
+const WRITER_TOKEN     = '1604sake';
+const APPS_SCRIPT_URL  = 'https://script.google.com/macros/s/AKfycbyVFh0gh866bjJv4d4bIAj3Z94LaI4eaByEwvkavBOxbZgQhDWrvbbGBWZToOwINMhGFA/exec';
 
 /* 47 도도부현: [표시명, [매칭별칭...], row(0-based), col(0-based)] */
 const PREFS = [
@@ -482,22 +515,44 @@ const PREFS = [
 let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', stockFilter = false, dateSort = 0;
 
 /* PIN */
-(function(){ if (sessionStorage.getItem('sake_pin')==='ok') unlockApp(); })();
-function pinKey(n){ if(pinInput.length>=4)return; pinInput+=n; updateDots(); if(pinInput.length===4)checkPin(); }
+(function(){
+  var m=sessionStorage.getItem('sake_mode');
+  if(m==='viewer'||m==='writer') unlockApp(m);
+})();
+function switchPinMode(){
+  document.getElementById('pin-numpad-section').style.display='none';
+  document.getElementById('pin-text-mode').style.display='flex';
+  document.getElementById('pin-mode-toggle').style.display='none';
+  document.getElementById('pin-text-input').focus();
+}
+function pinKey(n){ if(pinInput.length>=4)return; pinInput+=n; updateDots(); if(pinInput.length===4)checkPin(pinInput); }
 function pinDel(){ pinInput=pinInput.slice(0,-1); updateDots(); document.getElementById('pin-error').textContent=''; }
-function updateDots(){ for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinInput.length); }
-function checkPin(){
-  if(pinInput===CORRECT_PIN){
-    sessionStorage.setItem('sake_pin','ok');
+function updateDots(){ for(var i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pinInput.length); }
+function checkTextPin(){ checkPin(document.getElementById('pin-text-input').value.trim()); }
+function checkPin(val){
+  var errEl=document.getElementById('pin-error')||document.getElementById('pin-error-text');
+  if(val===WRITER_TOKEN){
+    sessionStorage.setItem('sake_mode','writer');
+    sessionStorage.setItem('sake_token',val);
     var s=document.getElementById('pin-screen'); s.style.transition='opacity .3s'; s.style.opacity='0';
-    setTimeout(unlockApp,300);
+    setTimeout(function(){ unlockApp('writer'); },300);
+  } else if(VIEWER_PINS.includes(val)){
+    sessionStorage.setItem('sake_mode','viewer');
+    var s=document.getElementById('pin-screen'); s.style.transition='opacity .3s'; s.style.opacity='0';
+    setTimeout(function(){ unlockApp('viewer'); },300);
   } else {
-    var err=document.getElementById('pin-error'); err.textContent='잘못된 PIN입니다';
-    err.style.animation='none'; requestAnimationFrame(function(){ err.style.animation='shake .35s ease'; });
+    var numErr=document.getElementById('pin-error');
+    var txtErr=document.getElementById('pin-error-text');
+    [numErr,txtErr].forEach(function(el){ if(!el)return; el.textContent='잘못된 PIN입니다'; el.style.animation='none'; requestAnimationFrame(function(){ el.style.animation='shake .35s ease'; }); });
     pinInput=''; setTimeout(updateDots,350);
+    document.getElementById('pin-text-input').value='';
   }
 }
-function unlockApp(){ document.getElementById('pin-screen').style.display='none'; loadData(); }
+function unlockApp(mode){
+  document.getElementById('pin-screen').style.display='none';
+  if(mode==='writer'){ var fab=document.getElementById('write-fab'); fab.style.display='flex'; }
+  loadData();
+}
 
 /* CSV */
 function parseCSV(text){
@@ -663,6 +718,88 @@ function selectPref(ko){
   var el=document.getElementById('map-result'); el.style.display='block';
   setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},60);
 }
+/* Write */
+function openWriteModal(){
+  document.getElementById('write-overlay').style.display='block';
+  document.getElementById('write-panel').style.display='block';
+  document.getElementById('w-name').focus();
+}
+function closeWriteModal(){
+  document.getElementById('write-overlay').style.display='none';
+  document.getElementById('write-panel').style.display='none';
+  document.getElementById('write-form').reset();
+  document.getElementById('write-msg').textContent='';
+}
+async function submitWrite(e){
+  e.preventDefault();
+  var name=document.getElementById('w-name').value.trim();
+  if(!name) return;
+  var row=[
+    name,
+    document.getElementById('w-cat').value,
+    document.getElementById('w-date').value.trim(),
+    document.getElementById('w-region').value.trim(),
+    document.getElementById('w-smv').value.trim(),
+    document.getElementById('w-heat').value,
+    document.getElementById('w-img').value.trim(),
+    document.getElementById('w-stock').value||'1'
+  ];
+  var btn=document.getElementById('write-submit');
+  var msg=document.getElementById('write-msg');
+  btn.disabled=true; btn.textContent='저장 중...'; msg.textContent='';
+  try{
+    var token=sessionStorage.getItem('sake_token')||'';
+    var res=await fetch(APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify({token:token,row:row})});
+    var data=JSON.parse(await res.text());
+    if(data.success){
+      msg.style.color='#196F3D'; msg.textContent='✓ 저장 완료!';
+      setTimeout(function(){ closeWriteModal(); loadData(); },1200);
+    } else {
+      msg.style.color='#922B21'; msg.textContent='오류: '+(data.error||'저장 실패');
+    }
+  } catch(err){
+    msg.style.color='#922B21'; msg.textContent='네트워크 오류: '+err.message;
+  }
+  btn.disabled=false; btn.textContent='저장';
+}
 </script>
+
+<!-- FAB -->
+<button id="write-fab" onclick="openWriteModal()">＋</button>
+
+<!-- Write modal -->
+<div id="write-overlay" onclick="closeWriteModal()"></div>
+<div id="write-panel">
+  <h3>사케 추가 <button onclick="closeWriteModal()">✕</button></h3>
+  <form id="write-form" onsubmit="submitWrite(event)">
+    <div class="w-field"><label>이름 *</label><input id="w-name" type="text" placeholder="나츠 준긴 요코야마 夏純吟 よこやま" required></div>
+    <div class="w-field"><label>구분</label>
+      <select id="w-cat">
+        <option value="">—</option>
+        <option>준마이다이긴죠</option><option>준마이긴죠</option>
+        <option>다이긴죠</option><option>긴죠</option>
+        <option>도쿠베츠준마이</option><option>준마이</option>
+        <option>혼죠죠</option><option>보통주</option><option>무라벨</option>
+      </select>
+    </div>
+    <div class="w-field"><label>제조년월</label><input id="w-date" type="text" placeholder="2026.04"></div>
+    <div class="w-field"><label>지역</label><input id="w-region" type="text" placeholder="야마구치"></div>
+    <div class="w-field"><label>일본주도</label><input id="w-smv" type="text" placeholder="+3~+4"></div>
+    <div class="w-field"><label>열처리</label>
+      <select id="w-heat">
+        <option value="">—</option>
+        <option>생주</option><option>생주 (무여과)</option>
+        <option>1회 열처리</option><option>1회 열처리 (나마즈메)</option>
+        <option>1회 열처리 (저알코올)</option><option>1회 열처리 (빙온숙성)</option>
+        <option>2회 열처리</option>
+      </select>
+    </div>
+    <div class="w-field"><label>이미지 URL</label><input id="w-img" type="text" placeholder="https://drive.google.com/..."></div>
+    <div class="w-field"><label>보유</label><input id="w-stock" type="number" value="1" min="0" max="99"></div>
+    <button id="write-submit" type="submit">저장</button>
+    <div id="write-msg"></div>
+  </form>
+</div>
+
 </body>
 </html>
