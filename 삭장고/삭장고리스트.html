@@ -749,7 +749,10 @@ async function submitWrite(e){
   btn.disabled=true; btn.textContent='저장 중...'; msg.textContent='';
   try{
     var token=sessionStorage.getItem('sake_token')||'';
-    await fetch(APPS_SCRIPT_URL,{method:'POST', mode:'no-cors', body:JSON.stringify({token:token,row:row})});
+    var url=new URL(APPS_SCRIPT_URL);
+    url.searchParams.set('token',token);
+    url.searchParams.set('data',JSON.stringify(row));
+    await fetch(url.toString(),{mode:'no-cors'});
     msg.style.color='#196F3D'; msg.textContent='✓ 저장 완료!';
     setTimeout(function(){ closeWriteModal(); loadData(); },1500);
   } catch(err){
