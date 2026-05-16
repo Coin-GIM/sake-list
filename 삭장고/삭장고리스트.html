@@ -570,7 +570,10 @@
       <span class="inp-search-icon">🔍</span>
       <input type="text" id="inp-list-search" placeholder="이름 · 지역 · 구분 검색…" oninput="inpFilterList()">
     </div>
-    <div class="inp-list-meta" id="inp-list-count">-</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div class="inp-list-meta" id="inp-list-count">-</div>
+      <button onclick="inpListLoaded=false;inpLoadList()" style="padding:6px 12px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">↺ 새로고침</button>
+    </div>
     <div class="inp-list-wrap">
       <table>
         <thead>
@@ -721,7 +724,7 @@ function h(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').r
 function fetchWithTimeout(url, ms){
   var ctrl=new AbortController();
   var tid=setTimeout(function(){ ctrl.abort(); },ms);
-  return fetch(url+'&t='+Date.now(),{signal:ctrl.signal,cache:'no-cache'}).finally(function(){ clearTimeout(tid); });
+  return fetch(url+'&t='+Date.now(),{signal:ctrl.signal}).finally(function(){ clearTimeout(tid); });
 }
 async function loadData(){
   try{
@@ -1005,7 +1008,7 @@ function inpCallScript(params){
   iframe.style.display='none'; iframe.src=APPS_SCRIPT_URL+qs;
   document.body.appendChild(iframe);
   return new Promise(function(resolve){
-    setTimeout(function(){ if(iframe.parentNode)document.body.removeChild(iframe); resolve(); },2500);
+    setTimeout(function(){ if(iframe.parentNode)document.body.removeChild(iframe); resolve(); },5000);
   });
 }
 
@@ -1119,6 +1122,7 @@ async function inpModalSave(){
   var item=inpAllRows.find(function(r){return r.sheetRow===inpModalState.sheetRow;});
   if(item){ while(item.data.length<=inpModalState.colIdx)item.data.push(''); item.data[inpModalState.colIdx]=val; }
   inpFilterList();
+  loadData();
   msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
   btn.disabled=false; btn.textContent='저장';
   setTimeout(inpCloseModal,800);
