@@ -1001,18 +1001,21 @@ function inpClearAll(){
   document.getElementById('inp-save-msg').textContent='';
 }
 
-function inpCallScript(params){
+async function inpCallScript(params){
   var qs='?token='+encodeURIComponent(WRITER_TOKEN);
   Object.keys(params).forEach(function(k){ qs+='&'+k+'='+encodeURIComponent(params[k]); });
-  var iframe=document.createElement('iframe');
-  iframe.style.display='none'; iframe.src=APPS_SCRIPT_URL+qs;
-  document.body.appendChild(iframe);
-  return new Promise(function(resolve){
-    setTimeout(function(){ if(iframe.parentNode)document.body.removeChild(iframe); resolve(); },5000);
-  });
+  var ctrl=new AbortController();
+  var tid=setTimeout(function(){ ctrl.abort(); },15000);
+  try{
+    var res=await fetch(APPS_SCRIPT_URL+qs,{signal:ctrl.signal});
+    clearTimeout(tid);
+    var data=await res.json();
+    if(!data.success) throw new Error(data.error||'저장 실패');
+    return data;
+  } catch(e){ clearTimeout(tid); throw e; }
 }
 
-function inpSave(){
+async function inpSave(){
   var name=document.getElementById('inp-f-name').value.trim();
   if(!name){alert('이름을 입력해주세요');return;}
   var row=[name,document.getElementById('inp-f-cat').value,document.getElementById('inp-f-date').value.trim(),
@@ -1021,11 +1024,15 @@ function inpSave(){
     document.getElementById('inp-f-stock').value||'1'];
   var btn=document.getElementById('inp-save-btn'), msg=document.getElementById('inp-save-msg');
   btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
-  inpCallScript({action:'append',data:JSON.stringify(row)}).then(function(){
+  try{
+    await inpCallScript({action:'append',data:JSON.stringify(row)});
     msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
     btn.disabled=false; btn.textContent='구글 시트에 저장';
     setTimeout(function(){ inpClearAll(); loadData(); },2000);
-  });
+  } catch(e){
+    msg.style.color='#922B21'; msg.textContent='✗ '+(e.name==='AbortError'?'타임아웃':e.message);
+    btn.disabled=false; btn.textContent='구글 시트에 저장';
+  }
 }
 
 function inpParseCSV(text){
@@ -1117,15 +1124,20 @@ async function inpModalSave(){
   if(!inpModalState) return;
   var val=document.getElementById('inp-m-input').value.trim();
   var btn=document.getElementById('inp-modal-save-btn'), msg=document.getElementById('inp-modal-msg');
-  btn.disabled=true; btn.textContent='저장 중…';
-  await inpCallScript({action:'update', range:inpModalState.letter+inpModalState.sheetRow, value:val});
-  var item=inpAllRows.find(function(r){return r.sheetRow===inpModalState.sheetRow;});
-  if(item){ while(item.data.length<=inpModalState.colIdx)item.data.push(''); item.data[inpModalState.colIdx]=val; }
-  inpFilterList();
-  loadData();
-  msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
-  btn.disabled=false; btn.textContent='저장';
-  setTimeout(inpCloseModal,800);
+  btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
+  try{
+    await inpCallScript({action:'update', range:inpModalState.letter+inpModalState.sheetRow, value:val});
+    var item=inpAllRows.find(function(r){return r.sheetRow===inpModalState.sheetRow;});
+    if(item){ while(item.data.length<=inpModalState.colIdx)item.data.push(''); item.data[inpModalState.colIdx]=val; }
+    inpFilterList();
+    loadData();
+    msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
+    btn.disabled=false; btn.textContent='저장';
+    setTimeout(inpCloseModal,800);
+  } catch(e){
+    msg.style.color='#922B21'; msg.textContent='✗ '+(e.name==='AbortError'?'타임아웃':e.message);
+    btn.disabled=false; btn.textContent='저장';
+  }
 }
 </script>
 
