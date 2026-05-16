@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sakmmelier</title>
+  <style>
+    :root { --red:#7B1E1E; --red2:#A52525; --bg:#F7F2EA; --card:#FFF; --text:#1A1009; --muted:#7A6050; --border:#E5D4BC; --green:#196F3D; }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI","Segoe UI",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+    header { background:var(--red); color:#fff; padding:14px 18px; position:sticky; top:0; z-index:200; }
+    .header-title { font-size:18px; font-weight:700; }
+    .tab-bar { background:#fff; border-bottom:2px solid var(--border); display:flex; position:sticky; top:47px; z-index:100; }
+    .tab-btn { flex:1; padding:11px 0 9px; border:none; background:none; font-size:14px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; font-family:inherit; }
+    .tab-btn.active { color:var(--red); border-bottom-color:var(--red); }
+    main { width:100%; max-width:560px; margin:0 auto; padding:16px; }
+    .section { background:var(--card); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 1px 6px rgba(0,0,0,.07); }
+    .section-title { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:10px; letter-spacing:.04em; }
+    .guide { background:#FFF8F0; border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; }
+    .guide pre { font-size:11.5px; color:#5A4030; line-height:1.8; white-space:pre-wrap; font-family:monospace; }
+    .guide-copy { margin-top:10px; padding:9px 16px; background:var(--red); border:none; border-radius:8px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:inherit; }
+    .guide-copy:active { background:var(--red2); }
+    #paste-area { width:100%; height:110px; border:1.5px dashed var(--border); border-radius:12px; padding:12px; font-size:14px; font-family:inherit; color:var(--text); background:#FDFAF5; resize:none; outline:none; }
+    #paste-area:focus { border-color:var(--red); }
+    #paste-area::placeholder { color:#C4A882; }
+    .btn-row { display:flex; gap:8px; margin-top:10px; }
+    .btn-parse { flex:1; padding:13px; background:var(--red); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
+    .btn-parse:active { background:var(--red2); }
+    .btn-clear { padding:13px 16px; background:#F0E8DC; color:var(--muted); border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; }
+    .field { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+    .field label { font-size:12px; font-weight:700; color:var(--muted); letter-spacing:.04em; }
+    .field input, .field select { width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:16px; font-family:inherit; background:#fff; color:var(--text); -webkit-appearance:none; appearance:none; }
+    .field input:focus, .field select:focus { outline:none; border-color:var(--red); }
+    .btn-save { width:100%; padding:16px; background:var(--red); color:#fff; border:none; border-radius:16px; font-size:17px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:4px; }
+    .btn-save:active { background:var(--red2); }
+    .btn-save:disabled { background:var(--muted); }
+    .save-msg { text-align:center; font-size:14px; font-weight:600; height:20px; margin-top:10px; }
+    #tab-list main { padding:12px; }
+    .search-wrap { position:relative; margin-bottom:12px; }
+    .search-wrap input { width:100%; padding:11px 14px 11px 36px; border:1.5px solid var(--border); border-radius:12px; font-size:15px; font-family:inherit; background:#fff; }
+    .search-wrap input:focus { outline:none; border-color:var(--red); }
+    .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:15px; color:var(--muted); pointer-events:none; }
+    .list-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px; color:var(--muted); font-weight:600; }
+    .tbl-wrap { overflow-x:auto; overflow-y:auto; max-height:calc(100vh - 200px); border-radius:14px; border:1px solid var(--border); background:#fff; box-shadow:0 1px 8px rgba(0,0,0,.07); }
+    table { width:100%; border-collapse:collapse; min-width:600px; }
+    thead { position:sticky; top:0; z-index:10; }
+    th { background:var(--red); color:#fff; padding:10px 12px; font-size:12px; font-weight:700; text-align:left; white-space:nowrap; }
+    td { padding:9px 12px; font-size:13px; border-bottom:1px solid var(--border); vertical-align:middle; cursor:pointer; }
+    tr:last-child td { border-bottom:none; }
+    td:hover { background:rgba(123,30,30,.05); }
+    .td-empty { color:var(--muted); font-style:italic; }
+    .spinner-wrap { text-align:center; padding:40px; color:var(--muted); font-size:14px; }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; }
+    .modal-overlay.open { display:block; }
+    .modal-sheet { position:fixed; bottom:0; left:0; right:0; background:#fff; border-radius:20px 20px 0 0; padding:20px 20px 36px; z-index:501; max-height:80vh; overflow-y:auto; transform:translateY(100%); transition:transform .28s ease; }
+    .modal-sheet.open { transform:translateY(0); }
+    .modal-title { font-size:16px; font-weight:700; color:var(--red); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; }
+    .modal-close { background:none; border:none; font-size:22px; color:var(--muted); cursor:pointer; line-height:1; }
+    .modal-field input, .modal-field select { width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:16px; font-family:inherit; background:#fff; -webkit-appearance:none; appearance:none; }
+    .modal-field input:focus, .modal-field select:focus { outline:none; border-color:var(--red); }
+    .modal-msg { font-size:13px; font-weight:600; height:18px; margin:8px 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">🍶 Sakmmelier</div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tbtn-ai"   onclick="showTab('ai')">AI 파싱 입력</button>
+  <button class="tab-btn"        id="tbtn-list" onclick="showTab('list')">목록 편집</button>
+</div>
+
+<div id="tab-ai">
+<main>
+  <div class="guide">
+    <div class="section-title">Claude / Gemini 프롬프트 복사 → AI에 붙여넣기</div>
+    <pre id="prompt-text">사케 정보를 아래 형식으로만 출력해줘:
+이름: [한글이름 일본어이름]
+구분: [준마이다이긴죠/준마이긴죠/다이긴죠/긴죠/도쿠베츠준마이/준마이/혼죠죠/보통주/무라벨 중 하나]
+제조년월: [YYYY.MM]
+지역: [일본 현 이름 한국어]
+일본주도: [수치, 모르면 공백]
+열처리: [생주/생주 (무여과)/1회 열처리/1회 열처리 (나마즈메)/1회 열처리 (저알코올)/1회 열처리 (빙온숙성)/2회 열처리 중 하나, 모르면 공백]
+보유: 1</pre>
+    <button class="guide-copy" onclick="copyPrompt()">프롬프트 복사</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">AI 결과 붙여넣기</div>
+    <textarea id="paste-area" placeholder="Claude/Gemini 출력 결과를 여기에 붙여넣으세요&#10;마크다운 테이블 형식도 인식됩니다"></textarea>
+    <div class="btn-row">
+      <button class="btn-parse" onclick="parseAndFill()">파싱 → 폼 자동입력</button>
+      <button class="btn-clear" onclick="clearAll()">초기화</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">사케 정보 확인 / 수정</div>
+    <div class="field"><label>이름 *</label><input id="f-name" type="text" placeholder="나츠 준긴 요코야마 夏純吟 よこやま"></div>
+    <div class="field"><label>구분</label>
+      <select id="f-cat">
+        <option value="">— 선택 —</option>
+        <option>준마이다이긴죠</option><option>준마이긴죠</option>
+        <option>다이긴죠</option><option>긴죠</option>
+        <option>도쿠베츠준마이</option><option>준마이</option>
+        <option>혼죠죠</option><option>보통주</option><option>무라벨</option>
+      </select>
+    </div>
+    <div class="field"><label>제조년월</label><input id="f-date" type="text" placeholder="2026.04"></div>
+    <div class="field"><label>지역</label><input id="f-region" type="text" placeholder="나가사키"></div>
+    <div class="field"><label>일본주도</label><input id="f-smv" type="text" placeholder="+3~+4"></div>
+    <div class="field"><label>열처리</label>
+      <select id="f-heat">
+        <option value="">— 선택 —</option>
+        <option>생주</option><option>생주 (무여과)</option>
+        <option>1회 열처리</option><option>1회 열처리 (나마즈메)</option>
+        <option>1회 열처리 (저알코올)</option><option>1회 열처리 (빙온숙성)</option>
+        <option>2회 열처리</option>
+      </select>
+    </div>
+    <div class="field"><label>이미지 URL (선택)</label><input id="f-img" type="url" placeholder="https://drive.google.com/..."></div>
+    <div class="field"><label>보유</label><input id="f-stock" type="number" value="1" min="0" max="99"></div>
+  </div>
+
+  <button class="btn-save" id="btn-save1" onclick="saveToSheet()">구글 시트에 저장</button>
+  <div class="save-msg" id="save-msg1"></div>
+</main>
+</div>
+
+<div id="tab-list" style="display:none">
+<main>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="list-search" placeholder="이름 · 지역 · 구분 검색…" oninput="filterList()">
+  </div>
+  <div class="list-meta"><span id="list-count">-</span></div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>이름</th><th>구분</th><th>제조년월</th><th>지역</th><th>일본주도</th><th>열처리</th><th>보유</th></tr>
+      </thead>
+      <tbody id="tbl-body">
+        <tr><td colspan="7"><div class="spinner-wrap">불러오는 중…</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
+<div class="modal-sheet" id="modal-sheet">
+  <div class="modal-title">
+    <span id="modal-title-text"></span>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+  <div id="modal-body"></div>
+  <div class="modal-msg" id="modal-msg"></div>
+  <button class="btn-save" id="modal-save-btn" onclick="modalSave()">저장</button>
+</div>
+
+<script>
+const SHEET_ID        = '1Lv1di5KmV3UbzeD-VfI_KXWFnm5Hrgftd4WL0UUU_nI';
+const CSV_URL         = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv';
+const WRITER_TOKEN    = '1604sake';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyVFh0gh866bjJv4d4bIAj3Z94LaI4eaByEwvkavBOxbZgQhDWrvbbGBWZToOwINMhGFA/exec';
+const CAT_OPTS  = ['준마이다이긴죠','준마이긴죠','다이긴죠','긴죠','도쿠베츠준마이','준마이','혼죠죠','보통주','무라벨'];
+const HEAT_OPTS = ['생주','생주 (무여과)','1회 열처리','1회 열처리 (나마즈메)','1회 열처리 (저알코올)','1회 열처리 (빙온숙성)','2회 열처리'];
+
+function showTab(t){
+  document.getElementById('tab-ai').style.display   = t==='ai'   ? '' : 'none';
+  document.getElementById('tab-list').style.display = t==='list' ? '' : 'none';
+  document.getElementById('tbtn-ai').classList.toggle('active',   t==='ai');
+  document.getElementById('tbtn-list').classList.toggle('active', t==='list');
+  if(t==='list' && !listLoaded){ listLoaded=true; loadList(); }
+}
+
+function copyPrompt(){
+  var text=document.getElementById('prompt-text').textContent;
+  var ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,99999);
+  document.execCommand('copy'); document.body.removeChild(ta);
+  var btn=document.querySelector('.guide-copy');
+  btn.textContent='복사됨 ✓'; setTimeout(function(){ btn.textContent='프롬프트 복사'; },2000);
+}
+
+var KEY_MAP=[
+  {field:'name',   keys:['이름','name','제품명','상품명','사케명']},
+  {field:'cat',    keys:['구분','종류','등급','category','분류']},
+  {field:'date',   keys:['제조년월','제조연월','년월','date']},
+  {field:'region', keys:['지역','산지','소재지','prefecture','region']},
+  {field:'smv',    keys:['일본주도','주도','smv']},
+  {field:'heat',   keys:['열처리','히이레','heat']},
+  {field:'img',    keys:['이미지','image','img','사진']},
+  {field:'stock',  keys:['보유','재고','수량','stock']},
+];
+function extractKV(line){
+  var t=line.match(/^\|\s*([^|\-\:]{1,20}?)\s*\|\s*([^|]+?)\s*\|?\s*$/);
+  if(t&&t[1]!=='항목'&&!t[1].includes('---')) return {k:t[1],v:t[2]};
+  var c=line.match(/^[\s\-\*#>]*([^:：]{1,20})[：:]\s*(.+)/);
+  if(c) return {k:c[1].trim(),v:c[2].trim()};
+  return null;
+}
+function normalizeDate(v){ var m=v.match(/(\d{4})[년\s\.]\s*(\d{1,2})[월]?/); return m?m[1]+'.'+('0'+m[2]).slice(-2):v; }
+function normalizeRegion(v){ var m=v.match(/^([가-힣]{2,5})[도부현]/); return m?m[1]:v; }
+function normalizeCategory(v){
+  if(v.includes('준마이다이긴')||v.includes('순미대음')) return '준마이다이긴죠';
+  if(v.includes('준마이긴')||v.includes('순미음')||v.includes('純米吟')) return '준마이긴죠';
+  if(v.includes('다이긴')||v.includes('大吟')) return '다이긴죠';
+  if(v.includes('긴죠')||v.includes('吟醸')||v.includes('음양')) return '긴죠';
+  if(v.includes('도쿠베츠준마이')||v.includes('특별순미')) return '도쿠베츠준마이';
+  if(v.includes('준마이')||v.includes('순미')||v.includes('純米')) return '준마이';
+  return v;
+}
+function parseAndFill(){
+  var text=document.getElementById('paste-area').value; if(!text.trim()) return;
+  var data={};
+  text.split('\n').forEach(function(line){
+    var kv=extractKV(line); if(!kv||!kv.v) return;
+    var k=kv.k.toLowerCase(), v=kv.v;
+    KEY_MAP.forEach(function(entry){
+      if(data[entry.field]) return;
+      if(entry.keys.some(function(kw){ return k.includes(kw); })) data[entry.field]=v;
+    });
+  });
+  if(data.name)   document.getElementById('f-name').value   = data.name;
+  if(data.date)   document.getElementById('f-date').value   = normalizeDate(data.date);
+  if(data.region) document.getElementById('f-region').value = normalizeRegion(data.region);
+  if(data.smv)    document.getElementById('f-smv').value    = data.smv;
+  if(data.stock)  document.getElementById('f-stock').value  = data.stock;
+  if(data.img)    document.getElementById('f-img').value    = data.img;
+  if(data.cat)    selectOpt('f-cat',  normalizeCategory(data.cat));
+  if(data.heat)   selectOpt('f-heat', data.heat);
+  if(Object.keys(data).length===0) alert('파싱 실패\n키:값 또는 마크다운 테이블 형식이 필요합니다.');
+}
+function selectOpt(id,val){
+  if(!val) return; var sel=document.getElementById(id);
+  for(var i=0;i<sel.options.length;i++){ if(sel.options[i].text===val){sel.selectedIndex=i;return;} }
+}
+function clearAll(){
+  document.getElementById('paste-area').value='';
+  ['f-name','f-date','f-region','f-smv','f-img'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('f-cat').selectedIndex=0;
+  document.getElementById('f-heat').selectedIndex=0;
+  document.getElementById('f-stock').value='1';
+  document.getElementById('save-msg1').textContent='';
+}
+
+function callScript(params){
+  var qs='?token='+encodeURIComponent(WRITER_TOKEN);
+  Object.keys(params).forEach(function(k){ qs+='&'+k+'='+encodeURIComponent(params[k]); });
+  var iframe=document.createElement('iframe');
+  iframe.style.display='none'; iframe.src=APPS_SCRIPT_URL+qs;
+  document.body.appendChild(iframe);
+  return new Promise(function(resolve){
+    setTimeout(function(){ if(iframe.parentNode)document.body.removeChild(iframe); resolve(); },2500);
+  });
+}
+
+function saveToSheet(){
+  var name=document.getElementById('f-name').value.trim();
+  if(!name){alert('이름을 입력해주세요');return;}
+  var row=[name,document.getElementById('f-cat').value,document.getElementById('f-date').value.trim(),
+    document.getElementById('f-region').value.trim(),document.getElementById('f-smv').value.trim(),
+    document.getElementById('f-heat').value,document.getElementById('f-img').value.trim(),
+    document.getElementById('f-stock').value||'1'];
+  var btn=document.getElementById('btn-save1'), msg=document.getElementById('save-msg1');
+  btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
+  callScript({action:'append',data:JSON.stringify(row)}).then(function(){
+    msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
+    btn.disabled=false; btn.textContent='구글 시트에 저장';
+    setTimeout(clearAll,2000);
+  });
+}
+
+var allRows=[], listLoaded=false;
+
+function parseCSV(text){
+  var rows=[], lines=text.split(/\r?\n/);
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i]; if(!line.trim()) continue;
+    var cells=[],cur='',inQ=false;
+    for(var j=0;j<line.length;j++){
+      var c=line[j];
+      if(c==='"'){inQ=!inQ;continue;}
+      if(c===','&&!inQ){cells.push(cur.trim());cur='';continue;}
+      cur+=c;
+    }
+    cells.push(cur.trim()); rows.push(cells);
+  }
+  return rows;
+}
+
+async function loadList(){
+  document.getElementById('tbl-body').innerHTML='<tr><td colspan="7"><div class="spinner-wrap">불러오는 중…</div></td></tr>';
+  try{
+    var res=await fetch(CSV_URL);
+    var rows=parseCSV(await res.text()).slice(1).filter(function(r){return r[0];});
+    allRows=rows.map(function(r,i){return {data:r, sheetRow:i+2};});
+    document.getElementById('list-count').textContent='총 '+allRows.length+'종';
+    renderList(allRows);
+  } catch(e){
+    document.getElementById('tbl-body').innerHTML='<tr><td colspan="7" style="text-align:center;color:#922B21;padding:30px">불러오기 실패: '+e.message+'</td></tr>';
+  }
+}
+
+function filterList(){
+  var q=document.getElementById('list-search').value.toLowerCase();
+  var filtered=q?allRows.filter(function(r){return r.data.join(' ').toLowerCase().includes(q);}):allRows;
+  document.getElementById('list-count').textContent=filtered.length+'종'+(q?' (검색결과)':'');
+  renderList(filtered);
+}
+
+function he(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderList(rows){
+  var sorted=rows.slice().sort(function(a,b){return (a.data[0]||'').localeCompare(b.data[0],'ko');});
+  document.getElementById('tbl-body').innerHTML=sorted.map(function(item){
+    var r=item.data, sr=item.sheetRow;
+    var cols=[0,1,2,3,4,5,7].map(function(ci){
+      var v=r[ci]||''; var cls=v?'':'td-empty';
+      return '<td class="'+cls+'" onclick="openEditModal('+sr+','+ci+')">'+(v?he(v):'—')+'</td>';
+    });
+    return '<tr>'+cols.join('')+'</tr>';
+  }).join('');
+}
+
+var modalState=null;
+function openEditModal(sheetRow,colIdx){
+  var item=allRows.find(function(r){return r.sheetRow===sheetRow;});
+  if(!item) return;
+  var cols=['이름','구분','제조년월','지역','일본주도','열처리','이미지URL','보유'];
+  var letters=['A','B','C','D','E','F','G','H'];
+  var cur=item.data[colIdx]||'';
+  modalState={sheetRow:sheetRow, colIdx:colIdx, letter:letters[colIdx]};
+  document.getElementById('modal-title-text').textContent=cols[colIdx]+' 수정 ('+item.data[0]+')';
+  document.getElementById('modal-msg').textContent='';
+  var html='<div class="modal-field">';
+  if(colIdx===1){
+    html+='<select id="m-input">'+CAT_OPTS.map(function(o){ return '<option'+(o===cur?' selected':'')+'>'+he(o)+'</option>'; }).join('')+'</select>';
+  } else if(colIdx===5){
+    html+='<select id="m-input"><option value="">—</option>'+HEAT_OPTS.map(function(o){ return '<option'+(o===cur?' selected':'')+'>'+he(o)+'</option>'; }).join('')+'</select>';
+  } else if(colIdx===7){
+    html+='<input id="m-input" type="number" value="'+he(cur)+'" min="0" max="99">';
+  } else {
+    html+='<input id="m-input" type="text" value="'+he(cur)+'">';
+  }
+  html+='</div>';
+  document.getElementById('modal-body').innerHTML=html;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-sheet').classList.add('open');
+  setTimeout(function(){ var inp=document.getElementById('m-input'); if(inp&&inp.tagName!=='SELECT')inp.focus(); },150);
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('modal-sheet').classList.remove('open');
+  modalState=null;
+}
+
+async function modalSave(){
+  if(!modalState) return;
+  var val=document.getElementById('m-input').value.trim();
+  var btn=document.getElementById('modal-save-btn'), msg=document.getElementById('modal-msg');
+  btn.disabled=true; btn.textContent='저장 중…';
+  await callScript({action:'update', range:modalState.letter+modalState.sheetRow, value:val});
+  var item=allRows.find(function(r){return r.sheetRow===modalState.sheetRow;});
+  if(item){ while(item.data.length<=modalState.colIdx)item.data.push(''); item.data[modalState.colIdx]=val; }
+  filterList();
+  msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
+  btn.disabled=false; btn.textContent='저장';
+  setTimeout(closeModal,800);
+}
+</script>
+</body>
+</html>
