@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>🍶 삭장고리스트</title>
+  <script src="https://accounts.google.com/gsi/client" async></script>
   <style>
     :root {
       --red: #7B1E1E; --red2: #A52525; --gold: #C49A3C;
       --bg: #F7F2EA; --card: #FFF; --text: #1A1009;
-      --muted: #7A6050; --border: #E5D4BC;
+      --muted: #7A6050; --border: #E5D4BC; --green: #2E7D32;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", "Segoe UI", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -182,6 +183,11 @@
     .inp-modal-field input, .inp-modal-field select { width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:16px; font-family:inherit; background:#fff; -webkit-appearance:none; appearance:none; }
     .inp-modal-field input:focus, .inp-modal-field select:focus { outline:none; border-color:var(--red); }
     .inp-modal-msg { font-size:13px; font-weight:600; height:18px; margin:8px 0; }
+    .inp-img-tab { flex:1; padding:8px; border:none; background:none; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; border-radius:8px; font-family:inherit; }
+    .inp-img-tab.active { background:#fff; color:var(--red); box-shadow:0 1px 4px rgba(0,0,0,.12); }
+    .inp-photo-drop { border:2px dashed var(--border); border-radius:12px; min-height:90px; cursor:pointer; overflow:hidden; }
+    .inp-photo-drop.active { border-color:var(--red); background:rgba(123,30,30,.02); }
+    .inp-tbl-img { width:38px; height:38px; object-fit:cover; border-radius:6px; display:block; }
 
     /* ===== 가이드 탭 ===== */
     .g-nav { background: #fff; border-bottom: 1.5px solid var(--border); position: sticky; top: 87px; z-index: 99; }
@@ -558,7 +564,13 @@
           <option>2회 열처리</option>
         </select>
       </div>
-      <div class="inp-field"><label>이미지 URL (선택)</label><input id="inp-f-img" type="url" placeholder="https://drive.google.com/..."></div>
+      <div class="inp-field">
+        <label>이미지 (선택)</label>
+        <div style="display:flex;gap:8px">
+          <input id="inp-f-img" type="url" placeholder="https://..." style="flex:1;min-width:0">
+          <button type="button" onclick="inpOpenImgModalForNew()" style="white-space:nowrap;padding:0 14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📷 업로드</button>
+        </div>
+      </div>
       <div class="inp-field"><label>보유</label><input id="inp-f-stock" type="number" value="1" min="0" max="99"></div>
     </div>
 
@@ -579,14 +591,54 @@
     <div class="inp-list-wrap">
       <table>
         <thead>
-          <tr><th>이름</th><th>구분</th><th>제조년월</th><th>지역</th><th>일본주도</th><th>열처리</th><th>보유</th></tr>
+          <tr><th style="text-align:center;width:52px">이미지</th><th>이름</th><th>구분</th><th>제조년월</th><th>지역</th><th>일본주도</th><th>열처리</th><th>보유</th></tr>
         </thead>
         <tbody id="inp-tbl-body">
-          <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">목록 편집 탭을 열면 불러옵니다</td></tr>
+          <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">목록 편집 탭을 열면 불러옵니다</td></tr>
         </tbody>
       </table>
     </div>
   </div>
+</div>
+
+<!-- 입력탭 이미지 모달 -->
+<div class="inp-modal-overlay" id="inp-img-overlay" onclick="inpCloseImgModal()"></div>
+<div class="inp-modal-sheet" id="inp-img-sheet">
+  <div class="inp-modal-title">
+    <span id="inp-img-title">이미지 변경</span>
+    <button class="inp-modal-close" onclick="inpCloseImgModal()">✕</button>
+  </div>
+  <div id="inp-img-preview-wrap" style="width:100%;height:140px;border-radius:12px;border:1px solid var(--border);background:#F5EDE0;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:14px">
+    <img id="inp-img-preview-img" src="" alt="" style="width:100%;height:100%;object-fit:contain;display:none">
+    <span id="inp-img-preview-ph" style="font-size:48px;opacity:.3">🍶</span>
+  </div>
+  <div style="display:flex;background:#F0E8DC;border-radius:10px;padding:3px;margin-bottom:14px">
+    <button class="inp-img-tab active" data-tab="photo" onclick="inpSwitchImgTab('photo')">📷 사진 선택</button>
+    <button class="inp-img-tab" data-tab="url" onclick="inpSwitchImgTab('url')">🔗 URL 입력</button>
+  </div>
+  <div id="inp-mtab-photo">
+    <div class="inp-photo-drop" id="inp-photo-drop"
+         onclick="document.getElementById('inp-modal-file').click()"
+         ondragover="event.preventDefault();this.classList.add('active')"
+         ondragleave="this.classList.remove('active')"
+         ondrop="inpOnPhotoDrop(event)">
+      <div id="inp-drop-hint" style="text-align:center;color:var(--muted);padding:20px 16px">
+        <div style="font-size:30px;margin-bottom:6px">📷</div>
+        <div style="font-size:13px">클릭 또는 드래그하여 사진 선택</div>
+      </div>
+      <img id="inp-photo-preview" style="display:none;width:100%;max-height:160px;object-fit:contain" alt="">
+    </div>
+    <input type="file" id="inp-modal-file" accept="image/*" style="display:none" onchange="inpOnModalFile(event)">
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Google Drive에 자동 업로드하고 URL을 저장합니다</p>
+  </div>
+  <div id="inp-mtab-url" style="display:none">
+    <div class="inp-field" style="margin-bottom:0">
+      <label>이미지 URL</label>
+      <input type="text" id="inp-modal-url" placeholder="https://...">
+    </div>
+  </div>
+  <div class="inp-modal-msg" id="inp-img-msg"></div>
+  <button class="inp-save" id="inp-img-save-btn" onclick="inpImgSave()">저장</button>
 </div>
 
 <!-- 입력탭 편집 모달 -->
@@ -604,6 +656,7 @@
 <script>
 const SHEET_ID         = '1Lv1di5KmV3UbzeD-VfI_KXWFnm5Hrgftd4WL0UUU_nI';
 const CSV_URL          = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv';
+const CLIENT_ID        = '101879058594-gcj1dcavmo50270heqg2d3s2h2s1mrku.apps.googleusercontent.com';
 const VIEWER_PINS      = ['1124'];
 const WRITER_TOKEN     = '1604sake';
 const APPS_SCRIPT_URL  = 'https://script.google.com/macros/s/AKfycbyVFh0gh866bjJv4d4bIAj3Z94LaI4eaByEwvkavBOxbZgQhDWrvbbGBWZToOwINMhGFA/exec';
@@ -1066,7 +1119,7 @@ function inpParseCSV(text){
 }
 
 async function inpLoadList(){
-  document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">불러오는 중…</td></tr>';
+  document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">불러오는 중…</td></tr>';
   try{
     var res=await fetchWithTimeout(CSV_URL,15000);
     if(!res.ok) throw new Error('HTTP '+res.status);
@@ -1076,7 +1129,7 @@ async function inpLoadList(){
     inpRenderList(inpAllRows);
   } catch(e){
     var msg=e.name==='AbortError'?'응답 시간 초과 — 다시 시도해주세요':e.message;
-    document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="7" style="text-align:center;color:#922B21;padding:30px">불러오기 실패: '+msg+'</td></tr>';
+    document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="8" style="text-align:center;color:#922B21;padding:30px">불러오기 실패: '+msg+'</td></tr>';
     inpListLoaded=false;
   }
 }
@@ -1094,11 +1147,13 @@ function inpRenderList(rows){
   var sorted=rows.slice().sort(function(a,b){return (a.data[0]||'').localeCompare(b.data[0],'ko');});
   document.getElementById('inp-tbl-body').innerHTML=sorted.map(function(item){
     var r=item.data, sr=item.sheetRow;
+    var imgUrl=r[6]||'';
+    var imgCell='<td style="text-align:center;width:52px;cursor:pointer" onclick="inpOpenImgModal('+sr+')">'+(imgUrl?'<img class="inp-tbl-img" src="'+inpHe(imgUrl)+'" onerror="this.replaceWith(document.createTextNode(\'📷\'))" alt="">':'<span style="font-size:20px;opacity:.35">📷</span>')+'</td>';
     var cols=[0,1,2,3,4,5,7].map(function(ci){
       var v=r[ci]||''; var cls=v?'':'inp-td-empty';
       return '<td class="'+cls+'" onclick="inpOpenEdit('+sr+','+ci+')">'+(v?inpHe(v):'—')+'</td>';
     });
-    return '<tr>'+cols.join('')+'</tr>';
+    return '<tr>'+imgCell+cols.join('')+'</tr>';
   }).join('');
 }
 
@@ -1133,6 +1188,180 @@ function inpCloseModal(){
   document.getElementById('inp-modal-sheet').classList.remove('open');
   inpModalState=null;
 }
+
+// ── Drive OAuth ───────────────────────────────────
+var inpDriveTokenClient=null, inpDriveToken=null, inpDriveTokenExp=0;
+var inpImgState=null, inpImgSelectedFile=null;
+
+function inpInitDriveAuth(){
+  if(typeof google==='undefined'||!CLIENT_ID) return;
+  inpDriveTokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:CLIENT_ID,
+    scope:'https://www.googleapis.com/auth/drive.file',
+    callback:function(){},
+  });
+}
+
+function inpGetDriveToken(){
+  return new Promise(function(resolve,reject){
+    if(inpDriveToken&&Date.now()<inpDriveTokenExp){resolve(inpDriveToken);return;}
+    if(!inpDriveTokenClient){reject(new Error('Google 로그인 필요 — CLIENT_ID 확인'));return;}
+    inpDriveTokenClient.callback=function(res){
+      if(res.error){reject(new Error(res.error));return;}
+      inpDriveToken=res.access_token;
+      inpDriveTokenExp=Date.now()+res.expires_in*1000;
+      resolve(inpDriveToken);
+    };
+    inpDriveTokenClient.requestAccessToken({prompt:''});
+  });
+}
+
+async function inpUploadToDrive(base64,mimeType,filename){
+  var token=await inpGetDriveToken();
+  var boundary='sake_'+Date.now();
+  var meta=JSON.stringify({name:filename,mimeType:mimeType});
+  var bin=atob(base64), bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  var body=new Blob(['--'+boundary+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n',meta,'\r\n--'+boundary+'\r\nContent-Type: '+mimeType+'\r\n\r\n',bytes,'\r\n--'+boundary+'--']);
+  var up=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+    {method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'multipart/related; boundary='+boundary},body:body});
+  if(!up.ok){var e=await up.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'HTTP '+up.status);}
+  var id=(await up.json()).id;
+  await fetch('https://www.googleapis.com/drive/v3/files/'+id+'/permissions',
+    {method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({type:'anyone',role:'reader'})});
+  return 'https://drive.google.com/thumbnail?id='+id+'&sz=w400';
+}
+
+function inpResizeToBase64(file,maxPx){
+  maxPx=maxPx||1200;
+  return new Promise(function(resolve,reject){
+    var img=new Image(), url=URL.createObjectURL(file);
+    img.onload=function(){
+      URL.revokeObjectURL(url);
+      var w=img.width,h=img.height;
+      if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(c.toDataURL('image/jpeg',0.88).split(',')[1]);
+    };
+    img.onerror=reject; img.src=url;
+  });
+}
+
+// ── 이미지 모달 ────────────────────────────────────
+function inpOpenImgModal(sheetRow){
+  var item=inpAllRows.find(function(r){return r.sheetRow===sheetRow;});
+  if(!item) return;
+  inpImgState={mode:'edit',sheetRow:sheetRow,sakeName:item.data[0]||'sake'};
+  inpImgSelectedFile=null;
+  var curUrl=item.data[6]||'';
+  document.getElementById('inp-img-title').textContent='이미지 변경 — '+(item.data[0]||'');
+  var img=document.getElementById('inp-img-preview-img'),ph=document.getElementById('inp-img-preview-ph');
+  if(curUrl){img.src=curUrl;img.style.display='block';ph.style.display='none';}
+  else{img.style.display='none';ph.style.display='';}
+  document.getElementById('inp-modal-url').value=curUrl;
+  document.getElementById('inp-modal-file').value='';
+  document.getElementById('inp-img-msg').textContent='';
+  inpResetPhotoPreview(); inpSwitchImgTab('photo');
+  document.getElementById('inp-img-overlay').classList.add('open');
+  document.getElementById('inp-img-sheet').classList.add('open');
+}
+
+function inpOpenImgModalForNew(){
+  inpImgState={mode:'new',sheetRow:null,sakeName:document.getElementById('inp-f-name').value.trim()||'sake'};
+  inpImgSelectedFile=null;
+  var curUrl=document.getElementById('inp-f-img').value.trim();
+  document.getElementById('inp-img-title').textContent='이미지 추가';
+  var img=document.getElementById('inp-img-preview-img'),ph=document.getElementById('inp-img-preview-ph');
+  if(curUrl){img.src=curUrl;img.style.display='block';ph.style.display='none';}
+  else{img.style.display='none';ph.style.display='';}
+  document.getElementById('inp-modal-url').value=curUrl;
+  document.getElementById('inp-modal-file').value='';
+  document.getElementById('inp-img-msg').textContent='';
+  inpResetPhotoPreview(); inpSwitchImgTab('photo');
+  document.getElementById('inp-img-overlay').classList.add('open');
+  document.getElementById('inp-img-sheet').classList.add('open');
+}
+
+function inpCloseImgModal(){
+  document.getElementById('inp-img-overlay').classList.remove('open');
+  document.getElementById('inp-img-sheet').classList.remove('open');
+  inpImgState=null; inpImgSelectedFile=null;
+}
+
+function inpSwitchImgTab(tab){
+  document.querySelectorAll('.inp-img-tab').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
+  document.getElementById('inp-mtab-photo').style.display=tab==='photo'?'block':'none';
+  document.getElementById('inp-mtab-url').style.display=tab==='url'?'block':'none';
+}
+
+function inpResetPhotoPreview(){
+  document.getElementById('inp-photo-preview').style.display='none';
+  document.getElementById('inp-drop-hint').style.display='block';
+  document.getElementById('inp-photo-drop').classList.remove('active');
+}
+
+function inpSetPhotoPreview(file){
+  inpImgSelectedFile=file;
+  var url=URL.createObjectURL(file);
+  var p=document.getElementById('inp-photo-preview');
+  p.src=url; p.style.display='block';
+  document.getElementById('inp-drop-hint').style.display='none';
+  document.getElementById('inp-photo-drop').classList.add('active');
+}
+
+function inpOnModalFile(e){ var f=e.target.files[0]; if(f) inpSetPhotoPreview(f); }
+
+function inpOnPhotoDrop(e){
+  e.preventDefault();
+  document.getElementById('inp-photo-drop').classList.remove('active');
+  var f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/')) inpSetPhotoPreview(f);
+}
+
+async function inpImgSave(){
+  if(!inpImgState) return;
+  var btn=document.getElementById('inp-img-save-btn'), msg=document.getElementById('inp-img-msg');
+  btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
+  var activeTab=document.querySelector('.inp-img-tab.active').dataset.tab;
+  var imageUrl='';
+  try{
+    if(activeTab==='photo'){
+      if(!inpImgSelectedFile){msg.style.color='#922B21';msg.textContent='사진을 선택해주세요';btn.disabled=false;btn.textContent='저장';return;}
+      msg.style.color='var(--muted)'; msg.textContent='Google Drive에 업로드 중…';
+      var base64=await inpResizeToBase64(inpImgSelectedFile);
+      var fname='sake_'+inpImgState.sakeName.replace(/[^\w가-힣]/g,'_')+(inpImgState.sheetRow?'_r'+inpImgState.sheetRow:'')+'.jpg';
+      imageUrl=await inpUploadToDrive(base64,'image/jpeg',fname);
+    } else {
+      imageUrl=document.getElementById('inp-modal-url').value.trim();
+      if(!imageUrl){msg.style.color='#922B21';msg.textContent='URL을 입력해주세요';btn.disabled=false;btn.textContent='저장';return;}
+    }
+    if(inpImgState.mode==='new'){
+      document.getElementById('inp-f-img').value=imageUrl;
+      msg.style.color='var(--green)'; msg.textContent='✓ URL 입력 완료';
+      btn.disabled=false; btn.textContent='저장';
+      setTimeout(inpCloseImgModal,800);
+    } else {
+      await inpCallScript({action:'update',range:'G'+inpImgState.sheetRow,value:imageUrl});
+      var item=inpAllRows.find(function(r){return r.sheetRow===inpImgState.sheetRow;});
+      if(item){while(item.data.length<=6)item.data.push('');item.data[6]=imageUrl;}
+      inpFilterList();
+      var mi=inpImgState.sheetRow-2;
+      if(mi>=0&&mi<allRows.length){while(allRows[mi].length<=6)allRows[mi].push('');allRows[mi][6]=imageUrl;renderList();renderMap();}
+      msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
+      btn.disabled=false; btn.textContent='저장';
+      setTimeout(inpCloseImgModal,800);
+    }
+  } catch(e){
+    msg.style.color='#922B21'; msg.textContent='✗ '+(e.name==='AbortError'?'타임아웃':e.message);
+    btn.disabled=false; btn.textContent='저장';
+  }
+}
+
+(function tryDriveInit(){
+  if(typeof google!=='undefined'&&google.accounts) inpInitDriveAuth();
+  else setTimeout(tryDriveInit,300);
+})();
 
 async function inpModalSave(){
   if(!inpModalState) return;
