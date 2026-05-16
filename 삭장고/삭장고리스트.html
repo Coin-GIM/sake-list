@@ -1070,15 +1070,20 @@ function inpClearAll(){
   document.getElementById('inp-save-msg').textContent='';
 }
 
-async function inpCallScript(params){
-  var qs='?token='+encodeURIComponent(WRITER_TOKEN);
-  Object.keys(params).forEach(function(k){ qs+='&'+k+'='+encodeURIComponent(params[k]); });
-  var ctrl=new AbortController();
-  var tid=setTimeout(function(){ ctrl.abort(); },15000);
-  try{
-    await fetch(APPS_SCRIPT_URL+qs,{signal:ctrl.signal,mode:'no-cors'});
-    clearTimeout(tid);
-  } catch(e){ clearTimeout(tid); throw e; }
+const INP_SHEET_NAME = '시트1';
+
+async function inpSheetsUpdateCell(cellRange, value){
+  var token=await inpGetDriveToken();
+  var url='https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+encodeURIComponent(INP_SHEET_NAME+'!'+cellRange)+'?valueInputOption=RAW';
+  var res=await fetch(url,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({values:[[value]]})});
+  if(!res.ok){var e=await res.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'HTTP '+res.status);}
+}
+
+async function inpSheetsAppendRow(rowValues){
+  var token=await inpGetDriveToken();
+  var url='https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+encodeURIComponent(INP_SHEET_NAME+'!A:H')+':append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS';
+  var res=await fetch(url,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({values:[rowValues]})});
+  if(!res.ok){var e=await res.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'HTTP '+res.status);}
 }
 
 async function inpSave(){
@@ -1091,7 +1096,7 @@ async function inpSave(){
   var btn=document.getElementById('inp-save-btn'), msg=document.getElementById('inp-save-msg');
   btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
   try{
-    await inpCallScript({action:'append',data:JSON.stringify(row)});
+    await inpSheetsAppendRow(row);
     msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료! (목록은 1분 후 새로고침)';
     btn.disabled=false; btn.textContent='구글 시트에 저장';
     setTimeout(inpClearAll,2000);
@@ -1197,7 +1202,7 @@ function inpInitDriveAuth(){
   if(typeof google==='undefined'||!CLIENT_ID) return;
   inpDriveTokenClient=google.accounts.oauth2.initTokenClient({
     client_id:CLIENT_ID,
-    scope:'https://www.googleapis.com/auth/drive.file',
+    scope:'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
     callback:function(){},
   });
 }
@@ -1342,7 +1347,7 @@ async function inpImgSave(){
       btn.disabled=false; btn.textContent='저장';
       setTimeout(inpCloseImgModal,800);
     } else {
-      await inpCallScript({action:'update',range:'G'+inpImgState.sheetRow,value:imageUrl});
+      await inpSheetsUpdateCell('G'+inpImgState.sheetRow, imageUrl);
       var item=inpAllRows.find(function(r){return r.sheetRow===inpImgState.sheetRow;});
       if(item){while(item.data.length<=6)item.data.push('');item.data[6]=imageUrl;}
       inpFilterList();
@@ -1369,7 +1374,7 @@ async function inpModalSave(){
   var btn=document.getElementById('inp-modal-save-btn'), msg=document.getElementById('inp-modal-msg');
   btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
   try{
-    await inpCallScript({action:'update', range:inpModalState.letter+inpModalState.sheetRow, value:val});
+    await inpSheetsUpdateCell(inpModalState.letter+inpModalState.sheetRow, val);
     /* 입력탭 목록 메모리 업데이트 */
     var item=inpAllRows.find(function(r){return r.sheetRow===inpModalState.sheetRow;});
     if(item){ while(item.data.length<=inpModalState.colIdx)item.data.push(''); item.data[inpModalState.colIdx]=val; }
