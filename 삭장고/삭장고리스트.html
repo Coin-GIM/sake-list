@@ -715,9 +715,14 @@ function parseCSV(text){
 function h(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 /* Load */
+function fetchWithTimeout(url, ms){
+  var ctrl=new AbortController();
+  var tid=setTimeout(function(){ ctrl.abort(); },ms);
+  return fetch(url+'&t='+Date.now(),{signal:ctrl.signal,cache:'no-cache'}).finally(function(){ clearTimeout(tid); });
+}
 async function loadData(){
   try{
-    var res=await fetch(CSV_URL);
+    var res=await fetchWithTimeout(CSV_URL,15000);
     if(!res.ok) throw new Error('HTTP '+res.status);
     var rows=parseCSV(await res.text()).slice(1).filter(function(r){return r[0];});
     allRows=rows;
@@ -727,7 +732,8 @@ async function loadData(){
     document.getElementById('state').style.display='none';
     document.getElementById('card-grid').style.display='grid';
   } catch(err){
-    document.getElementById('state').innerHTML='<div class="error-box"><strong>⚠️ 시트를 불러올 수 없습니다</strong>구글 시트 → <strong>공유</strong> → <strong>링크가 있는 모든 사용자 → 뷰어</strong>로 설정 후 새로고침 해주세요.<br><br><small style="color:#b06060">오류: '+h(err.message)+'</small></div>';
+    var msg=err.name==='AbortError'?'응답 시간 초과 — 새로고침 해주세요':h(err.message);
+    document.getElementById('state').innerHTML='<div class="error-box"><strong>⚠️ 시트를 불러올 수 없습니다</strong>구글 시트 → <strong>공유</strong> → <strong>링크가 있는 모든 사용자 → 뷰어</strong>로 설정 후 새로고침 해주세요.<br><br><small style="color:#b06060">오류: '+msg+'</small></div>';
   }
 }
 
@@ -1012,7 +1018,7 @@ function inpSave(){
   inpCallScript({action:'append',data:JSON.stringify(row)}).then(function(){
     msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
     btn.disabled=false; btn.textContent='구글 시트에 저장';
-    setTimeout(inpClearAll,2000);
+    setTimeout(function(){ inpClearAll(); loadData(); },2000);
   });
 }
 
@@ -1035,13 +1041,16 @@ function inpParseCSV(text){
 async function inpLoadList(){
   document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">불러오는 중…</td></tr>';
   try{
-    var res=await fetch(CSV_URL);
+    var res=await fetchWithTimeout(CSV_URL,15000);
+    if(!res.ok) throw new Error('HTTP '+res.status);
     var rows=inpParseCSV(await res.text()).slice(1).filter(function(r){return r[0];});
     inpAllRows=rows.map(function(r,i){return {data:r, sheetRow:i+2};});
     document.getElementById('inp-list-count').textContent='총 '+inpAllRows.length+'종';
     inpRenderList(inpAllRows);
   } catch(e){
-    document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="7" style="text-align:center;color:#922B21;padding:30px">불러오기 실패: '+e.message+'</td></tr>';
+    var msg=e.name==='AbortError'?'응답 시간 초과 — 다시 시도해주세요':e.message;
+    document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="7" style="text-align:center;color:#922B21;padding:30px">불러오기 실패: '+msg+'</td></tr>';
+    inpListLoaded=false;
   }
 }
 
