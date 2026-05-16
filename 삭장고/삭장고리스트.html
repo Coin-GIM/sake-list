@@ -58,9 +58,7 @@
     .header-inner { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
     .header-title { font-size: 19px; font-weight: 700; }
     .header-right { display: flex; align-items: center; gap: 8px; }
-    .header-count { font-size: 13px; font-weight: 600; background: rgba(255,255,255,.18); padding: 4px 12px; border-radius: 20px; cursor: pointer; user-select: none; transition: background .2s; }
-    .header-count:hover { background: rgba(255,255,255,.3); }
-    .header-count.filter-on { background: var(--gold); color: #fff; }
+    .header-count { font-size: 13px; font-weight: 600; background: rgba(255,255,255,.18); padding: 4px 12px; border-radius: 20px; }
     .header-sort { font-size: 13px; font-weight: 600; background: rgba(255,255,255,.18); padding: 4px 12px; border-radius: 20px; cursor: pointer; user-select: none; border: none; color: #fff; font-family: inherit; transition: background .2s; }
     .header-sort:hover { background: rgba(255,255,255,.3); }
     .header-sort.sort-on { background: var(--gold); }
@@ -88,12 +86,6 @@
     .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(123,30,30,.07); display: flex; overflow: hidden; transition: box-shadow .2s, transform .2s; position: relative; height: 108px; }
     .stock-badge { position: absolute; top: 8px; right: 10px; font-size: 11px; font-weight: 700; color: var(--muted); background: rgba(247,242,234,.95); border: 1px solid var(--border); border-radius: 8px; padding: 2px 7px; pointer-events: none; }
     .stock-badge.multi { color: var(--red); border-color: var(--gold); background: rgba(255,248,230,.97); }
-    .stock-badge.zero { color: #aaa; border-color: #ddd; background: #f5f5f5; }
-    .card.empty { background: #EFEFEF; }
-    .card.empty .card-name { color: #999; }
-    .card.empty .cat-badge { opacity: .45; }
-    .card.empty .tag { color: #bbb; }
-    .card.empty .card-img { background: #E4E4E4; filter: grayscale(1); }
     .card:hover { box-shadow: 0 7px 24px rgba(123,30,30,.16); transform: translateY(-3px); }
     .card-img { width: 64px; flex-shrink: 0; background: #F0E8D8; border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; align-self: stretch; }
     .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
@@ -302,7 +294,7 @@
     <div class="header-right">
       <button class="header-sort" id="hd-sort" onclick="toggleDateSort()">제조일</button>
       <button class="header-sort" id="hd-admin" onclick="goAdmin()" style="display:none">🔐</button>
-      <span class="header-count" id="hd-count" onclick="toggleStockFilter()" title="클릭: 보유중 필터">&#8212;</span>
+      <span class="header-count" id="hd-count">&#8212;</span>
     </div>
   </div>
 </header>
@@ -729,7 +721,7 @@ const PREFS = [
   ['오키나와',['오키나와'],                            15, 0],
 ];
 
-let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', stockFilter = false, dateSort = 0;
+let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', dateSort = 0;
 
 /* PIN */
 (function(){
@@ -818,9 +810,8 @@ async function loadData(){
     if(!res.ok) throw new Error('HTTP '+res.status);
     var rows=parseCSV(await res.text()).slice(1).filter(function(r){return r[0];});
     allRows=rows;
-    var totalStock=rows.reduce(function(sum,r){var s=parseInt(r[7]);return sum+(isNaN(s)||s<=0?0:s);},0);
-    document.getElementById('hd-count').textContent=totalStock+'병';
     buildFilters(); renderList(); renderDrunk(); renderMap();
+    updateHdCount();
     document.getElementById('state').style.display='none';
     document.getElementById('card-grid').style.display='grid';
   } catch(err){
@@ -836,6 +827,7 @@ function showTab(tab){
     document.getElementById('tab-'+t).style.display=tab===t?'block':'none';
   });
   document.getElementById('write-fab').style.display=tab==='input'?'none':'';
+  updateHdCount();
 }
 
 /* Guide nav */
@@ -860,10 +852,15 @@ var CAT_COLOR={'준마이다이긴죠':['#4A235A','#D7BDE2'],'준마이긴죠':[
 function catStyle(cat){ var c=CAT_COLOR[cat]||['#7A6050','#F5F0E8']; return 'color:'+c[0]+';background:'+c[1]; }
 
 function showImg(url){ document.getElementById('img-modal-img').src=url; document.getElementById('img-modal').style.display='flex'; }
-function toggleStockFilter(){
-  stockFilter=!stockFilter;
-  document.getElementById('hd-count').classList.toggle('filter-on',stockFilter);
-  renderList();
+function updateHdCount(){
+  var isDrunk=document.getElementById('tab-drunk').style.display!=='none';
+  if(isDrunk){
+    var cnt=allRows.filter(function(r){return parseInt(r[7])===0;}).length;
+    document.getElementById('hd-count').textContent=cnt+'종';
+  } else {
+    var total=allRows.reduce(function(sum,r){var s=parseInt(r[7]);return sum+(isNaN(s)||s<=0?0:s);},0);
+    document.getElementById('hd-count').textContent=total+'병';
+  }
 }
 function toggleDateSort(){
   dateSort=(dateSort+1)%3;
@@ -879,11 +876,10 @@ function cardHTML(r){
   var stockVal=parseInt(r[7]); var stock=isNaN(stockVal)?1:stockVal;
   var smv=(!smvRaw||/^#/.test(smvRaw))?'-':(/^\d+$/.test(smvRaw.trim())?'+'+smvRaw.trim():smvRaw);
   var imgHtml=imgUrl?'<img src="'+h(imgUrl)+'" alt="" loading="lazy" onclick="showImg(\''+h(imgUrl)+'\')" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';
-  var isEmpty=stock===0;
-  var badgeCls=isEmpty?' zero':stock>1?' multi':'';
+  var badgeCls=stock>1?' multi':'';
   var stockBadge='<div class="stock-badge'+badgeCls+'">보유 '+stock+'</div>';
   var tags=[region&&'<span class="tag">📍 '+h(region)+'</span>',date&&'<span class="tag">📅 '+h(date)+'</span>','<span class="tag">💧 '+h(smv)+'</span>',heat&&'<span class="tag">🌡️ '+h(heat)+'</span>'].filter(Boolean).join('');
-  return '<div class="card'+(isEmpty?' empty':'')+'"><div class="card-img">'+imgHtml+'<div class="card-img-ph" '+(imgUrl?'style="display:none"':'')+'>🍶</div></div><div class="card-body"><div class="card-name">'+h(name)+'</div>'+(cat?'<span class="cat-badge" style="'+catStyle(cat)+'">'+h(cat)+'</span>':'')+(tags?'<div class="card-tags">'+tags+'</div>':'')+'</div>'+stockBadge+'</div>';
+  return '<div class="card"><div class="card-img">'+imgHtml+'<div class="card-img-ph" '+(imgUrl?'style="display:none"':'')+'>🍶</div></div><div class="card-body"><div class="card-name">'+h(name)+'</div>'+(cat?'<span class="cat-badge" style="'+catStyle(cat)+'">'+h(cat)+'</span>':'')+(tags?'<div class="card-tags">'+tags+'</div>':'')+'</div>'+stockBadge+'</div>';
 }
 
 /* List */
@@ -1417,7 +1413,7 @@ async function inpModalSave(){
     if(mainIdx>=0 && mainIdx<allRows.length){
       while(allRows[mainIdx].length<=inpModalState.colIdx) allRows[mainIdx].push('');
       allRows[mainIdx][inpModalState.colIdx]=val;
-      buildFilters(); renderList(); renderDrunk(); renderMap();
+      buildFilters(); renderList(); renderDrunk(); renderMap(); updateHdCount();
     }
     msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
     btn.disabled=false; btn.textContent='저장';
