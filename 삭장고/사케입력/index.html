@@ -21,13 +21,10 @@
     .pin-logo  { font-size:56px; }
     .pin-title { color:rgba(255,255,255,.92); font-size:21px; font-weight:700; }
     .pin-sub   { color:rgba(255,255,255,.5); font-size:13px; margin-top:-16px; }
-    .pin-dots  { display:flex; gap:16px; }
-    .pin-dot   { width:16px; height:16px; border-radius:50%; background:rgba(255,255,255,.25); transition:background .15s; }
-    .pin-dot.filled { background:#fff; }
-    .pin-pad   { display:grid; grid-template-columns:repeat(3,72px); gap:12px; }
-    .pin-key   { height:72px; border-radius:50%; background:rgba(255,255,255,.15); border:none; color:#fff; font-size:24px; font-weight:600; cursor:pointer; font-family:inherit; }
-    .pin-key:active { background:rgba(255,255,255,.35); }
-    .pin-key.empty { background:none; pointer-events:none; }
+    .pin-input-wrap { display:flex; flex-direction:column; align-items:center; gap:12px; width:280px; }
+    .pin-input { width:100%; padding:14px 18px; border-radius:14px; border:none; font-size:18px; text-align:center; font-family:inherit; background:rgba(255,255,255,.95); outline:none; letter-spacing:.05em; }
+    .pin-btn   { width:100%; padding:14px; border-radius:14px; border:none; background:rgba(255,255,255,.25); color:#fff; font-size:17px; font-weight:700; cursor:pointer; font-family:inherit; }
+    .pin-btn:active { background:rgba(255,255,255,.4); }
     .pin-error { color:#FFB3B3; font-size:13px; font-weight:600; height:18px; text-align:center; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
 
@@ -77,26 +74,10 @@
   <div class="pin-logo">🍶</div>
   <div class="pin-title">삭장고 입력</div>
   <div class="pin-sub">관리자 PIN을 입력하세요</div>
-  <div class="pin-dots">
-    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
-    <div class="pin-dot" id="d4"></div><div class="pin-dot" id="d5"></div>
-    <div class="pin-dot" id="d6"></div><div class="pin-dot" id="d7"></div>
-  </div>
-  <div class="pin-error" id="pin-error"></div>
-  <div class="pin-pad">
-    <button class="pin-key" onclick="pinKey('1')">1</button>
-    <button class="pin-key" onclick="pinKey('2')">2</button>
-    <button class="pin-key" onclick="pinKey('3')">3</button>
-    <button class="pin-key" onclick="pinKey('4')">4</button>
-    <button class="pin-key" onclick="pinKey('5')">5</button>
-    <button class="pin-key" onclick="pinKey('6')">6</button>
-    <button class="pin-key" onclick="pinKey('7')">7</button>
-    <button class="pin-key" onclick="pinKey('8')">8</button>
-    <button class="pin-key" onclick="pinKey('9')">9</button>
-    <button class="pin-key empty"></button>
-    <button class="pin-key" onclick="pinKey('0')">0</button>
-    <button class="pin-key" onclick="pinDel()">⌫</button>
+  <div class="pin-input-wrap">
+    <div class="pin-error" id="pin-error"></div>
+    <input id="pin-input" class="pin-input" type="password" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')checkPin()">
+    <button class="pin-btn" onclick="checkPin()">확인</button>
   </div>
 </div>
 
@@ -212,39 +193,24 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyVFh0gh866bjJv
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 
 /* PIN */
-var pinInput = '';
-var MAX_PIN = 8;
-(function(){ if(sessionStorage.getItem('sake_input_auth')==='ok') unlock(); })();
+(function(){
+  if(sessionStorage.getItem('sake_input_auth')==='ok') unlock();
+  else setTimeout(function(){ document.getElementById('pin-input').focus(); }, 300);
+})();
 
-function pinKey(n){
-  if(pinInput.length >= MAX_PIN) return;
-  pinInput += n;
-  updateDots();
-  if(pinInput.length === MAX_PIN) checkPin();
-}
-function pinDel(){
-  pinInput = pinInput.slice(0,-1);
-  updateDots();
-  document.getElementById('pin-error').textContent = '';
-}
-function updateDots(){
-  for(var i=0;i<MAX_PIN;i++){
-    var el = document.getElementById('d'+i);
-    if(el) el.classList.toggle('filled', i < pinInput.length);
-  }
-}
 function checkPin(){
-  if(pinInput === WRITER_TOKEN){
+  var val = document.getElementById('pin-input').value;
+  if(val === WRITER_TOKEN){
     sessionStorage.setItem('sake_input_auth','ok');
     var s = document.getElementById('pin-screen');
     s.style.transition = 'opacity .3s'; s.style.opacity = '0';
     setTimeout(unlock, 300);
   } else {
     var err = document.getElementById('pin-error');
-    err.textContent = '잘못된 PIN입니다';
+    err.textContent = '잘못된 비밀번호입니다';
     err.style.animation = 'none';
     requestAnimationFrame(function(){ err.style.animation = 'shake .35s ease'; });
-    pinInput = ''; setTimeout(updateDots, 350);
+    document.getElementById('pin-input').value = '';
   }
 }
 function unlock(){ document.getElementById('pin-screen').style.display = 'none'; }
