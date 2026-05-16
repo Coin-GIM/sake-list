@@ -1007,11 +1007,8 @@ async function inpCallScript(params){
   var ctrl=new AbortController();
   var tid=setTimeout(function(){ ctrl.abort(); },15000);
   try{
-    var res=await fetch(APPS_SCRIPT_URL+qs,{signal:ctrl.signal});
+    await fetch(APPS_SCRIPT_URL+qs,{signal:ctrl.signal,mode:'no-cors'});
     clearTimeout(tid);
-    var data=await res.json();
-    if(!data.success) throw new Error(data.error||'저장 실패');
-    return data;
   } catch(e){ clearTimeout(tid); throw e; }
 }
 
