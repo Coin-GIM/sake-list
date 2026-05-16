@@ -310,6 +310,7 @@
 <!-- Tab bar -->
 <div class="tab-bar">
   <button class="tab-btn active" id="tb-list"  onclick="showTab('list')">📋 목록</button>
+  <button class="tab-btn"        id="tb-drunk" onclick="showTab('drunk')"><span style="display:inline-block;transform:rotate(180deg)">🍶</span> 주책</button>
   <button class="tab-btn"        id="tb-map"   onclick="showTab('map')">🗾 지도</button>
   <button class="tab-btn"        id="tb-guide" onclick="showTab('guide')">📖 가이드</button>
   <button class="tab-btn" id="tb-input" onclick="showTab('input')" style="display:none">✍️ 입력</button>
@@ -350,6 +351,22 @@
       <span id="map-result-count"></span>
     </div>
     <div class="map-card-grid" id="map-card-grid"></div>
+  </div>
+</div>
+
+<!-- DRUNK TAB -->
+<div id="tab-drunk" style="display:none">
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="drunk-search" placeholder="마신 술 검색…" oninput="renderDrunk()">
+    </div>
+  </div>
+  <div id="drunk-grid" class="grid"></div>
+  <div id="drunk-empty" style="display:none;text-align:center;padding:60px 16px;color:var(--muted)">
+    <div style="font-size:52px;margin-bottom:14px"><span style="display:inline-block;transform:rotate(180deg)">🍶</span></div>
+    <div style="font-weight:700;font-size:16px">아직 비운 술이 없어요</div>
+    <div style="font-size:13px;margin-top:6px">보유 수량이 0이 되면 여기로 옮겨집니다</div>
   </div>
 </div>
 
@@ -803,7 +820,7 @@ async function loadData(){
     allRows=rows;
     var totalStock=rows.reduce(function(sum,r){var s=parseInt(r[7]);return sum+(isNaN(s)||s<=0?0:s);},0);
     document.getElementById('hd-count').textContent=totalStock+'병';
-    buildFilters(); renderList(); renderMap();
+    buildFilters(); renderList(); renderDrunk(); renderMap();
     document.getElementById('state').style.display='none';
     document.getElementById('card-grid').style.display='grid';
   } catch(err){
@@ -814,7 +831,7 @@ async function loadData(){
 
 /* Tab */
 function showTab(tab){
-  ['list','map','guide','input'].forEach(function(t){
+  ['list','drunk','map','guide','input'].forEach(function(t){
     document.getElementById('tb-'+t).classList.toggle('active',tab===t);
     document.getElementById('tab-'+t).style.display=tab===t?'block':'none';
   });
@@ -872,7 +889,8 @@ function cardHTML(r){
 /* List */
 function buildFilters(){
   var order=['준마이다이긴죠','준마이긴죠','다이긴죠','긴죠','도쿠베츠준마이','준마이','혼죠죠','보통주','무라벨'];
-  var cats=[...new Set(allRows.map(function(r){return r[1];}).filter(Boolean))];
+  var activeRows=allRows.filter(function(r){var s=parseInt(r[7]);return isNaN(s)||s!==0;});
+  var cats=[...new Set(activeRows.map(function(r){return r[1];}).filter(Boolean))];
   cats.sort(function(a,b){ var ai=order.indexOf(a),bi=order.indexOf(b); return (ai<0?99:ai)-(bi<0?99:bi); });
   var wrap=document.getElementById('filters');
   cats.forEach(function(cat){
@@ -883,8 +901,7 @@ function buildFilters(){
 function setFilter(btn){ document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');}); btn.classList.add('active'); activeFilter=btn.dataset.cat; renderList(); }
 function renderList(){
   var q=document.getElementById('search').value.toLowerCase();
-  var rows=allRows.slice();
-  if(stockFilter) rows=rows.filter(function(r){var s=parseInt(r[7]);return !isNaN(s)&&s>0;});
+  var rows=allRows.filter(function(r){var s=parseInt(r[7]);return isNaN(s)||s!==0;});
   if(activeFilter) rows=rows.filter(function(r){return r[1]===activeFilter;});
   if(q) rows=rows.filter(function(r){return r.join(' ').toLowerCase().includes(q);});
   if(dateSort===0){
@@ -898,6 +915,22 @@ function renderList(){
   }
   var grid=document.getElementById('card-grid');
   grid.innerHTML=rows.length?rows.map(cardHTML).join(''):'<div class="no-result">🔍 검색 결과가 없습니다</div>';
+}
+
+/* Drunk */
+function renderDrunk(){
+  var q=document.getElementById('drunk-search').value.toLowerCase();
+  var rows=allRows.filter(function(r){var s=parseInt(r[7]);return s===0;});
+  if(q) rows=rows.filter(function(r){return r.join(' ').toLowerCase().includes(q);});
+  rows.sort(function(a,b){return a[0].localeCompare(b[0],'ko');});
+  var grid=document.getElementById('drunk-grid');
+  var empty=document.getElementById('drunk-empty');
+  if(rows.length){
+    grid.innerHTML=rows.map(cardHTML).join('');
+    grid.style.display='grid'; empty.style.display='none';
+  } else {
+    grid.innerHTML=''; grid.style.display='none'; empty.style.display='block';
+  }
 }
 
 /* Map */
@@ -1352,7 +1385,7 @@ async function inpImgSave(){
       if(item){while(item.data.length<=6)item.data.push('');item.data[6]=imageUrl;}
       inpFilterList();
       var mi=inpImgState.sheetRow-2;
-      if(mi>=0&&mi<allRows.length){while(allRows[mi].length<=6)allRows[mi].push('');allRows[mi][6]=imageUrl;renderList();renderMap();}
+      if(mi>=0&&mi<allRows.length){while(allRows[mi].length<=6)allRows[mi].push('');allRows[mi][6]=imageUrl;renderList();renderDrunk();renderMap();}
       msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
       btn.disabled=false; btn.textContent='저장';
       setTimeout(inpCloseImgModal,800);
@@ -1384,7 +1417,7 @@ async function inpModalSave(){
     if(mainIdx>=0 && mainIdx<allRows.length){
       while(allRows[mainIdx].length<=inpModalState.colIdx) allRows[mainIdx].push('');
       allRows[mainIdx][inpModalState.colIdx]=val;
-      renderList(); renderMap();
+      buildFilters(); renderList(); renderDrunk(); renderMap();
     }
     msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
     btn.disabled=false; btn.textContent='저장';
