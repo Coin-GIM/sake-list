@@ -136,6 +136,52 @@
       .pref-badge { font-size: 8px; padding: 0 3px; top: -5px; right: -5px; min-width: 14px; }
     }
 
+    /* ===== 입력 탭 ===== */
+    .inp-subtab-bar { display:flex; border-bottom:1.5px solid var(--border); background:#fff; }
+    .inp-subtab-btn { flex:1; padding:10px 0 8px; border:none; background:none; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; font-family:inherit; }
+    .inp-subtab-btn.active { color:var(--red); border-bottom-color:var(--red); }
+    .inp-page { max-width:560px; margin:0 auto; padding:16px 16px 80px; }
+    .inp-guide { background:#FFF8F0; border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; }
+    .inp-guide pre { font-size:11.5px; color:#5A4030; line-height:1.8; white-space:pre-wrap; font-family:monospace; }
+    .inp-guide-copy { margin-top:10px; padding:9px 16px; background:var(--red); border:none; border-radius:8px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; font-family:inherit; }
+    .inp-sec { background:var(--card); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 1px 6px rgba(0,0,0,.07); }
+    .inp-sec-ttl { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:10px; letter-spacing:.04em; }
+    #inp-paste { width:100%; height:110px; border:1.5px dashed var(--border); border-radius:12px; padding:12px; font-size:14px; font-family:inherit; color:var(--text); background:#FDFAF5; resize:none; outline:none; }
+    #inp-paste:focus { border-color:var(--red); }
+    #inp-paste::placeholder { color:#C4A882; }
+    .inp-btn-row { display:flex; gap:8px; margin-top:10px; }
+    .inp-btn-parse { flex:1; padding:13px; background:var(--red); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
+    .inp-btn-clear { padding:13px 16px; background:#F0E8DC; color:var(--muted); border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; }
+    .inp-field { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+    .inp-field label { font-size:12px; font-weight:700; color:var(--muted); letter-spacing:.04em; }
+    .inp-field input, .inp-field select { width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:16px; font-family:inherit; background:#fff; color:var(--text); -webkit-appearance:none; appearance:none; }
+    .inp-field input:focus, .inp-field select:focus { outline:none; border-color:var(--red); }
+    .inp-save { width:100%; padding:16px; background:var(--red); color:#fff; border:none; border-radius:16px; font-size:17px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:4px; }
+    .inp-save:disabled { background:var(--muted); }
+    .inp-save-msg { text-align:center; font-size:14px; font-weight:600; height:20px; margin-top:10px; }
+    .inp-search-wrap { position:relative; margin-bottom:10px; }
+    .inp-search-wrap input { width:100%; padding:11px 14px 11px 36px; border:1.5px solid var(--border); border-radius:12px; font-size:15px; font-family:inherit; background:#fff; }
+    .inp-search-wrap input:focus { outline:none; border-color:var(--red); }
+    .inp-search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:15px; color:var(--muted); pointer-events:none; }
+    .inp-list-meta { font-size:13px; color:var(--muted); font-weight:600; margin-bottom:8px; }
+    .inp-list-wrap { overflow-x:auto; border-radius:14px; border:1px solid var(--border); background:#fff; }
+    .inp-list-wrap table { width:100%; border-collapse:collapse; min-width:540px; }
+    .inp-list-wrap thead { position:sticky; top:0; z-index:10; }
+    .inp-list-wrap th { background:var(--red); color:#fff; padding:10px 12px; font-size:12px; font-weight:700; text-align:left; white-space:nowrap; }
+    .inp-list-wrap td { padding:9px 12px; font-size:13px; border-bottom:1px solid var(--border); vertical-align:middle; cursor:pointer; }
+    .inp-list-wrap tr:last-child td { border-bottom:none; }
+    .inp-list-wrap td:hover { background:rgba(123,30,30,.05); }
+    .inp-td-empty { color:var(--muted); font-style:italic; }
+    .inp-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; }
+    .inp-modal-overlay.open { display:block; }
+    .inp-modal-sheet { position:fixed; bottom:0; left:0; right:0; background:#fff; border-radius:20px 20px 0 0; padding:20px 20px 36px; z-index:501; max-height:80vh; overflow-y:auto; transform:translateY(100%); transition:transform .28s ease; }
+    .inp-modal-sheet.open { transform:translateY(0); }
+    .inp-modal-title { font-size:16px; font-weight:700; color:var(--red); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; }
+    .inp-modal-close { background:none; border:none; font-size:22px; color:var(--muted); cursor:pointer; line-height:1; }
+    .inp-modal-field input, .inp-modal-field select { width:100%; padding:13px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:16px; font-family:inherit; background:#fff; -webkit-appearance:none; appearance:none; }
+    .inp-modal-field input:focus, .inp-modal-field select:focus { outline:none; border-color:var(--red); }
+    .inp-modal-msg { font-size:13px; font-weight:600; height:18px; margin:8px 0; }
+
     /* ===== 가이드 탭 ===== */
     .g-nav { background: #fff; border-bottom: 1.5px solid var(--border); position: sticky; top: 87px; z-index: 99; }
     .g-nav-inner { max-width: 780px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 8px; }
@@ -258,6 +304,7 @@
   <button class="tab-btn active" id="tb-list"  onclick="showTab('list')">📋 목록</button>
   <button class="tab-btn"        id="tb-map"   onclick="showTab('map')">🗾 지도</button>
   <button class="tab-btn"        id="tb-guide" onclick="showTab('guide')">📖 가이드</button>
+  <button class="tab-btn"        id="tb-input" onclick="showTab('input')">✍️ 입력</button>
 </div>
 
 <!-- LIST TAB -->
@@ -454,6 +501,101 @@
   </div>
 </div>
 
+<!-- INPUT TAB -->
+<div id="tab-input" style="display:none">
+  <div class="inp-subtab-bar">
+    <button class="inp-subtab-btn active" id="inp-tb-ai"   onclick="inpShowSub('ai')">AI 파싱 입력</button>
+    <button class="inp-subtab-btn"        id="inp-tb-list" onclick="inpShowSub('list')">목록 편집</button>
+  </div>
+
+  <!-- AI parse sub-tab -->
+  <div id="inp-sub-ai" class="inp-page">
+    <div class="inp-guide">
+      <div class="inp-sec-ttl">Claude / Gemini 프롬프트 복사 → AI에 붙여넣기</div>
+      <pre id="inp-prompt-text">사케 정보를 아래 형식으로만 출력해줘:
+이름: [한글이름 일본어이름]
+구분: [준마이다이긴죠/준마이긴죠/다이긴죠/긴죠/도쿠베츠준마이/준마이/혼죠죠/보통주/무라벨 중 하나]
+제조년월: [YYYY.MM]
+지역: [일본 현 이름 한국어]
+일본주도: [수치, 모르면 공백]
+열처리: [생주/생주 (무여과)/1회 열처리/1회 열처리 (나마즈메)/1회 열처리 (저알코올)/1회 열처리 (빙온숙성)/2회 열처리 중 하나, 모르면 공백]
+보유: 1</pre>
+      <button class="inp-guide-copy" id="inp-copy-btn" onclick="inpCopyPrompt()">프롬프트 복사</button>
+    </div>
+
+    <div class="inp-sec">
+      <div class="inp-sec-ttl">AI 결과 붙여넣기</div>
+      <textarea id="inp-paste" placeholder="Claude/Gemini 출력 결과를 여기에 붙여넣으세요&#10;마크다운 테이블 형식도 인식됩니다"></textarea>
+      <div class="inp-btn-row">
+        <button class="inp-btn-parse" onclick="inpParse()">파싱 → 폼 자동입력</button>
+        <button class="inp-btn-clear" onclick="inpClearAll()">초기화</button>
+      </div>
+    </div>
+
+    <div class="inp-sec">
+      <div class="inp-sec-ttl">사케 정보 확인 / 수정</div>
+      <div class="inp-field"><label>이름 *</label><input id="inp-f-name" type="text" placeholder="나츠 준긴 요코야마 夏純吟 よこやま"></div>
+      <div class="inp-field"><label>구분</label>
+        <select id="inp-f-cat">
+          <option value="">— 선택 —</option>
+          <option>준마이다이긴죠</option><option>준마이긴죠</option>
+          <option>다이긴죠</option><option>긴죠</option>
+          <option>도쿠베츠준마이</option><option>준마이</option>
+          <option>혼죠죠</option><option>보통주</option><option>무라벨</option>
+        </select>
+      </div>
+      <div class="inp-field"><label>제조년월</label><input id="inp-f-date" type="text" placeholder="2026.04"></div>
+      <div class="inp-field"><label>지역</label><input id="inp-f-region" type="text" placeholder="나가사키"></div>
+      <div class="inp-field"><label>일본주도</label><input id="inp-f-smv" type="text" placeholder="+3~+4"></div>
+      <div class="inp-field"><label>열처리</label>
+        <select id="inp-f-heat">
+          <option value="">— 선택 —</option>
+          <option>생주</option><option>생주 (무여과)</option>
+          <option>1회 열처리</option><option>1회 열처리 (나마즈메)</option>
+          <option>1회 열처리 (저알코올)</option><option>1회 열처리 (빙온숙성)</option>
+          <option>2회 열처리</option>
+        </select>
+      </div>
+      <div class="inp-field"><label>이미지 URL (선택)</label><input id="inp-f-img" type="url" placeholder="https://drive.google.com/..."></div>
+      <div class="inp-field"><label>보유</label><input id="inp-f-stock" type="number" value="1" min="0" max="99"></div>
+    </div>
+
+    <button class="inp-save" id="inp-save-btn" onclick="inpSave()">구글 시트에 저장</button>
+    <div class="inp-save-msg" id="inp-save-msg"></div>
+  </div>
+
+  <!-- list edit sub-tab -->
+  <div id="inp-sub-list" class="inp-page" style="display:none">
+    <div class="inp-search-wrap">
+      <span class="inp-search-icon">🔍</span>
+      <input type="text" id="inp-list-search" placeholder="이름 · 지역 · 구분 검색…" oninput="inpFilterList()">
+    </div>
+    <div class="inp-list-meta" id="inp-list-count">-</div>
+    <div class="inp-list-wrap">
+      <table>
+        <thead>
+          <tr><th>이름</th><th>구분</th><th>제조년월</th><th>지역</th><th>일본주도</th><th>열처리</th><th>보유</th></tr>
+        </thead>
+        <tbody id="inp-tbl-body">
+          <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">목록 편집 탭을 열면 불러옵니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 입력탭 편집 모달 -->
+<div class="inp-modal-overlay" id="inp-modal-overlay" onclick="inpCloseModal()"></div>
+<div class="inp-modal-sheet" id="inp-modal-sheet">
+  <div class="inp-modal-title">
+    <span id="inp-modal-title-text"></span>
+    <button class="inp-modal-close" onclick="inpCloseModal()">✕</button>
+  </div>
+  <div id="inp-modal-body"></div>
+  <div class="inp-modal-msg" id="inp-modal-msg"></div>
+  <button class="inp-save" id="inp-modal-save-btn" onclick="inpModalSave()">저장</button>
+</div>
+
 <script>
 const SHEET_ID         = '1Lv1di5KmV3UbzeD-VfI_KXWFnm5Hrgftd4WL0UUU_nI';
 const CSV_URL          = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv';
@@ -591,10 +733,11 @@ async function loadData(){
 
 /* Tab */
 function showTab(tab){
-  ['list','map','guide'].forEach(function(t){
+  ['list','map','guide','input'].forEach(function(t){
     document.getElementById('tb-'+t).classList.toggle('active',tab===t);
     document.getElementById('tab-'+t).style.display=tab===t?'block':'none';
   });
+  document.getElementById('write-fab').style.display=tab==='input'?'none':'';
 }
 
 /* Guide nav */
@@ -759,6 +902,214 @@ function submitWrite(e){
     closeWriteModal(); loadData();
   },2500);
   btn.disabled=false; btn.textContent='저장';
+}
+
+/* ===== 입력 탭 ===== */
+var INP_CAT_OPTS  = ['준마이다이긴죠','준마이긴죠','다이긴죠','긴죠','도쿠베츠준마이','준마이','혼죠죠','보통주','무라벨'];
+var INP_HEAT_OPTS = ['생주','생주 (무여과)','1회 열처리','1회 열처리 (나마즈메)','1회 열처리 (저알코올)','1회 열처리 (빙온숙성)','2회 열처리'];
+var inpAllRows=[], inpListLoaded=false, inpModalState=null;
+
+function inpShowSub(sub){
+  document.getElementById('inp-sub-ai').style.display   = sub==='ai'   ? '' : 'none';
+  document.getElementById('inp-sub-list').style.display = sub==='list' ? '' : 'none';
+  document.getElementById('inp-tb-ai').classList.toggle('active',   sub==='ai');
+  document.getElementById('inp-tb-list').classList.toggle('active', sub==='list');
+  if(sub==='list' && !inpListLoaded){ inpListLoaded=true; inpLoadList(); }
+}
+
+function inpCopyPrompt(){
+  var text=document.getElementById('inp-prompt-text').textContent;
+  var ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,99999);
+  document.execCommand('copy'); document.body.removeChild(ta);
+  var btn=document.getElementById('inp-copy-btn');
+  btn.textContent='복사됨 ✓'; setTimeout(function(){ btn.textContent='프롬프트 복사'; },2000);
+}
+
+var INP_KEY_MAP=[
+  {field:'name',   keys:['이름','name','제품명','상품명','사케명']},
+  {field:'cat',    keys:['구분','종류','등급','category','분류']},
+  {field:'date',   keys:['제조년월','제조연월','년월','date']},
+  {field:'region', keys:['지역','산지','소재지','prefecture','region']},
+  {field:'smv',    keys:['일본주도','주도','smv']},
+  {field:'heat',   keys:['열처리','히이레','heat']},
+  {field:'img',    keys:['이미지','image','img','사진']},
+  {field:'stock',  keys:['보유','재고','수량','stock']},
+];
+function inpExtractKV(line){
+  var t=line.match(/^\|\s*([^|\-\:]{1,20}?)\s*\|\s*([^|]+?)\s*\|?\s*$/);
+  if(t&&t[1]!=='항목'&&!t[1].includes('---')) return {k:t[1],v:t[2]};
+  var c=line.match(/^[\s\-\*#>]*([^:：]{1,20})[：:]\s*(.+)/);
+  if(c) return {k:c[1].trim(),v:c[2].trim()};
+  return null;
+}
+function inpNormDate(v){ var m=v.match(/(\d{4})[년\s\.]\s*(\d{1,2})[월]?/); return m?m[1]+'.'+('0'+m[2]).slice(-2):v; }
+function inpNormRegion(v){ var m=v.match(/^([가-힣]{2,5})[도부현]/); return m?m[1]:v; }
+function inpNormCat(v){
+  if(v.includes('준마이다이긴')||v.includes('순미대음')) return '준마이다이긴죠';
+  if(v.includes('준마이긴')||v.includes('순미음')||v.includes('純米吟')) return '준마이긴죠';
+  if(v.includes('다이긴')||v.includes('大吟')) return '다이긴죠';
+  if(v.includes('긴죠')||v.includes('吟醸')||v.includes('음양')) return '긴죠';
+  if(v.includes('도쿠베츠준마이')||v.includes('특별순미')) return '도쿠베츠준마이';
+  if(v.includes('준마이')||v.includes('순미')||v.includes('純米')) return '준마이';
+  return v;
+}
+function inpSelectOpt(id,val){
+  if(!val) return; var sel=document.getElementById(id);
+  for(var i=0;i<sel.options.length;i++){ if(sel.options[i].text===val){sel.selectedIndex=i;return;} }
+}
+function inpParse(){
+  var text=document.getElementById('inp-paste').value; if(!text.trim()) return;
+  var data={};
+  text.split('\n').forEach(function(line){
+    var kv=inpExtractKV(line); if(!kv||!kv.v) return;
+    var k=kv.k.toLowerCase(), v=kv.v;
+    INP_KEY_MAP.forEach(function(entry){
+      if(data[entry.field]) return;
+      if(entry.keys.some(function(kw){ return k.includes(kw); })) data[entry.field]=v;
+    });
+  });
+  if(data.name)   document.getElementById('inp-f-name').value   = data.name;
+  if(data.date)   document.getElementById('inp-f-date').value   = inpNormDate(data.date);
+  if(data.region) document.getElementById('inp-f-region').value = inpNormRegion(data.region);
+  if(data.smv)    document.getElementById('inp-f-smv').value    = data.smv;
+  if(data.stock)  document.getElementById('inp-f-stock').value  = data.stock;
+  if(data.img)    document.getElementById('inp-f-img').value    = data.img;
+  if(data.cat)    inpSelectOpt('inp-f-cat',  inpNormCat(data.cat));
+  if(data.heat)   inpSelectOpt('inp-f-heat', data.heat);
+  if(Object.keys(data).length===0) alert('파싱 실패\n키:값 또는 마크다운 테이블 형식이 필요합니다.');
+}
+function inpClearAll(){
+  document.getElementById('inp-paste').value='';
+  ['inp-f-name','inp-f-date','inp-f-region','inp-f-smv','inp-f-img'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('inp-f-cat').selectedIndex=0;
+  document.getElementById('inp-f-heat').selectedIndex=0;
+  document.getElementById('inp-f-stock').value='1';
+  document.getElementById('inp-save-msg').textContent='';
+}
+
+function inpCallScript(params){
+  var qs='?token='+encodeURIComponent(WRITER_TOKEN);
+  Object.keys(params).forEach(function(k){ qs+='&'+k+'='+encodeURIComponent(params[k]); });
+  var iframe=document.createElement('iframe');
+  iframe.style.display='none'; iframe.src=APPS_SCRIPT_URL+qs;
+  document.body.appendChild(iframe);
+  return new Promise(function(resolve){
+    setTimeout(function(){ if(iframe.parentNode)document.body.removeChild(iframe); resolve(); },2500);
+  });
+}
+
+function inpSave(){
+  var name=document.getElementById('inp-f-name').value.trim();
+  if(!name){alert('이름을 입력해주세요');return;}
+  var row=[name,document.getElementById('inp-f-cat').value,document.getElementById('inp-f-date').value.trim(),
+    document.getElementById('inp-f-region').value.trim(),document.getElementById('inp-f-smv').value.trim(),
+    document.getElementById('inp-f-heat').value,document.getElementById('inp-f-img').value.trim(),
+    document.getElementById('inp-f-stock').value||'1'];
+  var btn=document.getElementById('inp-save-btn'), msg=document.getElementById('inp-save-msg');
+  btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
+  inpCallScript({action:'append',data:JSON.stringify(row)}).then(function(){
+    msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
+    btn.disabled=false; btn.textContent='구글 시트에 저장';
+    setTimeout(inpClearAll,2000);
+  });
+}
+
+function inpParseCSV(text){
+  var rows=[], lines=text.split(/\r?\n/);
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i]; if(!line.trim()) continue;
+    var cells=[],cur='',inQ=false;
+    for(var j=0;j<line.length;j++){
+      var c=line[j];
+      if(c==='"'){inQ=!inQ;continue;}
+      if(c===','&&!inQ){cells.push(cur.trim());cur='';continue;}
+      cur+=c;
+    }
+    cells.push(cur.trim()); rows.push(cells);
+  }
+  return rows;
+}
+
+async function inpLoadList(){
+  document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">불러오는 중…</td></tr>';
+  try{
+    var res=await fetch(CSV_URL);
+    var rows=inpParseCSV(await res.text()).slice(1).filter(function(r){return r[0];});
+    inpAllRows=rows.map(function(r,i){return {data:r, sheetRow:i+2};});
+    document.getElementById('inp-list-count').textContent='총 '+inpAllRows.length+'종';
+    inpRenderList(inpAllRows);
+  } catch(e){
+    document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="7" style="text-align:center;color:#922B21;padding:30px">불러오기 실패: '+e.message+'</td></tr>';
+  }
+}
+
+function inpFilterList(){
+  var q=document.getElementById('inp-list-search').value.toLowerCase();
+  var filtered=q?inpAllRows.filter(function(r){return r.data.join(' ').toLowerCase().includes(q);}):inpAllRows;
+  document.getElementById('inp-list-count').textContent=filtered.length+'종'+(q?' (검색결과)':'');
+  inpRenderList(filtered);
+}
+
+function inpHe(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function inpRenderList(rows){
+  var sorted=rows.slice().sort(function(a,b){return (a.data[0]||'').localeCompare(b.data[0],'ko');});
+  document.getElementById('inp-tbl-body').innerHTML=sorted.map(function(item){
+    var r=item.data, sr=item.sheetRow;
+    var cols=[0,1,2,3,4,5,7].map(function(ci){
+      var v=r[ci]||''; var cls=v?'':'inp-td-empty';
+      return '<td class="'+cls+'" onclick="inpOpenEdit('+sr+','+ci+')">'+(v?inpHe(v):'—')+'</td>';
+    });
+    return '<tr>'+cols.join('')+'</tr>';
+  }).join('');
+}
+
+function inpOpenEdit(sheetRow,colIdx){
+  var item=inpAllRows.find(function(r){return r.sheetRow===sheetRow;});
+  if(!item) return;
+  var cols=['이름','구분','제조년월','지역','일본주도','열처리','이미지URL','보유'];
+  var letters=['A','B','C','D','E','F','G','H'];
+  var cur=item.data[colIdx]||'';
+  inpModalState={sheetRow:sheetRow, colIdx:colIdx, letter:letters[colIdx]};
+  document.getElementById('inp-modal-title-text').textContent=cols[colIdx]+' 수정 ('+item.data[0]+')';
+  document.getElementById('inp-modal-msg').textContent='';
+  var html='<div class="inp-modal-field">';
+  if(colIdx===1){
+    html+='<select id="inp-m-input">'+INP_CAT_OPTS.map(function(o){ return '<option'+(o===cur?' selected':'')+'>'+inpHe(o)+'</option>'; }).join('')+'</select>';
+  } else if(colIdx===5){
+    html+='<select id="inp-m-input"><option value="">—</option>'+INP_HEAT_OPTS.map(function(o){ return '<option'+(o===cur?' selected':'')+'>'+inpHe(o)+'</option>'; }).join('')+'</select>';
+  } else if(colIdx===7){
+    html+='<input id="inp-m-input" type="number" value="'+inpHe(cur)+'" min="0" max="99">';
+  } else {
+    html+='<input id="inp-m-input" type="text" value="'+inpHe(cur)+'">';
+  }
+  html+='</div>';
+  document.getElementById('inp-modal-body').innerHTML=html;
+  document.getElementById('inp-modal-overlay').classList.add('open');
+  document.getElementById('inp-modal-sheet').classList.add('open');
+  setTimeout(function(){ var inp=document.getElementById('inp-m-input'); if(inp&&inp.tagName!=='SELECT')inp.focus(); },150);
+}
+
+function inpCloseModal(){
+  document.getElementById('inp-modal-overlay').classList.remove('open');
+  document.getElementById('inp-modal-sheet').classList.remove('open');
+  inpModalState=null;
+}
+
+async function inpModalSave(){
+  if(!inpModalState) return;
+  var val=document.getElementById('inp-m-input').value.trim();
+  var btn=document.getElementById('inp-modal-save-btn'), msg=document.getElementById('inp-modal-msg');
+  btn.disabled=true; btn.textContent='저장 중…';
+  await inpCallScript({action:'update', range:inpModalState.letter+inpModalState.sheetRow, value:val});
+  var item=inpAllRows.find(function(r){return r.sheetRow===inpModalState.sheetRow;});
+  if(item){ while(item.data.length<=inpModalState.colIdx)item.data.push(''); item.data[inpModalState.colIdx]=val; }
+  inpFilterList();
+  msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
+  btn.disabled=false; btn.textContent='저장';
+  setTimeout(inpCloseModal,800);
 }
 </script>
 
