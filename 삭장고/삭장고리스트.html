@@ -710,7 +710,10 @@ function goAdmin(){
   sessionStorage.removeItem('sake_mode');
   sessionStorage.removeItem('sake_token');
   pinInput='';
-  document.getElementById('pin-screen').style.display='flex';
+  var s=document.getElementById('pin-screen');
+  s.style.transition='none';
+  s.style.opacity='1';
+  s.style.display='flex';
   document.getElementById('pin-error').textContent='';
   updateDots();
 }
