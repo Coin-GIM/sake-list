@@ -304,7 +304,7 @@
   <button class="tab-btn active" id="tb-list"  onclick="showTab('list')">📋 목록</button>
   <button class="tab-btn"        id="tb-map"   onclick="showTab('map')">🗾 지도</button>
   <button class="tab-btn"        id="tb-guide" onclick="showTab('guide')">📖 가이드</button>
-  <button class="tab-btn"        id="tb-input" onclick="showTab('input')">✍️ 입력</button>
+  <button class="tab-btn" id="tb-input" onclick="showTab('input')" style="display:none">✍️ 입력</button>
 </div>
 
 <!-- LIST TAB -->
@@ -692,7 +692,10 @@ function checkPin(val){
 }
 function unlockApp(mode){
   document.getElementById('pin-screen').style.display='none';
-  if(mode==='writer'){ var fab=document.getElementById('write-fab'); fab.style.display='flex'; }
+  if(mode==='writer'){
+    document.getElementById('write-fab').style.display='flex';
+    document.getElementById('tb-input').style.display='';
+  }
   loadData();
 }
 
