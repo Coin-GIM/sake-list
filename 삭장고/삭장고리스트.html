@@ -1023,9 +1023,10 @@ async function inpSave(){
   btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
   try{
     await inpCallScript({action:'append',data:JSON.stringify(row)});
-    msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
+    msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료! (목록은 1분 후 새로고침)';
     btn.disabled=false; btn.textContent='구글 시트에 저장';
-    setTimeout(function(){ inpClearAll(); loadData(); },2000);
+    setTimeout(inpClearAll,2000);
+    setTimeout(loadData,60000);
   } catch(e){
     msg.style.color='#922B21'; msg.textContent='✗ '+(e.name==='AbortError'?'타임아웃':e.message);
     btn.disabled=false; btn.textContent='구글 시트에 저장';
@@ -1124,10 +1125,17 @@ async function inpModalSave(){
   btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
   try{
     await inpCallScript({action:'update', range:inpModalState.letter+inpModalState.sheetRow, value:val});
+    /* 입력탭 목록 메모리 업데이트 */
     var item=inpAllRows.find(function(r){return r.sheetRow===inpModalState.sheetRow;});
     if(item){ while(item.data.length<=inpModalState.colIdx)item.data.push(''); item.data[inpModalState.colIdx]=val; }
     inpFilterList();
-    loadData();
+    /* 메인 목록 메모리 직접 업데이트 (CSV 캐시 우회) */
+    var mainIdx=inpModalState.sheetRow-2;
+    if(mainIdx>=0 && mainIdx<allRows.length){
+      while(allRows[mainIdx].length<=inpModalState.colIdx) allRows[mainIdx].push('');
+      allRows[mainIdx][inpModalState.colIdx]=val;
+      renderList(); renderMap();
+    }
     msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
     btn.disabled=false; btn.textContent='저장';
     setTimeout(inpCloseModal,800);
