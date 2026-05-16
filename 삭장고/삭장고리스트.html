@@ -295,6 +295,7 @@
     <span class="header-title">🍶 삭장고리스트</span>
     <div class="header-right">
       <button class="header-sort" id="hd-sort" onclick="toggleDateSort()">제조일</button>
+      <button class="header-sort" id="hd-admin" onclick="goAdmin()" style="display:none">🔐</button>
       <span class="header-count" id="hd-count" onclick="toggleStockFilter()" title="클릭: 보유중 필터">&#8212;</span>
     </div>
   </div>
@@ -700,7 +701,18 @@ function unlockApp(mode){
     document.getElementById('write-fab').style.display='flex';
     document.getElementById('tb-input').style.display='';
   }
+  if(mode==='viewer'){
+    document.getElementById('hd-admin').style.display='';
+  }
   loadData();
+}
+function goAdmin(){
+  sessionStorage.removeItem('sake_mode');
+  sessionStorage.removeItem('sake_token');
+  pinInput='';
+  document.getElementById('pin-screen').style.display='flex';
+  document.getElementById('pin-error').textContent='';
+  updateDots();
 }
 
 /* CSV */
