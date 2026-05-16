@@ -1,5 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/", "destination": "/삭장고/삭장고리스트.html" }
-  ]
-}
