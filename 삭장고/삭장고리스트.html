@@ -729,7 +729,7 @@ let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', dateSor
 /* PIN */
 (function(){
   var m=sessionStorage.getItem('sake_mode');
-  if(m==='viewer'||m==='writer') unlockApp(m);
+  if(m==='viewer'||m==='writer') document.addEventListener('DOMContentLoaded',function(){unlockApp(m);});
 })();
 function switchPinMode(){
   document.getElementById('pin-numpad-section').style.display='none';
