@@ -850,7 +850,7 @@ let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', dateSor
 /* ===== 주막 탭 ===== */
 var mkDeals=[], mkSite='', mkSortKey='', mkSortDir=0, mkLoaded=false;
 var mkRate=null, mkAllSearch=[], mkSSortKey='', mkSSortDir=0;
-var MK_BASE=/^(localhost|127\.|192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname)?'http://'+location.hostname+':3001':'';
+var MK_BASE=/^(localhost|127\.|192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname)?'http://'+location.hostname+':3001':location.hostname.includes('vercel.app')?'':'https://sake-list.vercel.app';
 function mkParseNum(s){var n=parseInt((s||'').replace(/[^\d]/g,''));return isNaN(n)?-1:n;}
 function mkApplySort(rows){
   if(!mkSortKey||!mkSortDir)return rows;
@@ -987,7 +987,7 @@ async function mkDoSearch(){
       document.getElementById('mk-no-result').style.display='';
     }
   }catch(e){
-    document.getElementById('mk-search-status').textContent='⚠ 서버 연결 실패';
+    document.getElementById('mk-search-status').textContent='⚠ 검색 중 오류가 발생했습니다';
   }
 }
 async function mkLoadDeals(){
@@ -1002,7 +1002,7 @@ async function mkLoadDeals(){
     var rows=mkSite?mkDeals.filter(function(d){return d.site===mkSite;}):mkDeals;
     mkRender(mkApplySort(rows));
   }catch(e){
-    st.textContent='⚠ 서버 연결 실패 — 가격비교시작.bat 실행 후 새로고침';st.style.display='';tbl.style.display='none';
+    st.textContent='⚠ 딜 정보를 불러오지 못했습니다';st.style.display='';tbl.style.display='none';
   }
 }
 
