@@ -6,6 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>🍶 삭장고리스트</title>
   <script src="https://accounts.google.com/gsi/client" async></script>
+  <script>try{if(sessionStorage.getItem('sake_mode'))document.documentElement.classList.add('unlocked');}catch(e){}</script>
   <style>
     :root {
       --red: #7B1E1E; --red2: #A52525; --gold: #C49A3C;
@@ -17,6 +18,7 @@
 
     /* PIN */
     #pin-screen { position: fixed; inset: 0; z-index: 999; background: var(--red); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; }
+    .unlocked #pin-screen { display: none; }
     .pin-logo  { font-size: 52px; }
     .pin-title { color: rgba(255,255,255,.92); font-size: 20px; font-weight: 700; }
     .pin-sub   { color: rgba(255,255,255,.5);  font-size: 13px; margin-top: -18px; }
@@ -721,7 +723,8 @@ const PREFS = [
   ['오키나와',['오키나와'],                            15, 0],
 ];
 
-let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', dateSort = 0;
+if('scrollRestoration' in history) history.scrollRestoration='manual';
+let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', dateSort = 0, isWriterMode = false;
 
 /* PIN */
 (function(){
@@ -758,9 +761,11 @@ function checkPin(val){
   }
 }
 function unlockApp(mode){
+  document.documentElement.classList.add('unlocked');
   document.getElementById('pin-screen').style.display='none';
   window.scrollTo(0,0);
   if(mode==='writer'){
+    isWriterMode=true;
     document.getElementById('write-fab').style.display='flex';
     document.getElementById('tb-input').style.display='';
   }
@@ -770,9 +775,13 @@ function unlockApp(mode){
   loadData();
 }
 function goAdmin(){
+  isWriterMode=false;
+  document.documentElement.classList.remove('unlocked');
   sessionStorage.removeItem('sake_mode');
   sessionStorage.removeItem('sake_token');
   pinInput='';
+  document.getElementById('write-fab').style.display='none';
+  document.getElementById('tb-input').style.display='none';
   var s=document.getElementById('pin-screen');
   s.style.transition='none';
   s.style.opacity='1';
@@ -808,20 +817,25 @@ function fetchWithTimeout(url, ms){
 async function loadData(){
   window.scrollTo(0,0);
   var stateEl=document.getElementById('state');
+  var gridEl=document.getElementById('card-grid');
   stateEl.innerHTML='<div class="spinner"></div><div class="state-msg">목록을 불러오는 중&#x2026;</div>';
   stateEl.style.display='block';
-  document.getElementById('card-grid').style.display='none';
+  gridEl.style.display='none';
   try{
     var res=await fetchWithTimeout(CSV_URL,15000);
     if(!res.ok) throw new Error('HTTP '+res.status);
     var rows=parseCSV(await res.text()).slice(1).filter(function(r){return r[0];});
     allRows=rows;
-    buildFilters(); renderList(); renderDrunk(); renderMap();
+    buildFilters();
+    renderList();
+    renderDrunk();
+    renderMap();
     updateHdCount();
     stateEl.style.display='none';
-    document.getElementById('card-grid').style.display='grid';
+    gridEl.style.display='grid';
   } catch(err){
     var msg=err.name==='AbortError'?'응답 시간 초과':h(err.message);
+    console.error('[loadData]',err);
     stateEl.innerHTML='<div style="font-size:40px;margin-bottom:16px">⚠️</div><div style="font-weight:700;margin-bottom:8px">불러오기 실패</div><div style="font-size:13px;color:#b06060;margin-bottom:20px">'+msg+'</div><button onclick="loadData()" style="padding:10px 24px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">다시 시도</button>';
   }
 }
@@ -832,7 +846,7 @@ function showTab(tab){
     document.getElementById('tb-'+t).classList.toggle('active',tab===t);
     document.getElementById('tab-'+t).style.display=tab===t?'block':'none';
   });
-  document.getElementById('write-fab').style.display=tab==='input'?'none':'';
+  document.getElementById('write-fab').style.display=(tab==='input'||!isWriterMode)?'none':'flex';
   updateHdCount();
 }
 
@@ -895,6 +909,9 @@ function buildFilters(){
   var cats=[...new Set(activeRows.map(function(r){return r[1];}).filter(Boolean))];
   cats.sort(function(a,b){ var ai=order.indexOf(a),bi=order.indexOf(b); return (ai<0?99:ai)-(bi<0?99:bi); });
   var wrap=document.getElementById('filters');
+  wrap.querySelectorAll('.filter-btn[data-cat]:not([data-cat=""])').forEach(function(b){b.remove();});
+  activeFilter='';
+  wrap.querySelector('.filter-btn').classList.add('active');
   cats.forEach(function(cat){
     var btn=document.createElement('button'); btn.className='filter-btn'; btn.dataset.cat=cat; btn.textContent=cat;
     btn.onclick=function(){setFilter(btn);}; wrap.appendChild(btn);
