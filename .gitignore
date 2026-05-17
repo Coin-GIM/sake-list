@@ -6,12 +6,9 @@ config.js
 삭장고리스트_입력.html
 뷰어.html
 
-# 로컬 서버
-server.js
+# 로컬 전용 서버 파일
 입력서버시작.bat
 node_modules/
-package.json
-package-lock.json
 sake-credentials.json
 
 # Windows

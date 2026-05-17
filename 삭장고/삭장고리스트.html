@@ -850,7 +850,7 @@ let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', dateSor
 /* ===== 주막 탭 ===== */
 var mkDeals=[], mkSite='', mkSortKey='', mkSortDir=0, mkLoaded=false;
 var mkRate=null, mkAllSearch=[], mkSSortKey='', mkSSortDir=0;
-var MK_BASE='http://'+(/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.|127\.)/.test(location.hostname)?location.hostname:'localhost')+':3001';
+var MK_BASE=/^(localhost|127\.|192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname)?'http://'+location.hostname+':3001':'';
 function mkParseNum(s){var n=parseInt((s||'').replace(/[^\d]/g,''));return isNaN(n)?-1:n;}
 function mkApplySort(rows){
   if(!mkSortKey||!mkSortDir)return rows;
