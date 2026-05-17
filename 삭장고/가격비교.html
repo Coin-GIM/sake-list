@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍶 사케 가격비교</title>
+<style>
+:root {
+  --red:#7B1E1E; --gold:#C49A3C; --bg:#F7F2EA; --card:#FFF;
+  --text:#1A1009; --muted:#7A6050; --border:#E5D4BC;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+header{background:var(--red);color:#fff;padding:13px 18px;position:sticky;top:0;z-index:200;box-shadow:0 2px 14px rgba(0,0,0,.28);}
+.header-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.header-title{font-size:18px;font-weight:700;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.btn-refresh{font-size:12px;font-weight:600;background:rgba(255,255,255,.18);padding:4px 12px;border-radius:20px;border:none;color:#fff;cursor:pointer;font-family:inherit;transition:background .2s;}
+.btn-refresh:hover{background:rgba(255,255,255,.3);}
+.updated{font-size:11px;color:rgba(255,255,255,.6);}
+
+.tab-bar{background:#fff;border-bottom:1.5px solid var(--border);display:flex;position:sticky;top:47px;z-index:100;}
+.tab-btn{flex:1;padding:11px 0 9px;border:none;background:none;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;}
+.tab-btn.active{color:var(--red);border-bottom-color:var(--red);}
+
+.page{display:none;max-width:1120px;margin:0 auto;padding:16px;}
+.page.active{display:block;}
+
+/* 사이트 빠른링크 */
+.site-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.site-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;cursor:pointer;text-decoration:none;color:var(--text);transition:border-color .2s,background .2s;}
+.site-chip:hover{border-color:var(--red);background:#FFF5F5;}
+.site-chip.filter-on{background:var(--red);color:#fff;border-color:var(--red);}
+
+/* 딜 테이블 */
+.tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);background:#fff;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--red);color:#fff;}
+th{padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap;}
+td{padding:9px 12px;border-top:1px solid var(--border);vertical-align:middle;}
+.th-sort{cursor:pointer;user-select:none;}
+.th-sort:hover{background:rgba(255,255,255,.18);}
+.sort-icon{margin-left:5px;font-size:11px;opacity:.45;}
+.th-sort.sort-asc .sort-icon,.th-sort.sort-desc .sort-icon{opacity:1;}
+tr:hover td{background:#FFF8F0;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+.badge-타임세일{background:#FEE2E2;color:#991B1B;}
+.badge-공동구매{background:#DBEAFE;color:#1E40AF;}
+.badge-할인{background:#D1FAE5;color:#065F46;}
+.td-name{max-width:280px;}
+.td-name a{color:var(--text);text-decoration:none;font-weight:500;}
+.td-name a:hover{color:var(--red);}
+.td-price{font-weight:700;color:var(--red);white-space:nowrap;}
+.td-orig{color:var(--muted);text-decoration:line-through;font-size:12px;white-space:nowrap;}
+.td-disc{font-weight:700;color:#059669;white-space:nowrap;}
+.td-site{white-space:nowrap;font-weight:600;}
+
+/* 상태 */
+.status{padding:40px;text-align:center;color:var(--muted);font-size:14px;}
+.error-list{margin-top:12px;padding:10px 14px;background:#FEF2F2;border-radius:8px;font-size:12px;color:#991B1B;}
+
+/* 검색 탭 */
+.search-wrap{position:relative;margin-bottom:16px;}
+.search-wrap input{width:100%;padding:12px 16px 12px 44px;border:1.5px solid var(--border);border-radius:14px;font-size:15px;font-family:inherit;background:#fff;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.search-wrap input:focus{outline:none;border-color:var(--red);}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:18px;}
+.search-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.search-links a{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--red);color:#fff;text-decoration:none;}
+.search-links a:hover{opacity:.85;}
+.no-result{padding:40px;text-align:center;color:var(--muted);}
+
+/* 환율 위젯 */
+.rate-bar{display:flex;justify-content:flex-end;align-items:center;margin-bottom:6px;}
+.rate-chip{background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:4px 14px;font-size:12px;font-weight:600;color:#1D4ED8;}
+.rate-chip.err{background:#FEF2F2;border-color:#FCA5A5;color:#991B1B;}
+.td-jpy{font-weight:700;color:#1D4ED8;white-space:nowrap;}
+.td-krw-conv{font-weight:700;color:#7C3AED;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <span class="header-title">🍶 사케 가격비교</span>
+    <div class="header-right">
+      <span class="updated" id="updated-at"></span>
+      <button class="btn-refresh" onclick="loadDeals()">↻ 새로고침</button>
+    </div>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('deals',this)">딜 모아보기</button>
+  <button class="tab-btn" onclick="switchTab('search',this)">가격검색</button>
+</div>
+
+<!-- 딜 모아보기 -->
+<div class="page active" id="tab-deals">
+  <div class="site-links">
+    <a class="site-chip" href="https://sake09.com/shop/" target="_blank">사케09 ↗</a>
+    <a class="site-chip" href="https://sakelover.jp/product/list.html?cate_no=103" target="_blank">사케러버 타임세일 ↗</a>
+    <a class="site-chip" href="https://sakelover.jp/product/list.html?cate_no=101" target="_blank">사케러버 공동구매 ↗</a>
+    <a class="site-chip" href="https://dailyshot.co/" target="_blank">데일리샷 ↗</a>
+    <a class="site-chip" href="https://m.kihya.com/goods/goods_list.php?cateCd=006" target="_blank">키햐 ↗</a>
+    <span style="margin-left:auto;display:flex;gap:6px;">
+      <button class="site-chip filter-btn" data-site="" onclick="filterSite(this)">전체</button>
+      <button class="site-chip filter-btn" data-site="사케러버" onclick="filterSite(this)">사케러버</button>
+      <button class="site-chip filter-btn" data-site="키햐" onclick="filterSite(this)">키햐</button>
+    </span>
+  </div>
+  <div id="deals-status" class="status">불러오는 중...</div>
+  <div id="deals-error" class="error-list" style="display:none"></div>
+  <div class="tbl-wrap" id="deals-wrap" style="display:none">
+    <table>
+      <thead><tr><th>사이트</th><th>구분</th><th class="th-sort" data-key="name" onclick="sortDeals('name')">상품명 <span class="sort-icon">↕</span></th><th class="th-sort" data-key="price" onclick="sortDeals('price')">판매가 <span class="sort-icon">↕</span></th><th>정가</th><th class="th-sort" data-key="discount" onclick="sortDeals('discount')">할인율 <span class="sort-icon">↕</span></th></tr></thead>
+      <tbody id="deals-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 가격검색 -->
+<div class="page" id="tab-search">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-input" placeholder="사케 이름으로 검색 (예: 닷사이, 쿠보타)..." onkeydown="if(event.key==='Enter')doSearch()">
+  </div>
+  <div id="search-links" class="search-links" style="display:none"></div>
+  <div id="search-status" class="status" style="display:none">검색 중...</div>
+  <div class="rate-bar" id="rate-bar" style="display:none">
+    <span class="rate-chip" id="rate-chip">환율 불러오는 중...</span>
+  </div>
+  <div class="tbl-wrap" id="search-wrap" style="display:none">
+    <table>
+      <thead><tr><th>사이트</th><th>구분</th><th class="th-sort" data-tbl="s" data-key="name" onclick="sortSearch('name')">상품명 <span class="sort-icon">↕</span></th><th class="th-sort" data-tbl="s" data-key="krw" onclick="sortSearch('krw')">원화 <span class="sort-icon">↕</span></th><th class="th-sort" data-tbl="s" data-key="jpy" onclick="sortSearch('jpy')">엔화 <span class="sort-icon">↕</span></th></tr></thead>
+      <tbody id="search-body"></tbody>
+    </table>
+  </div>
+  <div id="search-no-result" class="no-result" style="display:none">🔍 현재 딜 목록에 없습니다. 아래 사이트에서 직접 검색해보세요.</div>
+</div>
+
+<script>
+var allDeals = [], activeSite = '', sortKey = '', sortDir = 0;
+var BASE = 'http://' + (location.hostname || 'localhost') + ':3001';
+var currentRate = null;
+var allSearch = [], sSortKey = '', sSortDir = 0;
+
+function parseNum(s) { var n = parseInt(s.replace(/[^\d]/g,'')); return isNaN(n) ? -1 : n; }
+
+function applySort(rows) {
+  if (!sortKey || !sortDir) return rows;
+  return rows.slice().sort(function(a, b) {
+    var va, vb;
+    if (sortKey === 'name')     { va = a.name; vb = b.name; return sortDir * va.localeCompare(vb, 'ja'); }
+    if (sortKey === 'price')    { va = parseNum(a.price);    vb = parseNum(b.price); }
+    if (sortKey === 'discount') { va = parseNum(a.discount); vb = parseNum(b.discount); }
+    return sortDir * (va - vb);
+  });
+}
+
+function sortDeals(key) {
+  if (sortKey === key) { sortDir = sortDir === 1 ? -1 : sortDir === -1 ? 0 : 1; }
+  else { sortKey = key; sortDir = 1; }
+  if (sortDir === 0) sortKey = '';
+  document.querySelectorAll('.th-sort').forEach(function(th) {
+    th.classList.remove('sort-asc','sort-desc');
+    var icon = th.querySelector('.sort-icon');
+    if (th.dataset.key === sortKey && sortDir !== 0) {
+      th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+      icon.textContent = sortDir === 1 ? '↑' : '↓';
+    } else { icon.textContent = '↕'; }
+  });
+  var rows = activeSite ? allDeals.filter(function(d){return d.site===activeSite;}) : allDeals;
+  renderDeals(applySort(rows));
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+function rowHtml(item) {
+  return '<tr>' +
+    '<td class="td-site">' + item.site + '</td>' +
+    '<td><span class="badge badge-' + item.type + '">' + item.type + '</span></td>' +
+    '<td class="td-name"><a href="' + item.link + '" target="_blank">' + esc(item.name) + '</a></td>' +
+    '<td class="td-price">' + item.price + '</td>' +
+    '<td class="td-orig">' + item.orig + '</td>' +
+    '<td class="td-disc">' + item.discount + '</td>' +
+  '</tr>';
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function searchRowHtml(item) {
+  var krwCell, jpyCell;
+  if (item.currency === 'JPY') {
+    jpyCell = '<td class="td-jpy">' + item.price + '</td>';
+    if (currentRate) {
+      var num = parseInt(item.price.replace(/[^\d]/g, ''));
+      var conv = Math.round(num * currentRate);
+      krwCell = '<td class="td-krw-conv">≈' + conv.toLocaleString() + '원</td>';
+    } else {
+      krwCell = '<td style="color:var(--muted)">-</td>';
+    }
+  } else {
+    krwCell = '<td class="td-price">' + item.price + '</td>';
+    jpyCell = '<td style="color:var(--muted)">-</td>';
+  }
+  return '<tr>' +
+    '<td class="td-site">' + item.site + '</td>' +
+    '<td><span class="badge badge-' + item.type + '">' + item.type + '</span></td>' +
+    '<td class="td-name"><a href="' + item.link + '" target="_blank">' + esc(item.name) + '</a></td>' +
+    krwCell + jpyCell +
+  '</tr>';
+}
+
+function sParseKrw(item) {
+  if (item.currency === 'JPY' && currentRate) {
+    return Math.round(parseInt(item.price.replace(/[^\d]/g,'')) * currentRate);
+  }
+  if (item.currency !== 'JPY') return parseInt(item.price.replace(/[^\d]/g,'')) || -1;
+  return -1;
+}
+function sParseJpy(item) {
+  if (item.currency === 'JPY') return parseInt(item.price.replace(/[^\d]/g,'')) || -1;
+  return -1;
+}
+
+function applySearchSort(rows) {
+  if (!sSortKey || !sSortDir) return rows;
+  return rows.slice().sort(function(a, b) {
+    var va, vb;
+    if (sSortKey === 'name') { return sSortDir * a.name.localeCompare(b.name, 'ja'); }
+    if (sSortKey === 'krw')  { va = sParseKrw(a); vb = sParseKrw(b); }
+    if (sSortKey === 'jpy')  { va = sParseJpy(a); vb = sParseJpy(b); }
+    return sSortDir * (va - vb);
+  });
+}
+
+function sortSearch(key) {
+  if (sSortKey === key) { sSortDir = sSortDir === 1 ? -1 : sSortDir === -1 ? 0 : 1; }
+  else { sSortKey = key; sSortDir = 1; }
+  if (sSortDir === 0) sSortKey = '';
+  document.querySelectorAll('.th-sort[data-tbl="s"]').forEach(function(th) {
+    th.classList.remove('sort-asc','sort-desc');
+    var icon = th.querySelector('.sort-icon');
+    if (th.dataset.key === sSortKey && sSortDir !== 0) {
+      th.classList.add(sSortDir === 1 ? 'sort-asc' : 'sort-desc');
+      icon.textContent = sSortDir === 1 ? '↑' : '↓';
+    } else { icon.textContent = '↕'; }
+  });
+  document.getElementById('search-body').innerHTML = applySearchSort(allSearch).map(searchRowHtml).join('');
+}
+
+async function loadRate() {
+  try {
+    var r = await fetch(BASE + '/api/rate');
+    var data = await r.json();
+    currentRate = data.rate;
+    var per100 = Math.round(currentRate * 100).toLocaleString();
+    var chip = document.getElementById('rate-chip');
+    chip.textContent = '환율 ¥100 = ₩' + per100 + '  (' + (data.date || '') + ')';
+    chip.classList.remove('err');
+    document.getElementById('rate-bar').style.display = '';
+  } catch(e) {
+    var chip = document.getElementById('rate-chip');
+    chip.textContent = '환율 불러오기 실패';
+    chip.classList.add('err');
+    document.getElementById('rate-bar').style.display = '';
+  }
+}
+
+function renderDeals(rows) {
+  document.getElementById('deals-status').style.display = 'none';
+  if (!rows.length) {
+    document.getElementById('deals-status').textContent = '딜 정보를 가져오지 못했습니다.';
+    document.getElementById('deals-status').style.display = '';
+    document.getElementById('deals-wrap').style.display = 'none';
+    return;
+  }
+  document.getElementById('deals-body').innerHTML = rows.map(rowHtml).join('');
+  document.getElementById('deals-wrap').style.display = '';
+}
+
+function filterSite(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('filter-on'));
+  btn.classList.add('filter-on');
+  activeSite = btn.dataset.site;
+  var rows = activeSite ? allDeals.filter(d => d.site === activeSite) : allDeals;
+  renderDeals(applySort(rows));
+}
+
+async function loadDeals() {
+  document.getElementById('deals-status').textContent = '불러오는 중...';
+  document.getElementById('deals-status').style.display = '';
+  document.getElementById('deals-wrap').style.display = 'none';
+  document.getElementById('deals-error').style.display = 'none';
+  try {
+    var r = await fetch(BASE + '/api/deals');
+    var data = await r.json();
+    allDeals = data.items || [];
+    if (data.updatedAt) document.getElementById('updated-at').textContent = data.updatedAt + ' 기준';
+    if (data.errors && data.errors.length) {
+      document.getElementById('deals-error').textContent = '⚠ 일부 실패: ' + data.errors.join(' | ');
+      document.getElementById('deals-error').style.display = '';
+    }
+    var rows = activeSite ? allDeals.filter(d => d.site === activeSite) : allDeals;
+    renderDeals(applySort(rows));
+  } catch(e) {
+    document.getElementById('deals-status').textContent = '⚠ 서버 연결 실패 — 입력서버시작.bat 실행 후 새로고침';
+    document.getElementById('deals-status').style.display = '';
+  }
+}
+
+async function doSearch() {
+  var q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+  document.getElementById('search-status').style.display = '';
+  document.getElementById('search-links').style.display = 'none';
+  document.getElementById('search-wrap').style.display = 'none';
+  document.getElementById('search-no-result').style.display = 'none';
+  try {
+    var r = await fetch(BASE + '/api/search?q=' + encodeURIComponent(q));
+    var data = await r.json();
+    document.getElementById('search-status').style.display = 'none';
+    // 사이트별 검색 링크
+    if (data.links && data.links.length) {
+      document.getElementById('search-links').innerHTML = data.links.map(l =>
+        '<a href="' + l.url + '" target="_blank">' + l.site + '에서 검색 ↗</a>'
+      ).join('');
+      document.getElementById('search-links').style.display = '';
+    }
+    if (data.items && data.items.length) {
+      allSearch = data.items;
+      sSortKey = ''; sSortDir = 0;
+      document.querySelectorAll('.th-sort[data-tbl="s"]').forEach(function(th){ th.classList.remove('sort-asc','sort-desc'); th.querySelector('.sort-icon').textContent='↕'; });
+      document.getElementById('search-body').innerHTML = allSearch.map(searchRowHtml).join('');
+      document.getElementById('search-wrap').style.display = '';
+      document.getElementById('rate-bar').style.display = '';
+    } else {
+      allSearch = [];
+      document.getElementById('search-no-result').style.display = '';
+    }
+  } catch(e) {
+    document.getElementById('search-status').textContent = '⚠ 서버 연결 실패';
+  }
+}
+
+loadDeals();
+loadRate();
+</script>
+</body>
+</html>

@@ -246,6 +246,55 @@
       .smv-tbl th,.smv-tbl td{padding:6px 8px;}
       .grade-req{display:none;}
     }
+
+    /* ===== 주막 탭 ===== */
+    .mk-wrap{max-width:1120px;margin:0 auto;padding:16px 16px 60px;}
+    .mk-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+    .mk-updated{font-size:12px;color:var(--muted);}
+    .mk-refresh{font-size:12px;font-weight:600;background:var(--red);color:#fff;padding:5px 14px;border-radius:20px;border:none;cursor:pointer;font-family:inherit;transition:background .2s;}
+    .mk-refresh:hover{background:var(--red2);}
+    .mk-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+    .mk-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;cursor:pointer;text-decoration:none;color:var(--text);transition:border-color .2s,background .2s;white-space:nowrap;}
+    .mk-chip:hover{border-color:var(--red);background:#FFF5F5;}
+    .mk-chip.on{background:var(--red);color:#fff;border-color:var(--red);}
+    .mk-tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);background:#fff;}
+    .mk-tbl-wrap table{width:100%;border-collapse:collapse;font-size:13px;}
+    .mk-tbl-wrap thead tr{background:var(--red);color:#fff;}
+    .mk-tbl-wrap th{padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap;}
+    .mk-tbl-wrap td{padding:9px 12px;border-top:1px solid var(--border);vertical-align:middle;}
+    .mk-tbl-wrap tr:hover td{background:#FFF8F0;}
+    .mk-th-sort{cursor:pointer;user-select:none;}
+    .mk-th-sort:hover{background:rgba(255,255,255,.18);}
+    .mk-sort-icon{margin-left:5px;font-size:11px;opacity:.45;}
+    .mk-th-sort.sort-asc .mk-sort-icon,.mk-th-sort.sort-desc .mk-sort-icon{opacity:1;}
+    .mk-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+    .mk-badge-타임세일{background:#FEE2E2;color:#991B1B;}
+    .mk-badge-공동구매{background:#DBEAFE;color:#1E40AF;}
+    .mk-badge-할인{background:#D1FAE5;color:#065F46;}
+    .mk-td-name{max-width:260px;}.mk-td-name a{color:var(--text);text-decoration:none;font-weight:500;}.mk-td-name a:hover{color:var(--red);}
+    .mk-td-price{font-weight:700;color:var(--red);white-space:nowrap;}
+    .mk-td-orig{color:var(--muted);text-decoration:line-through;font-size:12px;white-space:nowrap;}
+    .mk-td-disc{font-weight:700;color:#059669;white-space:nowrap;}
+    .mk-td-site{white-space:nowrap;font-weight:600;}
+    .mk-status{padding:40px;text-align:center;color:var(--muted);font-size:14px;}
+    .mk-error{margin-top:10px;padding:10px 14px;background:#FEF2F2;border-radius:8px;font-size:12px;color:#991B1B;}
+    .mk-subtab-bar{display:flex;border-bottom:1.5px solid var(--border);margin-bottom:14px;}
+    .mk-subtab-btn{flex:1;padding:10px 0 8px;border:none;background:none;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;font-family:inherit;}
+    .mk-subtab-btn.on{color:var(--red);border-bottom-color:var(--red);}
+    .mk-subpage{display:none;}.mk-subpage.on{display:block;}
+    .mk-search-wrap{position:relative;margin-bottom:12px;}
+    .mk-search-wrap input{width:100%;padding:11px 14px 11px 40px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;background:#fff;color:var(--text);}
+    .mk-search-wrap input:focus{outline:none;border-color:var(--red);}
+    .mk-search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;}
+    .mk-search-links{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+    .mk-search-links a{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;background:var(--red);color:#fff;text-decoration:none;}
+    .mk-search-links a:hover{opacity:.85;}
+    .mk-rate-bar{display:flex;justify-content:flex-end;margin-bottom:6px;}
+    .mk-rate-chip{background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:4px 13px;font-size:12px;font-weight:600;color:#1D4ED8;}
+    .mk-rate-chip.err{background:#FEF2F2;border-color:#FCA5A5;color:#991B1B;}
+    .mk-td-jpy{font-weight:700;color:#1D4ED8;white-space:nowrap;}
+    .mk-td-krw-conv{font-weight:700;color:#7C3AED;white-space:nowrap;}
+    .mk-no-result{padding:40px;text-align:center;color:var(--muted);font-size:14px;}
   </style>
 </head>
 <body>
@@ -306,7 +355,8 @@
   <button class="tab-btn active" id="tb-list"  onclick="showTab('list')">📋 목록</button>
   <button class="tab-btn"        id="tb-drunk" onclick="showTab('drunk')"><span style="display:inline-block;transform:rotate(180deg)">🍶</span> 주책</button>
   <button class="tab-btn"        id="tb-map"   onclick="showTab('map')">🗾 지도</button>
-  <button class="tab-btn"        id="tb-guide" onclick="showTab('guide')">📖 가이드</button>
+  <button class="tab-btn"        id="tb-guide"  onclick="showTab('guide')">📖 가이드</button>
+  <button class="tab-btn"        id="tb-market" onclick="showTab('market')">🏪 주막</button>
   <button class="tab-btn" id="tb-input" onclick="showTab('input')" style="display:none">✍️ 입력</button>
 </div>
 
@@ -520,6 +570,77 @@
   </div>
 </div>
 
+<!-- MARKET TAB -->
+<div id="tab-market" style="display:none">
+  <div class="mk-wrap">
+    <div class="mk-subtab-bar">
+      <button class="mk-subtab-btn on" onclick="mkSubTab('deals',this)">딜 모아보기</button>
+      <button class="mk-subtab-btn" onclick="mkSubTab('search',this)">가격검색</button>
+    </div>
+
+    <!-- 딜 모아보기 -->
+    <div class="mk-subpage on" id="mk-sub-deals">
+      <div class="mk-hdr">
+        <div class="mk-chips">
+          <a class="mk-chip" href="https://sake09.com/shop/" target="_blank">사케09 ↗</a>
+          <a class="mk-chip" href="https://sakelover.jp/product/list.html?cate_no=103" target="_blank">사케러버 타임세일 ↗</a>
+          <a class="mk-chip" href="https://sakelover.jp/product/list.html?cate_no=101" target="_blank">사케러버 공동구매 ↗</a>
+          <a class="mk-chip" href="https://dailyshot.co/" target="_blank">데일리샷 ↗</a>
+          <a class="mk-chip" href="https://m.kihya.com/goods/goods_list.php?cateCd=006" target="_blank">키햐 ↗</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="mk-updated" id="mk-updated"></span>
+          <button class="mk-refresh" onclick="mkLoadDeals()">↻ 새로고침</button>
+        </div>
+      </div>
+      <div class="mk-chips" id="mk-filters">
+        <button class="mk-chip on" data-site="" onclick="mkFilterSite(this)">전체</button>
+        <button class="mk-chip" data-site="사케러버" onclick="mkFilterSite(this)">사케러버</button>
+        <button class="mk-chip" data-site="키햐" onclick="mkFilterSite(this)">키햐</button>
+      </div>
+      <div id="mk-status" class="mk-status">불러오는 중...</div>
+      <div id="mk-error" class="mk-error" style="display:none"></div>
+      <div class="mk-tbl-wrap" id="mk-tbl" style="display:none">
+        <table>
+          <thead><tr>
+            <th>사이트</th><th>구분</th>
+            <th class="mk-th-sort" data-key="name" onclick="mkSort('name')">상품명 <span class="mk-sort-icon">↕</span></th>
+            <th class="mk-th-sort" data-key="price" onclick="mkSort('price')">판매가 <span class="mk-sort-icon">↕</span></th>
+            <th>정가</th>
+            <th class="mk-th-sort" data-key="discount" onclick="mkSort('discount')">할인율 <span class="mk-sort-icon">↕</span></th>
+          </tr></thead>
+          <tbody id="mk-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 가격검색 -->
+    <div class="mk-subpage" id="mk-sub-search">
+      <div class="mk-search-wrap">
+        <span class="mk-search-icon">🔍</span>
+        <input type="text" id="mk-search-input" placeholder="사케 이름으로 검색 (예: 닷사이, 쿠보타)..." onkeydown="if(event.key==='Enter')mkDoSearch()">
+      </div>
+      <div id="mk-search-links" class="mk-search-links" style="display:none"></div>
+      <div id="mk-search-status" class="mk-status" style="display:none">검색 중...</div>
+      <div class="mk-rate-bar" id="mk-rate-bar" style="display:none">
+        <span class="mk-rate-chip" id="mk-rate-chip">환율 불러오는 중...</span>
+      </div>
+      <div class="mk-tbl-wrap" id="mk-search-tbl" style="display:none">
+        <table>
+          <thead><tr>
+            <th>사이트</th><th>구분</th>
+            <th class="mk-th-sort" data-tbl="ms" data-key="name" onclick="mkSortSearch('name')">상품명 <span class="mk-sort-icon">↕</span></th>
+            <th class="mk-th-sort" data-tbl="ms" data-key="krw" onclick="mkSortSearch('krw')">원화 <span class="mk-sort-icon">↕</span></th>
+            <th class="mk-th-sort" data-tbl="ms" data-key="jpy" onclick="mkSortSearch('jpy')">엔화 <span class="mk-sort-icon">↕</span></th>
+          </tr></thead>
+          <tbody id="mk-search-body"></tbody>
+        </table>
+      </div>
+      <div id="mk-no-result" class="mk-no-result" style="display:none">🔍 현재 딜 목록에 없습니다. 아래 사이트에서 직접 검색해보세요.</div>
+    </div>
+  </div>
+</div>
+
 <!-- INPUT TAB -->
 <div id="tab-input" style="display:none">
   <div class="inp-subtab-bar">
@@ -726,6 +847,165 @@ const PREFS = [
 if('scrollRestoration' in history) history.scrollRestoration='manual';
 let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', dateSort = 0, isWriterMode = false;
 
+/* ===== 주막 탭 ===== */
+var mkDeals=[], mkSite='', mkSortKey='', mkSortDir=0, mkLoaded=false;
+var mkRate=null, mkAllSearch=[], mkSSortKey='', mkSSortDir=0;
+var MK_BASE='http://'+(/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.|127\.)/.test(location.hostname)?location.hostname:'localhost')+':3001';
+function mkParseNum(s){var n=parseInt((s||'').replace(/[^\d]/g,''));return isNaN(n)?-1:n;}
+function mkApplySort(rows){
+  if(!mkSortKey||!mkSortDir)return rows;
+  return rows.slice().sort(function(a,b){
+    if(mkSortKey==='name')return mkSortDir*a.name.localeCompare(b.name,'ja');
+    var va=mkSortKey==='price'?mkParseNum(a.price):mkParseNum(a.discount);
+    var vb=mkSortKey==='price'?mkParseNum(b.price):mkParseNum(b.discount);
+    return mkSortDir*(va-vb);
+  });
+}
+function mkSort(key){
+  if(mkSortKey===key){mkSortDir=mkSortDir===1?-1:mkSortDir===-1?0:1;}
+  else{mkSortKey=key;mkSortDir=1;}
+  if(mkSortDir===0)mkSortKey='';
+  document.querySelectorAll('.mk-th-sort').forEach(function(th){
+    th.classList.remove('sort-asc','sort-desc');
+    var icon=th.querySelector('.mk-sort-icon');
+    if(th.dataset.key===mkSortKey&&mkSortDir!==0){th.classList.add(mkSortDir===1?'sort-asc':'sort-desc');icon.textContent=mkSortDir===1?'↑':'↓';}
+    else icon.textContent='↕';
+  });
+  var rows=mkSite?mkDeals.filter(function(d){return d.site===mkSite;}):mkDeals;
+  mkRender(mkApplySort(rows));
+}
+function mkRowHtml(item){
+  return '<tr>'+
+    '<td class="mk-td-site">'+h(item.site)+'</td>'+
+    '<td><span class="mk-badge mk-badge-'+item.type+'">'+h(item.type)+'</span></td>'+
+    '<td class="mk-td-name"><a href="'+h(item.link)+'" target="_blank">'+h(item.name)+'</a></td>'+
+    '<td class="mk-td-price">'+h(item.price)+'</td>'+
+    '<td class="mk-td-orig">'+h(item.orig)+'</td>'+
+    '<td class="mk-td-disc">'+h(item.discount)+'</td>'+
+  '</tr>';
+}
+function mkRender(rows){
+  var st=document.getElementById('mk-status'),tbl=document.getElementById('mk-tbl');
+  if(!rows||!rows.length){st.textContent='딜 정보가 없습니다.';st.style.display='';tbl.style.display='none';return;}
+  st.style.display='none';
+  document.getElementById('mk-body').innerHTML=rows.map(mkRowHtml).join('');
+  tbl.style.display='';
+  updateHdCount();
+}
+function mkFilterSite(btn){
+  document.querySelectorAll('#mk-filters .mk-chip').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  mkSite=btn.dataset.site;
+  var rows=mkSite?mkDeals.filter(function(d){return d.site===mkSite;}):mkDeals;
+  mkRender(mkApplySort(rows));
+}
+function mkSubTab(id,btn){
+  document.querySelectorAll('.mk-subtab-btn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.mk-subpage').forEach(function(p){p.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('mk-sub-'+id).classList.add('on');
+}
+function mkSearchRowHtml(item){
+  var krwCell,jpyCell;
+  if(item.currency==='JPY'){
+    jpyCell='<td class="mk-td-jpy">'+h(item.price)+'</td>';
+    if(mkRate){var num=parseInt(item.price.replace(/[^\d]/g,''));var conv=Math.round(num*mkRate);krwCell='<td class="mk-td-krw-conv">≈'+conv.toLocaleString()+'원</td>';}
+    else krwCell='<td style="color:var(--muted)">-</td>';
+  }else{
+    krwCell='<td class="mk-td-price">'+h(item.price)+'</td>';
+    jpyCell='<td style="color:var(--muted)">-</td>';
+  }
+  return '<tr>'+
+    '<td class="mk-td-site">'+h(item.site)+'</td>'+
+    '<td><span class="mk-badge mk-badge-'+item.type+'">'+h(item.type)+'</span></td>'+
+    '<td class="mk-td-name"><a href="'+h(item.link)+'" target="_blank">'+h(item.name)+'</a></td>'+
+    krwCell+jpyCell+
+  '</tr>';
+}
+function mkSParseKrw(item){if(item.currency==='JPY'&&mkRate)return Math.round(parseInt(item.price.replace(/[^\d]/g,''))*mkRate);if(item.currency!=='JPY')return parseInt(item.price.replace(/[^\d]/g,''))||0;return -1;}
+function mkSParseJpy(item){if(item.currency==='JPY')return parseInt(item.price.replace(/[^\d]/g,''))||0;return -1;}
+function mkApplySearchSort(rows){
+  if(!mkSSortKey||!mkSSortDir)return rows;
+  return rows.slice().sort(function(a,b){
+    if(mkSSortKey==='name')return mkSSortDir*a.name.localeCompare(b.name,'ja');
+    var va=mkSSortKey==='krw'?mkSParseKrw(a):mkSParseJpy(a);
+    var vb=mkSSortKey==='krw'?mkSParseKrw(b):mkSParseJpy(b);
+    return mkSSortDir*(va-vb);
+  });
+}
+function mkSortSearch(key){
+  if(mkSSortKey===key){mkSSortDir=mkSSortDir===1?-1:mkSSortDir===-1?0:1;}
+  else{mkSSortKey=key;mkSSortDir=1;}
+  if(mkSSortDir===0)mkSSortKey='';
+  document.querySelectorAll('.mk-th-sort[data-tbl="ms"]').forEach(function(th){
+    th.classList.remove('sort-asc','sort-desc');
+    var icon=th.querySelector('.mk-sort-icon');
+    if(th.dataset.key===mkSSortKey&&mkSSortDir!==0){th.classList.add(mkSSortDir===1?'sort-asc':'sort-desc');icon.textContent=mkSSortDir===1?'↑':'↓';}
+    else icon.textContent='↕';
+  });
+  document.getElementById('mk-search-body').innerHTML=mkApplySearchSort(mkAllSearch).map(mkSearchRowHtml).join('');
+}
+async function mkLoadRate(){
+  try{
+    var r=await fetch(MK_BASE+'/api/rate');
+    var data=await r.json();
+    mkRate=data.rate;
+    var per100=Math.round(mkRate*100).toLocaleString();
+    var chip=document.getElementById('mk-rate-chip');
+    chip.textContent='환율 ¥100 = ₩'+per100+'  ('+(data.date||'')+')';
+    chip.classList.remove('err');
+    document.getElementById('mk-rate-bar').style.display='';
+  }catch(e){
+    var chip=document.getElementById('mk-rate-chip');
+    chip.textContent='환율 불러오기 실패';chip.classList.add('err');
+    document.getElementById('mk-rate-bar').style.display='';
+  }
+}
+async function mkDoSearch(){
+  var q=(document.getElementById('mk-search-input').value||'').trim();
+  if(!q)return;
+  document.getElementById('mk-search-status').style.display='';
+  document.getElementById('mk-search-links').style.display='none';
+  document.getElementById('mk-search-tbl').style.display='none';
+  document.getElementById('mk-no-result').style.display='none';
+  try{
+    var r=await fetch(MK_BASE+'/api/search?q='+encodeURIComponent(q));
+    var data=await r.json();
+    document.getElementById('mk-search-status').style.display='none';
+    if(data.links&&data.links.length){
+      document.getElementById('mk-search-links').innerHTML=data.links.map(function(l){return '<a href="'+l.url+'" target="_blank">'+l.site+'에서 검색 ↗</a>';}).join('');
+      document.getElementById('mk-search-links').style.display='';
+    }
+    if(data.items&&data.items.length){
+      mkAllSearch=data.items;mkSSortKey='';mkSSortDir=0;
+      document.querySelectorAll('.mk-th-sort[data-tbl="ms"]').forEach(function(th){th.classList.remove('sort-asc','sort-desc');th.querySelector('.mk-sort-icon').textContent='↕';});
+      document.getElementById('mk-search-body').innerHTML=mkAllSearch.map(mkSearchRowHtml).join('');
+      document.getElementById('mk-search-tbl').style.display='';
+      document.getElementById('mk-rate-bar').style.display='';
+    }else{
+      mkAllSearch=[];
+      document.getElementById('mk-no-result').style.display='';
+    }
+  }catch(e){
+    document.getElementById('mk-search-status').textContent='⚠ 서버 연결 실패';
+  }
+}
+async function mkLoadDeals(){
+  var st=document.getElementById('mk-status'),tbl=document.getElementById('mk-tbl'),err=document.getElementById('mk-error');
+  st.textContent='불러오는 중...';st.style.display='';tbl.style.display='none';err.style.display='none';
+  try{
+    var r=await fetch(MK_BASE+'/api/deals');
+    var data=await r.json();
+    mkDeals=data.items||[];
+    if(data.updatedAt)document.getElementById('mk-updated').textContent=data.updatedAt+' 기준';
+    if(data.errors&&data.errors.length){err.textContent='⚠ 일부 실패: '+data.errors.join(' | ');err.style.display='';}
+    var rows=mkSite?mkDeals.filter(function(d){return d.site===mkSite;}):mkDeals;
+    mkRender(mkApplySort(rows));
+  }catch(e){
+    st.textContent='⚠ 서버 연결 실패 — 가격비교시작.bat 실행 후 새로고침';st.style.display='';tbl.style.display='none';
+  }
+}
+
 /* PIN */
 (function(){
   var m=sessionStorage.getItem('sake_mode');
@@ -842,11 +1122,12 @@ async function loadData(){
 
 /* Tab */
 function showTab(tab){
-  ['list','drunk','map','guide','input'].forEach(function(t){
+  ['list','drunk','map','guide','market','input'].forEach(function(t){
     document.getElementById('tb-'+t).classList.toggle('active',tab===t);
     document.getElementById('tab-'+t).style.display=tab===t?'block':'none';
   });
   document.getElementById('write-fab').style.display=(tab==='input'||!isWriterMode)?'none':'flex';
+  if(tab==='market'&&!mkLoaded){mkLoaded=true;mkLoadDeals();mkLoadRate();}
   updateHdCount();
 }
 
@@ -874,9 +1155,12 @@ function catStyle(cat){ var c=CAT_COLOR[cat]||['#7A6050','#F5F0E8']; return 'col
 function showImg(url){ document.getElementById('img-modal-img').src=url; document.getElementById('img-modal').style.display='flex'; }
 function updateHdCount(){
   var isDrunk=document.getElementById('tab-drunk').style.display!=='none';
+  var isMarket=document.getElementById('tab-market').style.display!=='none';
   if(isDrunk){
     var cnt=allRows.filter(function(r){return parseInt(r[7])===0;}).length;
     document.getElementById('hd-count').textContent=cnt+'종';
+  } else if(isMarket){
+    document.getElementById('hd-count').textContent=mkDeals.length?mkDeals.length+'딜':'—';
   } else {
     var total=allRows.reduce(function(sum,r){var s=parseInt(r[7]);return sum+(isNaN(s)||s<=0?0:s);},0);
     document.getElementById('hd-count').textContent=total+'병';
