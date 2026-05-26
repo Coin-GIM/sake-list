@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나이롱뽕 점수판</title>
+  <style>
+    :root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f1f5f9;--sub:#94a3b8;--accent:#f59e0b;--green:#22c55e;--red:#ef4444;--panel-alpha:0.82;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,'Malgun Gothic','맑은 고딕',sans-serif;min-height:100vh;}
+    .container{max-width:500px;margin:0 auto;padding:16px;}
+    .screen{display:none;} .screen.active{display:block;}
+    .app-header{text-align:center;padding:18px 0 12px;}
+    .app-title{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-.5px;}
+    .app-subtitle{font-size:13px;color:var(--sub);margin-top:4px;}
+    .card{background:rgba(15,20,35,var(--panel-alpha));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 4px 24px rgba(0,0,0,0.35);}
+    .section-label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;}
+    .input-group{margin-bottom:12px;}
+    .input-label{display:block;font-size:13px;color:var(--sub);margin-bottom:6px;}
+    input[type=text],input[type=date],input[type=number]{width:100%;background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:15px;font-family:inherit;outline:none;}
+    input:focus{border-color:var(--accent);}
+    input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:var(--border);outline:none;cursor:pointer;}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
+    input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
+    .btn{display:block;width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;transition:opacity .12s;}
+    .btn:active{opacity:.75;}
+    .btn-primary{background:var(--accent);color:#000;}
+    .btn-secondary{background:rgba(30,41,59,0.75);color:var(--text);border:1px solid var(--border);}
+    .btn-sm{display:inline-block;width:auto;padding:8px 16px;font-size:14px;margin-bottom:0;}
+    .flex-row{display:flex;gap:10px;margin-bottom:10px;}
+    .flex-row .btn{flex:1;margin-bottom:0;}
+    .s-pos{color:var(--red);} .s-neg{color:var(--green);} .s-zero{color:var(--sub);}
+    .round-badge{display:inline-block;background:var(--accent);color:#000;font-weight:800;font-size:12px;padding:3px 10px;border-radius:99px;}
+    .game-info-bar{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:4px;}
+
+    /* ── Ranking Row ── */
+    .ranking-row{display:flex;gap:4px;padding:4px 0 2px;justify-content:space-around;}
+    .rank-chip{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0;}
+    .rank-chip-medal{font-size:14px;line-height:1;}
+    .rank-chip-name{font-size:10px;font-weight:700;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+    .rank-chip-score{font-size:11px;font-weight:800;}
+
+    /* ── Score Input Grid ── */
+    .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    .score-card{background:rgba(15,23,42,0.55);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;gap:8px;}
+    .score-card-top{display:flex;gap:8px;align-items:center;width:100%;}
+    .score-card-info{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden;}
+    .score-card-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .score-card-ranks{font-size:10px;color:var(--sub);white-space:nowrap;}
+    .score-card-total{font-size:12px;font-weight:800;}
+    .score-card-input{width:100%;background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;padding:9px 6px;color:var(--text);font-size:20px;font-family:inherit;text-align:center;outline:none;}
+    .score-card-input:focus{border-color:var(--accent);}
+
+    /* ── Rank rows (result / history) ── */
+    .rank-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+    .rank-row:last-child{border-bottom:none;}
+    .rank-num{font-size:18px;font-weight:800;min-width:32px;text-align:center;}
+    .rank-score{font-size:18px;font-weight:800;min-width:52px;text-align:right;}
+    .rank-name{flex:1;font-size:15px;font-weight:600;}
+
+    /* ── Round table ── */
+    .round-table{width:100%;border-collapse:collapse;font-size:13px;}
+    .round-table th{color:var(--sub);text-align:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,0.07);}
+    .round-table td{text-align:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,0.07);}
+    .round-table tr:last-child td{border-bottom:none;}
+    .total-row td{border-top:2px solid #475569!important;font-weight:800;}
+
+    /* ── History ── */
+    .history-item{background:rgba(15,20,35,var(--panel-alpha));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.3);position:relative;}
+    .history-item:active{opacity:.75;}
+    .history-item-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+    .history-menu-btn{background:none;border:none;color:var(--sub);font-size:15px;font-weight:900;cursor:pointer;padding:0 5px;border-radius:5px;line-height:1.6;letter-spacing:2px;flex-shrink:0;}
+    .history-menu-btn:active{background:rgba(255,255,255,0.08);}
+    .history-date{font-size:12px;color:var(--sub);}
+    .history-menu-drop{position:absolute;top:38px;right:8px;background:#1e293b;border:1px solid #334155;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.55);z-index:200;min-width:110px;overflow:hidden;}
+    .history-menu-drop button{display:block;width:100%;padding:11px 14px;background:none;border:none;color:#ef4444;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;text-align:left;}
+    .history-menu-drop button:active{background:rgba(239,68,68,0.12);}
+    .history-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+    .history-meta{font-size:13px;color:var(--sub);}
+    .empty-state{text-align:center;padding:60px 20px;color:var(--sub);}
+    .empty-icon{font-size:52px;margin-bottom:12px;}
+
+    /* ── Player Management ── */
+    .player-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+    .player-card{display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .avatar-box{width:80px;height:80px;border-radius:12px;border:2px dashed var(--border);overflow:hidden;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;transition:border-color .15s;}
+    .avatar-box:hover{border-color:var(--accent);}
+    .avatar-box.has-img{border-style:solid;}
+    .av-bg{position:absolute;inset:0;}
+    .av-initial{position:absolute;font-size:20px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);z-index:1;pointer-events:none;}
+    .av-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;pointer-events:none;}
+    .av-edit{position:absolute;bottom:3px;right:3px;background:rgba(0,0,0,.6);border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;z-index:3;color:#fff;}
+    .player-name-edit{width:100%;background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;padding:7px 8px;color:var(--text);font-size:14px;font-family:inherit;outline:none;text-align:center;}
+    .player-name-edit:focus{border-color:var(--accent);}
+
+    /* ── Avatar circle ── */
+    .avatar-sm{border-radius:50%;flex-shrink:0;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+    .avatar-sm .av-initial{font-size:12px;}
+
+    /* ── Setup Player Selection ── */
+    .player-sel-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .player-sel-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:rgba(15,23,42,0.5);transition:all .15s;position:relative;user-select:none;}
+    .player-sel-card.sel-on{border-color:var(--accent);background:rgba(245,158,11,0.12);}
+    .player-sel-card.sel-off{opacity:0.35;}
+    .player-sel-name{font-size:12px;font-weight:700;color:var(--text);}
+    .sel-check{position:absolute;top:4px;right:6px;font-size:13px;color:var(--accent);font-weight:800;}
+
+    /* ── Opacity label row ── */
+    .opacity-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+
+    /* ── History nav (홈버튼 + 탭) ── */
+    .history-nav{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+    .tab-bar{display:flex;gap:6px;flex:1;}
+    .tab-btn{flex:1;padding:9px 4px;border:1px solid var(--border);border-radius:8px;background:rgba(30,41,59,0.65);color:var(--sub);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;text-align:center;transition:all .15s;}
+    .tab-btn.tab-active{background:var(--accent);color:#000;border-color:var(--accent);}
+
+    /* ── Map legend ── */
+    .map-legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--sub);margin-bottom:8px;}
+    .legend-dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:middle;}
+
+    /* ── Tile map grid ── */
+    .map-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(7,54px) 22px 54px;gap:4px;margin-bottom:12px;}
+    .map-tile{border:2px solid #334155;border-radius:7px;padding:3px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:rgba(15,20,35,0.72);transition:all .15s;text-align:center;user-select:none;position:relative;}
+    .map-tile:active{opacity:.72;}
+    .map-tile.map-tile-zero{opacity:.45;}
+    .map-tile.map-tile-active{border-color:var(--accent)!important;background:rgba(245,158,11,0.18);}
+    .map-tile-label{font-size:10px;font-weight:700;color:var(--text);line-height:1.25;word-break:keep-all;}
+    .map-tile-count{font-size:10px;font-weight:800;color:var(--accent);margin-top:2px;}
+
+    /* ── Player rank bar ── */
+    .player-rank-bar{font-size:11px;color:var(--sub);text-align:center;line-height:1.8;}
+  </style>
+</head>
+<body>
+
+<!-- Korean Traditional Room Background SVG -->
+<svg id="bg-svg" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#150a03"/>
+      <stop offset="100%" stop-color="#2a1408"/>
+    </linearGradient>
+    <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0d05"/>
+      <stop offset="100%" stop-color="#0d0703"/>
+    </linearGradient>
+    <linearGradient id="shojiGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f0ddb0" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#e8d09a" stop-opacity="0.62"/>
+    </linearGradient>
+    <radialGradient id="lanternGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.45"/>
+      <stop offset="55%" stop-color="#f59e0b" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fffde7" stop-opacity="0.9"/>
+      <stop offset="55%" stop-color="#fff9c4" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#fff9c4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vigGrad" cx="50%" cy="45%" r="72%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.68"/>
+    </radialGradient>
+    <linearGradient id="sunBeam" x1="1" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="tableGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c4a1a"/>
+      <stop offset="100%" stop-color="#4a2c0e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wall -->
+  <rect width="1000" height="560" fill="url(#wallGrad)"/>
+
+  <!-- Ceiling beam -->
+  <rect x="0" y="35" width="1000" height="9" fill="#5c3010" opacity="0.9"/>
+
+  <!-- Sunlight beam from right -->
+  <polygon points="780,0 1000,0 1000,320 560,560" fill="url(#sunBeam)"/>
+
+  <!-- === Shoji Panel 1: Plum Blossom === -->
+  <g transform="translate(28,55)">
+    <rect width="178" height="285" rx="4" fill="#5c3010"/>
+    <rect x="5" y="5" width="168" height="275" rx="2" fill="url(#shojiGrad)"/>
+    <line x1="5" y1="96" x2="173" y2="96" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="5" y1="188" x2="173" y2="188" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="89" y1="5" x2="89" y2="280" stroke="#8b6530" stroke-width="2.5"/>
+    <!-- Plum branch -->
+    <path d="M28 278 Q58 205 68 148 Q78 105 63 58" stroke="#3d2008" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M63 162 Q88 142 112 152" stroke="#3d2008" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M68 118 Q46 96 36 86" stroke="#3d2008" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M55 200 Q72 180 95 185" stroke="#3d2008" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- Blossoms -->
+    <circle cx="63" cy="57" r="9" fill="#ec4899" opacity="0.75"/>
+    <circle cx="57" cy="63" r="7" fill="#f472b6" opacity="0.65"/>
+    <circle cx="70" cy="63" r="7" fill="#f472b6" opacity="0.65"/>
+    <circle cx="112" cy="151" r="8" fill="#ec4899" opacity="0.7"/>
+    <circle cx="106" cy="157" r="6" fill="#f472b6" opacity="0.6"/>
+    <circle cx="36" cy="86" r="7" fill="#f472b6" opacity="0.65"/>
+    <circle cx="30" cy="80" r="5" fill="#ec4899" opacity="0.55"/>
+    <circle cx="95" cy="184" r="6" fill="#ec4899" opacity="0.6"/>
+    <!-- Blossom dots -->
+    <circle cx="63" cy="57" r="3" fill="#fcd34d" opacity="0.9"/>
+    <circle cx="112" cy="151" r="3" fill="#fcd34d" opacity="0.9"/>
+  </g>
+
+  <!-- === Shoji Panel 2: Moon + Night === -->
+  <g transform="translate(228,55)">
+    <rect width="178" height="285" rx="4" fill="#5c3010"/>
+    <rect x="5" y="5" width="168" height="275" rx="2" fill="#182845" opacity="0.88"/>
+    <line x1="5" y1="96" x2="173" y2="96" stroke="#3a2d18" stroke-width="2.5"/>
+    <line x1="5" y1="188" x2="173" y2="188" stroke="#3a2d18" stroke-width="2.5"/>
+    <line x1="89" y1="5" x2="89" y2="280" stroke="#3a2d18" stroke-width="2.5"/>
+    <!-- Moon glow -->
+    <circle cx="115" cy="68" r="50" fill="url(#moonGlow)"/>
+    <!-- Moon crescent -->
+    <circle cx="115" cy="68" r="30" fill="#fffde7"/>
+    <circle cx="128" cy="60" r="24" fill="#182845"/>
+    <!-- Stars -->
+    <circle cx="28" cy="28" r="2" fill="#fff" opacity="0.85"/>
+    <circle cx="52" cy="15" r="1.5" fill="#fff" opacity="0.75"/>
+    <circle cx="18" cy="52" r="1.5" fill="#fff" opacity="0.65"/>
+    <circle cx="40" cy="118" r="1" fill="#fff" opacity="0.55"/>
+    <circle cx="68" cy="98" r="1.5" fill="#fff" opacity="0.65"/>
+    <circle cx="148" cy="38" r="1.5" fill="#fff" opacity="0.7"/>
+    <circle cx="160" cy="120" r="1" fill="#fff" opacity="0.5"/>
+    <!-- Mountain silhouette -->
+    <polygon points="5,275 55,178 85,210 115,160 148,192 173,275" fill="#0e1b30"/>
+    <!-- Reflection on water hint -->
+    <rect x="5" y="240" width="168" height="35" fill="#1e2d4a" opacity="0.6"/>
+    <line x1="20" y1="250" x2="95" y2="250" stroke="#fff" stroke-width="1" opacity="0.15"/>
+    <line x1="30" y1="260" x2="80" y2="260" stroke="#fff" stroke-width="1" opacity="0.1"/>
+  </g>
+
+  <!-- === Shoji Panel 3: Pine Tree === -->
+  <g transform="translate(428,55)">
+    <rect width="178" height="285" rx="4" fill="#5c3010"/>
+    <rect x="5" y="5" width="168" height="275" rx="2" fill="url(#shojiGrad)"/>
+    <line x1="5" y1="96" x2="173" y2="96" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="5" y1="188" x2="173" y2="188" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="89" y1="5" x2="89" y2="280" stroke="#8b6530" stroke-width="2.5"/>
+    <!-- Pine trunk -->
+    <rect x="84" y="205" width="11" height="68" rx="2" fill="#3d2008"/>
+    <!-- Pine layers (bottom to conceptually top) -->
+    <polygon points="89,32 22,138 156,138" fill="#1a4a2e" opacity="0.88"/>
+    <polygon points="89,82 18,168 160,168" fill="#1f5c38" opacity="0.88"/>
+    <polygon points="89,132 14,210 164,210" fill="#1a4a2e" opacity="0.88"/>
+    <!-- Snow on branches -->
+    <polygon points="89,32 65,95 113,95" fill="#e8f4fd" opacity="0.45"/>
+    <polygon points="89,82 60,130 118,130" fill="#e8f4fd" opacity="0.35"/>
+  </g>
+
+  <!-- === Shoji Panel 4: Bamboo === -->
+  <g transform="translate(628,55)">
+    <rect width="178" height="285" rx="4" fill="#5c3010"/>
+    <rect x="5" y="5" width="168" height="275" rx="2" fill="url(#shojiGrad)"/>
+    <line x1="5" y1="96" x2="173" y2="96" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="5" y1="188" x2="173" y2="188" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="89" y1="5" x2="89" y2="280" stroke="#8b6530" stroke-width="2.5"/>
+    <!-- Bamboo stalks -->
+    <rect x="30" y="18" width="13" height="258" rx="6" fill="#2d6b27" opacity="0.82"/>
+    <rect x="52" y="18" width="13" height="258" rx="6" fill="#368830" opacity="0.82"/>
+    <rect x="82" y="18" width="13" height="258" rx="6" fill="#2d6b27" opacity="0.75"/>
+    <rect x="118" y="18" width="13" height="258" rx="6" fill="#368830" opacity="0.82"/>
+    <rect x="140" y="18" width="11" height="258" rx="5" fill="#2d6b27" opacity="0.65"/>
+    <!-- Nodes -->
+    <rect x="28" y="96" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="28" y="188" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="50" y="78" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="50" y="162" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="80" y="104" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="80" y="192" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="116" y="86" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="116" y="172" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <!-- Leaves -->
+    <ellipse cx="60" cy="22" rx="22" ry="6" transform="rotate(-32 60 22)" fill="#368830" opacity="0.8"/>
+    <ellipse cx="98" cy="18" rx="22" ry="6" transform="rotate(22 98 18)" fill="#2d6b27" opacity="0.8"/>
+    <ellipse cx="132" cy="26" rx="18" ry="5" transform="rotate(-18 132 26)" fill="#368830" opacity="0.75"/>
+    <ellipse cx="42" cy="18" rx="16" ry="5" transform="rotate(12 42 18)" fill="#2d6b27" opacity="0.7"/>
+  </g>
+
+  <!-- Wall base board -->
+  <rect x="0" y="338" width="1000" height="7" fill="#8b5e3c" opacity="0.8"/>
+
+  <!-- Floor -->
+  <rect x="0" y="345" width="1000" height="215" fill="url(#floorGrad)"/>
+
+  <!-- Floor planks horizontal -->
+  <line x1="0" y1="375" x2="1000" y2="375" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="405" x2="1000" y2="405" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="435" x2="1000" y2="435" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="465" x2="1000" y2="465" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="495" x2="1000" y2="495" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="525" x2="1000" y2="525" stroke="#1a0b04" stroke-width="2.5"/>
+  <!-- Vertical plank joints (offset per row) -->
+  <line x1="250" y1="345" x2="250" y2="405" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="500" y1="345" x2="500" y2="405" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="750" y1="345" x2="750" y2="405" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="130" y1="405" x2="130" y2="465" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="380" y1="405" x2="380" y2="465" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="620" y1="405" x2="620" y2="465" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="870" y1="405" x2="870" y2="465" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="200" y1="465" x2="200" y2="560" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="460" y1="465" x2="460" y2="560" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="700" y1="465" x2="700" y2="560" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="940" y1="465" x2="940" y2="560" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+
+  <!-- Hanging Lantern (center, top) -->
+  <circle cx="500" cy="18" r="105" fill="url(#lanternGlow)"/>
+  <line x1="500" y1="0" x2="500" y2="22" stroke="#5c3010" stroke-width="3.5"/>
+  <!-- Lantern cap -->
+  <rect x="480" y="18" width="40" height="8" rx="3" fill="#8b1a10"/>
+  <!-- Lantern body -->
+  <rect x="475" y="25" width="50" height="38" rx="7" fill="#c0392b"/>
+  <!-- Lantern inner glow -->
+  <rect x="480" y="29" width="40" height="30" rx="5" fill="#f59e0b" opacity="0.75"/>
+  <!-- Lantern ribs -->
+  <line x1="495" y1="25" x2="495" y2="63" stroke="#8b1a10" stroke-width="2" opacity="0.6"/>
+  <line x1="505" y1="25" x2="505" y2="63" stroke="#8b1a10" stroke-width="2" opacity="0.6"/>
+  <line x1="515" y1="25" x2="515" y2="63" stroke="#8b1a10" stroke-width="2" opacity="0.6"/>
+  <!-- Lantern bottom cap -->
+  <rect x="480" y="61" width="40" height="7" rx="3" fill="#8b1a10"/>
+  <!-- Tassel -->
+  <line x1="492" y1="68" x2="490" y2="82" stroke="#c0392b" stroke-width="2.5"/>
+  <line x1="500" y1="68" x2="500" y2="84" stroke="#c0392b" stroke-width="2.5"/>
+  <line x1="508" y1="68" x2="510" y2="82" stroke="#c0392b" stroke-width="2.5"/>
+  <circle cx="490" cy="83" r="3" fill="#c0392b"/>
+  <circle cx="500" cy="85" r="3" fill="#c0392b"/>
+  <circle cx="510" cy="83" r="3" fill="#c0392b"/>
+
+  <!-- Low table (center floor) -->
+  <!-- Table shadow -->
+  <ellipse cx="500" cy="425" rx="135" ry="18" fill="#000" opacity="0.35"/>
+  <!-- Table top surface -->
+  <ellipse cx="500" cy="402" rx="125" ry="22" fill="url(#tableGrad)"/>
+  <ellipse cx="500" cy="399" rx="125" ry="22" fill="url(#tableGrad)"/>
+  <!-- Table rim highlight -->
+  <ellipse cx="500" cy="398" rx="123" ry="20" fill="none" stroke="#a0692a" stroke-width="2" opacity="0.6"/>
+  <!-- Table legs -->
+  <rect x="400" y="408" width="9" height="22" rx="3" fill="#3d2008"/>
+  <rect x="591" y="408" width="9" height="22" rx="3" fill="#3d2008"/>
+  <rect x="420" y="408" width="9" height="20" rx="3" fill="#3d2008"/>
+  <rect x="571" y="408" width="9" height="20" rx="3" fill="#3d2008"/>
+
+  <!-- Hwatu Cards on table -->
+  <rect x="452" y="383" width="17" height="24" rx="2.5" fill="#111" transform="rotate(-12 460 395)"/>
+  <rect x="453" y="384" width="15" height="22" rx="1.5" fill="#dc2626" transform="rotate(-12 460 395)" opacity="0.92"/>
+  <circle cx="460" cy="393" r="4" fill="#fcd34d" transform="rotate(-12 460 395)" opacity="0.9"/>
+
+  <rect x="476" y="380" width="17" height="24" rx="2.5" fill="#111" transform="rotate(6 484 392)"/>
+  <rect x="477" y="381" width="15" height="22" rx="1.5" fill="#111" transform="rotate(6 484 392)"/>
+  <circle cx="484" cy="390" r="5" fill="#22c55e" transform="rotate(6 484 392)" opacity="0.9"/>
+
+  <rect x="500" y="378" width="17" height="24" rx="2.5" fill="#111" transform="rotate(-4 508 390)"/>
+  <rect x="501" y="379" width="15" height="22" rx="1.5" fill="#f59e0b" transform="rotate(-4 508 390)" opacity="0.92"/>
+
+  <rect x="524" y="381" width="17" height="24" rx="2.5" fill="#111" transform="rotate(10 532 393)"/>
+  <rect x="525" y="382" width="15" height="22" rx="1.5" fill="#1d4ed8" transform="rotate(10 532 393)" opacity="0.92"/>
+  <circle cx="532" cy="391" r="3.5" fill="#fff" transform="rotate(10 532 393)" opacity="0.7"/>
+
+  <!-- Tea set -->
+  <ellipse cx="558" cy="393" rx="13" ry="9" fill="#5a3010"/>
+  <ellipse cx="558" cy="390" rx="13" ry="9" fill="#7a4520"/>
+  <ellipse cx="558" cy="388" rx="11" ry="7" fill="#182845" opacity="0.85"/>
+  <!-- Steam -->
+  <path d="M553 385 Q555 380 553 375" stroke="#aaa" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M558 384 Q560 378 558 373" stroke="#aaa" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+  <!-- Cushions -->
+  <!-- Left cushion -->
+  <ellipse cx="265" cy="440" rx="58" ry="19" fill="#4c1d95" opacity="0.55"/>
+  <ellipse cx="265" cy="437" rx="58" ry="19" fill="#7c3aed" opacity="0.52"/>
+  <ellipse cx="265" cy="435" rx="55" ry="16" fill="#8b5cf6" opacity="0.4"/>
+  <!-- Right cushion -->
+  <ellipse cx="735" cy="440" rx="58" ry="19" fill="#065f46" opacity="0.55"/>
+  <ellipse cx="735" cy="437" rx="58" ry="19" fill="#0f766e" opacity="0.52"/>
+  <ellipse cx="735" cy="435" rx="55" ry="16" fill="#14b8a6" opacity="0.4"/>
+  <!-- Top-center small cushion -->
+  <ellipse cx="500" cy="355" rx="48" ry="14" fill="#9f1239" opacity="0.4"/>
+  <ellipse cx="500" cy="353" rx="48" ry="14" fill="#be185d" opacity="0.35"/>
+
+  <!-- Vignette -->
+  <rect width="1000" height="560" fill="url(#vigGrad)"/>
+
+  <!-- Bottom darkening -->
+  <rect x="0" y="500" width="1000" height="60" fill="black" opacity="0.28"/>
+</svg>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="container">
+    <div class="app-header">
+      <div class="app-title">🎴 나이롱뽕</div>
+      <div class="app-subtitle">뽕 치는 그 짜릿함</div>
+    </div>
+    <button class="btn btn-primary" onclick="goSetup()">🃏 새 게임 시작</button>
+    <button class="btn btn-secondary" onclick="goHistory()">📋 게임 이력</button>
+    <button class="btn btn-secondary" onclick="goSettings()">⚙️ 설정</button>
+    <button class="btn btn-secondary" id="admin-btn" onclick="toggleAdminMode()">🔒 관리자</button>
+  </div>
+</div>
+
+<!-- SETTINGS (플레이어 관리 + 투명도) -->
+<div class="screen" id="screen-settings">
+  <div class="container">
+    <div class="app-header">
+      <div class="app-title">설정</div>
+    </div>
+
+    <!-- 투명도 슬라이더 -->
+    <div class="card">
+      <div class="section-label" style="margin-bottom:12px">배경 투명도</div>
+      <div class="opacity-row">
+        <label class="input-label" style="margin-bottom:0">패널 불투명도</label>
+        <span id="opacity-val" style="font-size:14px;font-weight:800;color:var(--accent)">82%</span>
+      </div>
+      <input type="range" id="opacity-slider" min="10" max="95" value="82" oninput="setOpacity(this.value)">
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#475569">
+        <span>투명</span><span>불투명</span>
+      </div>
+    </div>
+
+    <!-- 플레이어 관리 -->
+    <div class="card">
+      <div class="section-label" style="margin-bottom:4px">플레이어 관리</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:14px">이름과 사진을 수정할 수 있어요</div>
+      <div class="player-grid" id="player-grid"></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="savePlayerEdits()">저장</button>
+    <button class="btn btn-secondary" data-scr="home" onclick="showScreen(this.dataset.scr)">← 홈</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="screen" id="screen-setup">
+  <div class="container">
+    <div class="app-header"><div class="app-title">게임 설정</div></div>
+    <div class="card">
+      <div class="section-label" style="margin-bottom:12px">게임 정보</div>
+      <div class="input-group">
+        <label class="input-label">날짜</label>
+        <input type="date" id="setup-date">
+      </div>
+      <div class="input-group" style="margin-bottom:0">
+        <label class="input-label">장소</label>
+        <input type="text" id="setup-location" placeholder="예: 홍대 OO 카페">
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-label">참여 플레이어</div>
+        <span id="setup-sel-count" style="font-size:13px;font-weight:700;color:var(--accent)">6명 참석</span>
+      </div>
+      <div class="player-sel-grid" id="setup-player-select"></div>
+    </div>
+    <div class="card">
+      <div class="section-label" style="margin-bottom:12px">게임 수</div>
+      <div class="input-group" style="margin-bottom:0">
+        <label class="input-label">총 게임 수 (비워두면 무제한)</label>
+        <input type="number" id="setup-rounds" min="1" placeholder="무제한">
+      </div>
+    </div>
+    <div class="flex-row">
+      <button class="btn btn-secondary" data-scr="home" onclick="showScreen(this.dataset.scr)">← 뒤로</button>
+      <button class="btn btn-primary" onclick="startGame()">게임 시작 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="screen-game">
+  <div class="container">
+    <div class="app-header" style="padding-top:12px">
+      <div class="app-title">🎴 나이롱뽕</div>
+      <div class="game-info-bar" id="game-info-bar"></div>
+    </div>
+
+    <!-- 순위 행 (맨 위) -->
+    <div class="card" style="padding:12px 10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="section-label">현재 순위</div>
+        <span id="round-done-label" style="font-size:11px;color:#64748b"></span>
+      </div>
+      <div class="ranking-row" id="ranking-row"></div>
+    </div>
+
+    <!-- 점수 입력 카드 -->
+    <div class="card" id="score-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-label">라운드 점수 입력</div>
+        <span class="round-badge" id="round-badge">1R</span>
+      </div>
+      <div class="score-grid" id="score-inputs"></div>
+      <button class="btn btn-primary" style="margin-bottom:0" onclick="submitRound()">라운드 확정 ✓</button>
+    </div>
+
+    <!-- 라운드 기록 -->
+    <div class="card" id="history-card" style="display:none">
+      <div class="section-label" style="margin-bottom:10px">라운드별 기록</div>
+      <div style="overflow-x:auto"><table class="round-table" id="round-table"></table></div>
+    </div>
+
+    <button class="btn btn-secondary" id="end-btn" onclick="confirmEnd()">게임 종료</button>
+  </div>
+</div>
+
+<!-- HISTORY LIST -->
+<div class="screen" id="screen-history">
+  <div class="container">
+    <div class="app-header"><div class="app-title">게임 이력</div></div>
+    <div class="history-nav">
+      <button class="btn btn-secondary btn-sm" data-scr="home" onclick="showScreen(this.dataset.scr)">← 홈</button>
+      <div class="tab-bar">
+        <button class="tab-btn tab-active" id="tab-list" onclick="switchHistoryTab('list')">목록</button>
+        <button class="tab-btn" id="tab-map" onclick="switchHistoryTab('map')">🗺 지도</button>
+      </div>
+    </div>
+    <div id="history-list"></div>
+    <div id="map-section" style="display:none">
+      <div class="map-legend">
+        <span><span class="legend-dot" style="background:#8b5cf6"></span>특별·자치시</span>
+        <span><span class="legend-dot" style="background:#3b82f6"></span>광역시</span>
+        <span><span class="legend-dot" style="background:#f59e0b"></span>특례시</span>
+        <span><span class="legend-dot" style="background:#475569"></span>도·지역</span>
+      </div>
+      <div class="map-grid" id="map-container"></div>
+      <div id="map-game-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY DETAIL -->
+<div class="screen" id="screen-detail">
+  <div class="container">
+    <div class="app-header"><div class="app-title">게임 결과</div></div>
+    <button class="btn btn-secondary btn-sm" style="margin-bottom:16px" onclick="showScreen('history')">← 이력</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- PIN Modal -->
+<div id="pin-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:900;align-items:center;justify-content:center;">
+  <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px 24px;width:min(340px,90vw);text-align:center">
+    <div style="font-size:20px;font-weight:800;margin-bottom:8px">🔐 관리자 PIN</div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:18px">저장 권한이 있는 관리자만 입력하세요</div>
+    <input type="password" id="pin-input" placeholder="PIN" maxlength="20"
+      style="width:100%;background:rgba(15,23,42,0.7);border:1px solid #334155;border-radius:8px;padding:12px;color:#f1f5f9;font-size:22px;text-align:center;outline:none;letter-spacing:6px;font-family:inherit"
+      onkeydown="if(event.key==='Enter')confirmPin()">
+    <div id="pin-error" style="color:#ef4444;font-size:13px;margin-top:10px;min-height:20px"></div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-secondary" style="flex:1;margin-bottom:0;padding:12px" onclick="closePinOverlay()">취소</button>
+      <button class="btn btn-primary" style="flex:1;margin-bottom:0;padding:12px" onclick="confirmPin()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;color:#f1f5f9;z-index:1000;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5)"></div>
+
+<script>
+// ── Constants ──────────────────────────────────────────────
+var COLORS = ['#f59e0b','#3b82f6','#22c55e','#ec4899','#a855f7','#14b8a6'];
+
+// ── Map tile definitions ──────────────────────────────────
+// type: sp=특별시/자치시, me=광역시, sc=특례시, re=도·지역
+// grid row 8 = 22px gap, row 9 = 제주(섬)
+var MAP_TILES = [
+  {id:'서울',  label:'서울',    gc:'3/4', gr:'1/2', type:'sp',
+   keys:['서울','홍대','이태원','신촌','강남','마포','합정','종로','혜화','건대','신림','잠실','성수','여의도','명동','인사동','연남','상수','을지로','용산','노원','망원','Seoul']},
+  {id:'강원',  label:'강원도',  gc:'4/5', gr:'1/3', type:'re',
+   keys:['강원','춘천','원주','강릉','동해','태백','속초','삼척','Chuncheon','Wonju','Gangneung']},
+  {id:'인천',  label:'인천',    gc:'1/2', gr:'2/3', type:'me',
+   keys:['인천','부평','송도','구월','계양','Incheon']},
+  {id:'경기북', label:'경기북부', gc:'2/3', gr:'2/3', type:'re',
+   keys:['의정부','동두천','양주','구리','남양주','포천','파주','고양','일산','덕양','화정','백마','Goyang','Uijeongbu']},
+  {id:'경기남', label:'경기남부', gc:'3/4', gr:'2/3', type:'re',
+   keys:['안양','부천','광명','군포','의왕','안산','시흥','오산','화성','평택','안성','하남','김포','성남','분당','판교','용인','수지','기흥','Anyang','Bucheon','Yongin','Seongnam']},
+  {id:'수원',  label:'수원',    gc:'2/3', gr:'3/4', type:'sc',
+   keys:['수원','영통','팔달','권선','장안','Suwon']},
+  {id:'충북',  label:'충청북도', gc:'4/5', gr:'3/5', type:'re',
+   keys:['충북','청주','충주','제천','청원','Cheongju','Chungju']},
+  {id:'충남',  label:'충청남도', gc:'1/2', gr:'4/5', type:'re',
+   keys:['충남','천안','공주','보령','아산','서산','논산','계룡','당진','Cheonan','Asan']},
+  {id:'세종',  label:'세종',    gc:'2/3', gr:'4/5', type:'sp',
+   keys:['세종','Sejong']},
+  {id:'대전',  label:'대전',    gc:'3/4', gr:'4/5', type:'me',
+   keys:['대전','유성','둔산','노은','Daejeon']},
+  {id:'경북',  label:'경상북도', gc:'5/6', gr:'4/6', type:'re',
+   keys:['경북','포항','경주','김천','안동','구미','영주','영천','상주','문경','경산','Pohang','Gyeongju','Gumi']},
+  {id:'전북',  label:'전라북도', gc:'1/2', gr:'5/6', type:'re',
+   keys:['전북','전주','군산','익산','정읍','남원','김제','Jeonju','Gunsan']},
+  {id:'대구',  label:'대구',    gc:'3/4', gr:'5/6', type:'me',
+   keys:['대구','동성로','수성','달서','칠곡','Daegu']},
+  {id:'경남',  label:'경상남도', gc:'4/5', gr:'5/6', type:'re',
+   keys:['경남','진주','통영','사천','김해','밀양','거제','양산','창원','마산','진해','울산','삼산','태화','언양','Changwon','Jinju','Ulsan']},
+  {id:'광주',  label:'광주',    gc:'1/2', gr:'6/7', type:'me',
+   keys:['광주','충장로','상무','첨단','광산','Gwangju']},
+  {id:'전남',  label:'전라남도', gc:'2/3', gr:'6/8', type:'re',
+   keys:['전남','목포','여수','순천','나주','광양','Mokpo','Yeosu']},
+  {id:'부산',  label:'부산',    gc:'5/6', gr:'6/7', type:'me',
+   keys:['부산','해운대','서면','광안','남포','센텀','동래','Busan']},
+  {id:'제주',  label:'제주도',  gc:'1/2', gr:'9/10', type:'re',
+   keys:['제주','서귀포','Jeju']},
+];
+var TILE_STYLE = {
+  sp: {border:'#8b5cf6', bg:'rgba(139,92,246,0.18)'},
+  me: {border:'#3b82f6', bg:'rgba(59,130,246,0.18)'},
+  sc: {border:'#f59e0b', bg:'rgba(245,158,11,0.18)'},
+  re: {border:'#475569', bg:'rgba(71,85,105,0.22)'}
+};
+
+var DEFAULT_PLAYERS = [
+  {id:0, name:'황',    color:'#f59e0b', image:null},
+  {id:1, name:'곤',    color:'#3b82f6', image:null},
+  {id:2, name:'이셔뷩',color:'#22c55e', image:null},
+  {id:3, name:'몽끼',  color:'#ec4899', image:null},
+  {id:4, name:'짐서방',color:'#a855f7', image:null},
+  {id:5, name:'뚜부',  color:'#14b8a6', image:null}
+];
+var PLAYERS_KEY = 'nairongbbong_players';
+var STORAGE_KEY  = 'nairongbbong_v1';
+
+// ── State ─────────────────────────────────────────────────
+var G = null;
+var setupSelected = [0,1,2,3,4,5];
+var historyTab = 'list';
+var mapActiveTile = null;
+var openHistoryMenu = null;
+
+// ── Cloud / Admin constants ────────────────────────────────
+var API_URL = '/api/games';
+var ADMIN_PIN_KEY = 'nrbAdminPin';
+
+// ── Navigation ────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function goSetup() {
+  document.getElementById('setup-date').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('setup-location').value = '';
+  document.getElementById('setup-rounds').value = '';
+  setupSelected = getPlayers().map(function(_, i) { return i; });
+  renderSetupPlayerSelect();
+  showScreen('setup');
+  autoFillLocation();
+}
+function goHistory() {
+  historyTab = 'list';
+  mapActiveTile = null;
+  renderHistoryList();
+  showScreen('history');
+  var tl = document.getElementById('tab-list');
+  var tm = document.getElementById('tab-map');
+  if (tl) tl.classList.add('tab-active');
+  if (tm) tm.classList.remove('tab-active');
+  var hl = document.getElementById('history-list');
+  var ms = document.getElementById('map-section');
+  if (hl) hl.style.display = 'block';
+  if (ms) ms.style.display = 'none';
+}
+function switchHistoryTab(tab) {
+  historyTab = tab;
+  var tl = document.getElementById('tab-list');
+  var tm = document.getElementById('tab-map');
+  var hl = document.getElementById('history-list');
+  var ms = document.getElementById('map-section');
+  if (tab === 'list') {
+    tl.classList.add('tab-active'); tm.classList.remove('tab-active');
+    hl.style.display = 'block'; ms.style.display = 'none';
+  } else {
+    tm.classList.add('tab-active'); tl.classList.remove('tab-active');
+    hl.style.display = 'none'; ms.style.display = 'block';
+    mapActiveTile = null;
+    renderHistoryMap();
+  }
+}
+function goSettings() { loadOpacitySlider(); renderPlayersScreen(); showScreen('settings'); }
+function goPlayers() { goSettings(); }
+
+// ── Cloud Sync ─────────────────────────────────────────────
+function syncFromCloud() {
+  fetch(API_URL)
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (Array.isArray(data) && data.length > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+    })
+    .catch(function() {});
+}
+function pushToCloud(games) {
+  var pin = sessionStorage.getItem(ADMIN_PIN_KEY);
+  if (!pin) return;
+  fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Pin': pin },
+    body: JSON.stringify(games)
+  })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function() { showToast('☁️ 클라우드 저장 완료'); })
+    .catch(function() { showToast('⚠️ 클라우드 저장 실패'); });
+}
+
+// ── Admin Mode ─────────────────────────────────────────────
+function isAdminMode() { return !!sessionStorage.getItem(ADMIN_PIN_KEY); }
+function toggleAdminMode() {
+  if (isAdminMode()) {
+    sessionStorage.removeItem(ADMIN_PIN_KEY);
+    updateAdminBtn();
+    showToast('관리자 모드 해제');
+  } else {
+    openPinOverlay();
+  }
+}
+function openPinOverlay() {
+  var el = document.getElementById('pin-overlay');
+  if (el) el.style.display = 'flex';
+  var inp = document.getElementById('pin-input');
+  if (inp) { inp.value = ''; inp.style.borderColor = '#334155'; setTimeout(function(){ inp.focus(); }, 80); }
+  var err = document.getElementById('pin-error');
+  if (err) err.textContent = '';
+}
+function closePinOverlay() {
+  var el = document.getElementById('pin-overlay');
+  if (el) el.style.display = 'none';
+}
+function confirmPin() {
+  var inp = document.getElementById('pin-input');
+  var pin = inp ? inp.value.trim() : '';
+  if (!pin) return;
+  var err = document.getElementById('pin-error');
+  fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Pin': pin },
+    body: 'null'
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d && d.verified) {
+        sessionStorage.setItem(ADMIN_PIN_KEY, pin);
+        closePinOverlay();
+        updateAdminBtn();
+        showToast('✅ 관리자 모드 활성화');
+      } else {
+        if (err) err.textContent = '❌ PIN이 올바르지 않습니다';
+        if (inp) inp.style.borderColor = '#ef4444';
+      }
+    })
+    .catch(function() {
+      if (err) err.textContent = '❌ 서버 연결 실패';
+    });
+}
+function updateAdminBtn() {
+  var btn = document.getElementById('admin-btn');
+  if (!btn) return;
+  if (isAdminMode()) {
+    btn.textContent = '🔓 관리자 ON';
+    btn.style.borderColor = '#22c55e';
+    btn.style.color = '#22c55e';
+  } else {
+    btn.textContent = '🔒 관리자';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }
+}
+function showToast(msg) {
+  var el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._tid);
+  el._tid = setTimeout(function() { el.style.opacity = '0'; }, 2800);
+}
+
+// ── IP Location Auto-fill ──────────────────────────────────
+function autoFillLocation() {
+  var el = document.getElementById('setup-location');
+  if (!el || el.value) return;
+  fetch('https://ipinfo.io/json')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d && d.city && el.value === '') {
+        el.value = d.city;
+        el.style.color = 'var(--sub)';
+        el.addEventListener('input', function clearStyle() {
+          el.style.color = '';
+          el.removeEventListener('input', clearStyle);
+        });
+      }
+    })
+    .catch(function() {});
+}
+
+// ── Player Storage ─────────────────────────────────────────
+function getPlayers() {
+  try {
+    var s = JSON.parse(localStorage.getItem(PLAYERS_KEY));
+    if (s && s.length === 6) return s;
+  } catch (e) {}
+  return DEFAULT_PLAYERS.map(function(p) { return Object.assign({}, p); });
+}
+function storePlayers(pl) { localStorage.setItem(PLAYERS_KEY, JSON.stringify(pl)); }
+
+// ── Player Rank Stats ──────────────────────────────────────
+function calcPlayerRankStats() {
+  var list = loadHistory();
+  var stats = {};
+  getPlayers().forEach(function(p) { stats[p.name] = {r1:0, r2:0, r3:0}; });
+  list.forEach(function(g) {
+    g.rounds.forEach(function(r) {
+      var arr = g.players.map(function(p) {
+        return {name: p.name, score: (r.scores && r.scores[p.name] !== undefined) ? r.scores[p.name] : 0};
+      }).sort(function(a, b) { return a.score - b.score; });
+      arr.forEach(function(ps, idx) {
+        if (!stats[ps.name]) stats[ps.name] = {r1:0, r2:0, r3:0};
+        if (idx === 0) stats[ps.name].r1++;
+        else if (idx === 1) stats[ps.name].r2++;
+        else if (idx === 2) stats[ps.name].r3++;
+      });
+    });
+  });
+  return stats;
+}
+
+// ── Player Management ──────────────────────────────────────
+function triggerUpload(idx) {
+  document.getElementById('file-' + idx).click();
+}
+function renderPlayersScreen() {
+  var pl = getPlayers();
+  var stats = calcPlayerRankStats();
+  var html = '';
+  pl.forEach(function(p, i) {
+    var hasImg = !!p.image;
+    var st = stats[p.name] || {r1:0, r2:0, r3:0};
+    html += '<div class="player-card">';
+    html += '<div class="avatar-box' + (hasImg ? ' has-img' : '') + '" id="av-box-' + i + '" onclick="triggerUpload(' + i + ')" style="background:' + p.color + '22">';
+    html += '<div class="av-bg" style="background:' + p.color + '44"></div>';
+    html += '<span class="av-initial" id="av-init-' + i + '"' + (hasImg ? ' style="display:none"' : '') + '>' + esc(p.name.slice(0,2)) + '</span>';
+    html += '<img class="av-img" id="av-img-' + i + '" src="' + (hasImg ? p.image : '') + '" alt=""' + (hasImg ? '' : ' style="display:none"') + '>';
+    html += '<div class="av-edit">&#9998;</div>';
+    html += '</div>';
+    html += '<input type="file" id="file-' + i + '" accept="image/*" style="display:none" onchange="handleImgUpload(' + i + ',event)">';
+    html += '<input class="player-name-edit" type="text" id="pname-' + i + '" value="' + esc(p.name) + '" maxlength="6" placeholder="이름">';
+    html += '<div class="player-rank-bar">🥇' + st.r1 + ' 🥈' + st.r2 + ' 🥉' + st.r3 + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('player-grid').innerHTML = html;
+}
+function handleImgUpload(idx, event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  compressImage(file, function(dataUrl) {
+    document.getElementById('av-img-' + idx).src = dataUrl;
+    document.getElementById('av-img-' + idx).style.display = 'block';
+    document.getElementById('av-init-' + idx).style.display = 'none';
+    document.getElementById('av-box-' + idx).classList.add('has-img');
+  });
+}
+function compressImage(file, cb) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var MAX = 300, w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else       { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      var c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(c.toDataURL('image/jpeg', 0.78));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function savePlayerEdits() {
+  var pl = getPlayers();
+  pl.forEach(function(p, i) {
+    var ne = document.getElementById('pname-' + i);
+    var ie = document.getElementById('av-img-' + i);
+    if (ne) { var n = ne.value.trim(); if (n) p.name = n; }
+    if (ie && ie.src && ie.style.display !== 'none' && ie.src.startsWith('data:')) p.image = ie.src;
+  });
+  storePlayers(pl);
+  alert('저장됐습니다!');
+  showScreen('settings');
+}
+
+// ── Opacity / Settings ────────────────────────────────────
+function setOpacity(val) {
+  var v = Math.max(10, Math.min(95, parseInt(val)));
+  document.documentElement.style.setProperty('--panel-alpha', (v / 100).toFixed(2));
+  var el = document.getElementById('opacity-val');
+  if (el) el.textContent = v + '%';
+  localStorage.setItem('panelOpacity', v);
+}
+function loadOpacity() {
+  var saved = localStorage.getItem('panelOpacity');
+  if (saved) {
+    var v = parseInt(saved);
+    document.documentElement.style.setProperty('--panel-alpha', (v / 100).toFixed(2));
+  }
+}
+function loadOpacitySlider() {
+  var saved = parseInt(localStorage.getItem('panelOpacity') || '82');
+  var sl = document.getElementById('opacity-slider');
+  if (sl) sl.value = saved;
+  var vl = document.getElementById('opacity-val');
+  if (vl) vl.textContent = saved + '%';
+}
+
+// ── Setup: Player Selection ────────────────────────────────
+function togglePlayerSelect(idx) {
+  var pos = setupSelected.indexOf(idx);
+  if (pos >= 0) {
+    if (setupSelected.length <= 2) { alert('최소 2명 이상이어야 합니다.'); return; }
+    setupSelected.splice(pos, 1);
+  } else {
+    setupSelected.push(idx);
+  }
+  renderSetupPlayerSelect();
+}
+function renderSetupPlayerSelect() {
+  var pl = getPlayers();
+  var html = '';
+  pl.forEach(function(p, i) {
+    var sel = setupSelected.indexOf(i) >= 0;
+    html += '<div class="player-sel-card' + (sel ? ' sel-on' : ' sel-off') + '" onclick="togglePlayerSelect(' + i + ')">';
+    html += avatarSm(p, 52);
+    html += '<span class="player-sel-name">' + esc(p.name) + '</span>';
+    if (sel) html += '<span class="sel-check">✓</span>';
+    html += '</div>';
+  });
+  document.getElementById('setup-player-select').innerHTML = html;
+  var countEl = document.getElementById('setup-sel-count');
+  if (countEl) countEl.textContent = setupSelected.length + '명 참석';
+}
+
+// ── Start Game ────────────────────────────────────────────
+function startGame() {
+  var dateVal = document.getElementById('setup-date').value;
+  if (!dateVal) { alert('날짜를 입력해주세요.'); return; }
+  if (setupSelected.length < 2) { alert('최소 2명을 선택해주세요.'); return; }
+  var allPl = getPlayers();
+  var sorted = setupSelected.slice().sort(function(a,b){ return a-b; });
+  var pl = sorted.map(function(i) { return allPl[i]; });
+  var rl = parseInt(document.getElementById('setup-rounds').value) || null;
+  var totals = {};
+  pl.forEach(function(p) { totals[p.name] = 0; });
+  var locEl = document.getElementById('setup-location');
+  locEl.style.color = '';
+  G = {
+    id: Date.now(), date: dateVal,
+    location: locEl.value.trim() || '장소 미입력',
+    players: pl, roundLimit: rl, currentRound: 1, rounds: [], totals: totals, finished: false
+  };
+  document.getElementById('score-card').style.display = 'block';
+  document.getElementById('history-card').style.display = 'none';
+  document.getElementById('end-btn').style.display = 'block';
+  var ex = document.getElementById('result-card'); if (ex) ex.remove();
+  showScreen('game');
+  renderGameScreen();
+}
+
+// ── Game Screen ───────────────────────────────────────────
+function renderGameScreen() {
+  document.getElementById('game-info-bar').innerHTML =
+    '<span>📅 ' + fmtDate(G.date) + '</span>' +
+    '<span>📍 ' + esc(G.location) + '</span>' +
+    (G.roundLimit ? '<span>총 ' + G.roundLimit + '라운드</span>' : '');
+  renderRankingRow();
+  renderScoreInputs();
+}
+
+// ── Ranking Row (상단 순위) ────────────────────────────────
+function sortedPlayers() {
+  return G.players.slice().sort(function(a, b) {
+    var d = G.totals[a.name] - G.totals[b.name];
+    if (d !== 0) return d;
+    return G.players.indexOf(a) - G.players.indexOf(b);
+  });
+}
+function renderRankingRow() {
+  var sorted = sortedPlayers();
+  var medals = ['🥇','🥈','🥉','4위','5위','6위'];
+  var html = '';
+  sorted.forEach(function(p, i) {
+    var t = G.totals[p.name];
+    html += '<div class="rank-chip">';
+    html += '<div class="rank-chip-medal">' + (medals[i] || (i+1)+'위') + '</div>';
+    html += avatarSm(p, 42);
+    html += '<div class="rank-chip-name">' + esc(p.name) + '</div>';
+    html += '<div class="rank-chip-score ' + scoreClass(t) + '">' + fmtScore(t) + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('ranking-row').innerHTML = html;
+  document.getElementById('round-done-label').textContent =
+    G.rounds.length > 0 ? G.rounds.length + 'R 완료' : '시작 전';
+}
+
+// ── Score Input (2열 카드형) ──────────────────────────────
+function renderScoreInputs() {
+  document.getElementById('round-badge').textContent = G.currentRound + 'R';
+  var stats = calcPlayerRankStats();
+  var html = '';
+  G.players.forEach(function(p, i) {
+    var t = G.totals[p.name];
+    var st = stats[p.name] || {r1:0, r2:0, r3:0};
+    html += '<div class="score-card" style="border-top:3px solid ' + p.color + '">';
+    html += '<div class="score-card-top">';
+    html += avatarSm(p, 44);
+    html += '<div class="score-card-info">';
+    html += '<div class="score-card-name">' + esc(p.name) + '</div>';
+    html += '<div class="score-card-ranks">🥇' + st.r1 + ' 🥈' + st.r2 + ' 🥉' + st.r3 + '</div>';
+    html += '<div class="score-card-total ' + scoreClass(t) + '">' + fmtScore(t) + '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '<input class="score-input-field score-card-input" type="number" id="si-' + i + '" placeholder="0" inputmode="decimal">';
+    html += '</div>';
+  });
+  document.getElementById('score-inputs').innerHTML = html;
+  setTimeout(function() { var el = document.getElementById('si-0'); if (el) el.focus(); }, 80);
+}
+
+function submitRound() {
+  var scores = {}, allFilled = true;
+  G.players.forEach(function(p, i) {
+    var el = document.getElementById('si-' + i);
+    if (!el || el.value.trim() === '') { allFilled = false; return; }
+    scores[p.name] = parseInt(el.value) || 0;
+  });
+  if (!allFilled) { alert('모든 플레이어의 점수를 입력해주세요.'); return; }
+  G.rounds.push({ round: G.currentRound, scores: scores });
+  G.players.forEach(function(p) { G.totals[p.name] += scores[p.name]; });
+  G.currentRound++;
+  if (G.roundLimit && G.currentRound > G.roundLimit) { endGame(); return; }
+  renderRankingRow();
+  renderScoreInputs();
+  renderRoundTable();
+  document.getElementById('history-card').style.display = 'block';
+}
+
+function confirmEnd() {
+  if (G.rounds.length === 0) {
+    if (confirm('아직 기록된 라운드가 없습니다. 종료할까요?')) showScreen('home');
+    return;
+  }
+  if (confirm(G.rounds.length + '라운드까지의 기록을 저장하고 종료할까요?')) endGame();
+}
+function endGame() {
+  G.finished = true;
+  saveGame(G);
+  document.getElementById('score-card').style.display = 'none';
+  document.getElementById('end-btn').style.display = 'none';
+  renderRankingRow();
+  var sorted = sortedPlayers();
+  var medals = ['🥇','🥈','🥉'];
+  var html = '<div class="card" id="result-card"><div class="section-label" style="margin-bottom:12px">🏆 최종 결과</div>';
+  sorted.forEach(function(p, i) {
+    var t = G.totals[p.name];
+    html += '<div class="rank-row"><div class="rank-num">' + (medals[i] || (i+1)+'위') + '</div>';
+    html += avatarSm(p, 34);
+    html += '<div class="rank-name">' + esc(p.name) + '</div>';
+    html += '<div class="rank-score ' + scoreClass(t) + '">' + fmtScore(t) + '</div></div>';
+  });
+  html += '<div class="flex-row" style="margin-top:14px">';
+  html += '<button class="btn btn-primary" data-scr="home" onclick="showScreen(this.dataset.scr)">홈으로</button>';
+  html += '<button class="btn btn-secondary" onclick="goHistory()">이력 보기</button>';
+  html += '</div></div>';
+  document.getElementById('history-card').insertAdjacentHTML('afterend', html);
+  renderRoundTable();
+  document.getElementById('history-card').style.display = 'block';
+}
+
+// ── Round Table ────────────────────────────────────────────
+function renderRoundTable() {
+  if (G.rounds.length === 0) return;
+  var tbl = document.getElementById('round-table');
+  var th = '<thead><tr><th style="color:#64748b">R</th>';
+  G.players.forEach(function(p) { th += '<th style="color:' + p.color + '">' + esc(p.name) + '</th>'; });
+  th += '</tr></thead>';
+  var tb = '<tbody>';
+  G.rounds.forEach(function(r) {
+    tb += '<tr><td style="color:#64748b;font-weight:700">' + r.round + '</td>';
+    G.players.forEach(function(p) { var s = r.scores[p.name]; tb += '<td class="' + scoreClass(s) + '">' + fmtScore(s) + '</td>'; });
+    tb += '</tr>';
+  });
+  tb += '<tr class="total-row"><td style="color:#94a3b8">합</td>';
+  G.players.forEach(function(p) { var t = G.totals[p.name]; tb += '<td class="' + scoreClass(t) + '">' + fmtScore(t) + '</td>'; });
+  tb += '</tr></tbody>';
+  tbl.innerHTML = th + tb;
+}
+
+// ── History ────────────────────────────────────────────────
+function saveGame(g) {
+  var l = loadHistory();
+  l.unshift(g);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(l));
+  if (isAdminMode()) pushToCloud(l);
+}
+function loadHistory() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { return []; } }
+
+// ── Map ────────────────────────────────────────────────────
+function tileMatchCount(tileId, list) {
+  var tile = MAP_TILES.find(function(t){ return t.id === tileId; });
+  if (!tile) return 0;
+  return list.filter(function(g) {
+    var loc = (g.location || '').toLowerCase();
+    return tile.keys.some(function(k){ return loc.includes(k.toLowerCase()); });
+  }).length;
+}
+function renderHistoryMap() {
+  var list = loadHistory();
+  var html = '';
+  MAP_TILES.forEach(function(t) {
+    var cnt = tileMatchCount(t.id, list);
+    var st = TILE_STYLE[t.type];
+    var isActive = mapActiveTile === t.id;
+    var isZero = cnt === 0;
+    var borderColor = isActive ? 'var(--accent)' : st.border;
+    var bgColor = isActive ? 'rgba(245,158,11,0.18)' : (isZero ? 'rgba(15,20,35,0.55)' : st.bg);
+    var cls = 'map-tile' + (isActive ? ' map-tile-active' : '') + (isZero ? ' map-tile-zero' : '');
+    html += '<div class="' + cls + '"'
+      + ' style="grid-column:' + t.gc + ';grid-row:' + t.gr
+      + ';border-color:' + borderColor + ';background:' + bgColor + '"'
+      + ' data-tile="' + t.id + '" onclick="selectMapTile(this.dataset.tile)">';
+    html += '<div class="map-tile-label">' + t.label + '</div>';
+    if (cnt > 0) html += '<div class="map-tile-count">' + cnt + '게임</div>';
+    html += '</div>';
+  });
+  document.getElementById('map-container').innerHTML = html;
+  if (mapActiveTile) renderTileGameList(mapActiveTile, list);
+}
+function selectMapTile(tileId) {
+  if (mapActiveTile === tileId) {
+    mapActiveTile = null;
+    document.getElementById('map-game-list').innerHTML = '';
+    renderHistoryMap();
+    return;
+  }
+  mapActiveTile = tileId;
+  renderHistoryMap();
+  var gl = document.getElementById('map-game-list');
+  if (gl) setTimeout(function(){ gl.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 80);
+}
+function renderTileGameList(tileId, list) {
+  var tile = MAP_TILES.find(function(t){ return t.id === tileId; });
+  if (!tile) return;
+  if (!list) list = loadHistory();
+  var filtered = [], fullIdxs = [];
+  list.forEach(function(g, i) {
+    var loc = (g.location || '').toLowerCase();
+    if (tile.keys.some(function(k){ return loc.includes(k.toLowerCase()); })) {
+      filtered.push(g); fullIdxs.push(i);
+    }
+  });
+  var box = document.getElementById('map-game-list');
+  if (filtered.length === 0) {
+    box.innerHTML = '<div style="text-align:center;padding:28px;color:var(--sub);font-size:14px">'
+      + tile.label + ' 지역 게임 기록 없음</div>';
+    return;
+  }
+  box.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--sub);margin:4px 0 10px">'
+    + tile.label + ' · ' + filtered.length + '게임</div>'
+    + filtered.map(function(g, i) {
+      var idx = fullIdxs[i];
+      var sorted = g.players.slice().sort(function(a,b){ return g.totals[a.name]-g.totals[b.name]; });
+      var w = sorted[0];
+      return '<div class="history-item" data-idx="' + idx + '" onclick="showDetail(this.dataset.idx)">'
+        + '<div class="history-date">' + fmtDate(g.date) + '</div>'
+        + '<div class="history-title">📍 ' + esc(g.location) + '</div>'
+        + '<div class="history-meta">' + g.rounds.length + '라운드 · ' + g.players.length + '명 · 🥇 '
+        + esc(w.name) + ' (' + fmtScore(g.totals[w.name]) + ')</div>'
+        + '</div>';
+    }).join('');
+}
+function renderHistoryList() {
+  var list = loadHistory();
+  var box = document.getElementById('history-list');
+  if (list.length === 0) {
+    box.innerHTML = '<div class="empty-state"><div class="empty-icon">🃏</div><div>저장된 게임이 없습니다</div></div>';
+    return;
+  }
+  box.innerHTML = list.map(function(g, idx) {
+    var sorted = g.players.slice().sort(function(a,b){ return g.totals[a.name]-g.totals[b.name]; });
+    var w = sorted[0];
+    return '<div class="history-item" data-idx="' + idx + '" onclick="showDetail(this.dataset.idx)">'
+      + '<div class="history-item-hdr">'
+      + '<span class="history-date">' + fmtDate(g.date) + '</span>'
+      + '<button class="history-menu-btn" data-idx="' + idx + '" onclick="toggleHistoryMenu(this.dataset.idx,event)">···</button>'
+      + '</div>'
+      + '<div id="hmenu-' + idx + '" class="history-menu-drop" style="display:none">'
+      + '<button data-idx="' + idx + '" onclick="deleteGame(this.dataset.idx,event)">🗑 삭제</button>'
+      + '</div>'
+      + '<div class="history-title">📍 ' + esc(g.location) + '</div>'
+      + '<div class="history-meta">' + g.rounds.length + '라운드 · ' + g.players.length + '명 · 🥇 ' + esc(w.name) + ' (' + fmtScore(g.totals[w.name]) + ')</div>'
+      + '</div>';
+  }).join('');
+}
+
+function toggleHistoryMenu(idx, e) {
+  e.stopPropagation();
+  var id = 'hmenu-' + idx;
+  if (openHistoryMenu && openHistoryMenu !== id) {
+    var prev = document.getElementById(openHistoryMenu);
+    if (prev) prev.style.display = 'none';
+  }
+  var drop = document.getElementById(id);
+  if (!drop) return;
+  var isOpen = drop.style.display !== 'none';
+  drop.style.display = isOpen ? 'none' : 'block';
+  openHistoryMenu = isOpen ? null : id;
+}
+
+function deleteGame(idx, e) {
+  e.stopPropagation();
+  if (!confirm('이 게임 기록을 삭제할까요?')) return;
+  var list = loadHistory();
+  list.splice(parseInt(idx), 1);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  openHistoryMenu = null;
+  if (isAdminMode()) pushToCloud(list);
+  renderHistoryList();
+}
+function showDetail(idx) {
+  var g = loadHistory()[parseInt(idx)]; if (!g) return;
+  var sorted = g.players.slice().sort(function(a,b){ return g.totals[a.name]-g.totals[b.name]; });
+  var medals = ['🥇','🥈','🥉'];
+  function avD(p) {
+    var h = '<div class="avatar-sm" style="width:28px;height:28px">';
+    h += '<div class="av-bg" style="background:' + (p.color||'#64748b') + '"></div>';
+    h += '<span class="av-initial"' + (p.image?' style="display:none"':'') + '>' + esc((p.name||'').slice(0,1)) + '</span>';
+    if (p.image) h += '<img class="av-img" src="' + p.image + '" alt="" style="object-fit:contain">';
+    h += '</div>';
+    return h;
+  }
+  var html = '<div class="card"><div class="section-label" style="margin-bottom:10px">게임 정보</div>'
+    + '<div style="font-size:15px;margin-bottom:6px">📅 ' + fmtDate(g.date) + '</div>'
+    + '<div style="font-size:15px">📍 ' + esc(g.location) + '</div></div>'
+    + '<div class="card"><div class="section-label" style="margin-bottom:12px">🏆 최종 순위</div>';
+  sorted.forEach(function(p,i){
+    var t = g.totals[p.name];
+    html += '<div class="rank-row"><div class="rank-num">' + (medals[i]||(i+1)+'위') + '</div>'
+      + avD(p) + '<div class="rank-name">' + esc(p.name) + '</div>'
+      + '<div class="rank-score ' + scoreClass(t) + '">' + fmtScore(t) + '</div></div>';
+  });
+  html += '</div>';
+  if (g.rounds.length > 0) {
+    html += '<div class="card"><div class="section-label" style="margin-bottom:10px">라운드별 기록</div><div style="overflow-x:auto"><table class="round-table"><thead><tr><th style="color:#64748b">R</th>';
+    g.players.forEach(function(p){ html += '<th style="color:' + p.color + '">' + esc(p.name) + '</th>'; });
+    html += '</tr></thead><tbody>';
+    g.rounds.forEach(function(r){
+      html += '<tr><td style="color:#64748b;font-weight:700">' + r.round + '</td>';
+      g.players.forEach(function(p){ var s=r.scores[p.name]; html+='<td class="'+scoreClass(s)+'">'+fmtScore(s)+'</td>'; });
+      html += '</tr>';
+    });
+    html += '<tr class="total-row"><td style="color:#94a3b8">합</td>';
+    g.players.forEach(function(p){ var t=g.totals[p.name]; html+='<td class="'+scoreClass(t)+'">'+fmtScore(t)+'</td>'; });
+    html += '</tr></tbody></table></div></div>';
+  }
+  document.getElementById('detail-content').innerHTML = html;
+  showScreen('detail');
+}
+
+// ── Shared Avatar Helper ───────────────────────────────────
+function avatarSm(p, sz) {
+  var s = sz || 34;
+  var h = '<div class="avatar-sm" style="width:' + s + 'px;height:' + s + 'px">';
+  h += '<div class="av-bg" style="background:' + p.color + '"></div>';
+  h += '<span class="av-initial"' + (p.image ? ' style="display:none"' : '') + '>' + esc((p.name||'').slice(0,1)) + '</span>';
+  if (p.image) h += '<img class="av-img" src="' + p.image + '" alt="" style="object-fit:contain">';
+  h += '</div>';
+  return h;
+}
+
+// ── Utils ─────────────────────────────────────────────────
+function fmtScore(n) { return n > 0 ? '+' + n : String(n); }
+function scoreClass(n) { return n > 0 ? 's-pos' : n < 0 ? 's-neg' : 's-zero'; }
+function fmtDate(s) {
+  if (!s) return '';
+  var d = new Date(s + 'T00:00:00');
+  return d.getFullYear() + '.' + pad(d.getMonth()+1) + '.' + pad(d.getDate());
+}
+function pad(n) { return String(n).padStart(2, '0'); }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Boot ──────────────────────────────────────────────────
+if (!localStorage.getItem(PLAYERS_KEY)) {
+  storePlayers(DEFAULT_PLAYERS.map(function(p){ return Object.assign({}, p); }));
+}
+loadOpacity();
+syncFromCloud();
+updateAdminBtn();
+document.addEventListener('click', function() {
+  if (openHistoryMenu) {
+    var el = document.getElementById(openHistoryMenu);
+    if (el) el.style.display = 'none';
+    openHistoryMenu = null;
+  }
+});
+
+</script>
+</body>
+</html>

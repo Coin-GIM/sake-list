@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나이롱뽕 점수판</title>
+  <style>
+    :root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f1f5f9;--sub:#94a3b8;--accent:#f59e0b;--green:#22c55e;--red:#ef4444;--panel-alpha:0.82;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,'Malgun Gothic','맑은 고딕',sans-serif;min-height:100vh;}
+    .container{max-width:500px;margin:0 auto;padding:16px;}
+    .screen{display:none;} .screen.active{display:block;}
+    .app-header{text-align:center;padding:18px 0 12px;}
+    .app-title{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-.5px;}
+    .app-subtitle{font-size:13px;color:var(--sub);margin-top:4px;}
+    .card{background:rgba(15,20,35,var(--panel-alpha));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 4px 24px rgba(0,0,0,0.35);}
+    .section-label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;}
+    .input-group{margin-bottom:12px;}
+    .input-label{display:block;font-size:13px;color:var(--sub);margin-bottom:6px;}
+    input[type=text],input[type=date],input[type=number]{width:100%;background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:15px;font-family:inherit;outline:none;}
+    input:focus{border-color:var(--accent);}
+    input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:var(--border);outline:none;cursor:pointer;}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
+    input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
+    .btn{display:block;width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;transition:opacity .12s;}
+    .btn:active{opacity:.75;}
+    .btn-primary{background:var(--accent);color:#000;}
+    .btn-secondary{background:rgba(30,41,59,0.75);color:var(--text);border:1px solid var(--border);}
+    .btn-sm{display:inline-block;width:auto;padding:8px 16px;font-size:14px;margin-bottom:0;}
+    .flex-row{display:flex;gap:10px;margin-bottom:10px;}
+    .flex-row .btn{flex:1;margin-bottom:0;}
+    .s-pos{color:var(--red);} .s-neg{color:var(--green);} .s-zero{color:var(--sub);}
+    .round-badge{display:inline-block;background:var(--accent);color:#000;font-weight:800;font-size:12px;padding:3px 10px;border-radius:99px;}
+    .game-info-bar{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:4px;}
+
+    /* ── Ranking Row ── */
+    .ranking-row{display:flex;gap:4px;padding:4px 0 2px;justify-content:space-around;}
+    .rank-chip{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0;}
+    .rank-chip-medal{font-size:14px;line-height:1;}
+    .rank-chip-name{font-size:10px;font-weight:700;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+    .rank-chip-score{font-size:11px;font-weight:800;}
+
+    /* ── Score Input Grid ── */
+    .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    .score-card{background:rgba(15,23,42,0.55);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;gap:8px;}
+    .score-card-top{display:flex;gap:8px;align-items:center;width:100%;}
+    .score-card-info{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden;}
+    .score-card-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .score-card-ranks{font-size:10px;color:var(--sub);white-space:nowrap;}
+    .score-card-total{font-size:12px;font-weight:800;}
+    .score-card-input{width:100%;background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;padding:9px 6px;color:var(--text);font-size:20px;font-family:inherit;text-align:center;outline:none;}
+    .score-card-input:focus{border-color:var(--accent);}
+
+    /* ── Rank rows (result / history) ── */
+    .rank-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+    .rank-row:last-child{border-bottom:none;}
+    .rank-num{font-size:18px;font-weight:800;min-width:32px;text-align:center;}
+    .rank-score{font-size:18px;font-weight:800;min-width:52px;text-align:right;}
+    .rank-name{flex:1;font-size:15px;font-weight:600;}
+
+    /* ── Round table ── */
+    .round-table{width:100%;border-collapse:collapse;font-size:13px;}
+    .round-table th{color:var(--sub);text-align:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,0.07);}
+    .round-table td{text-align:center;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,0.07);}
+    .round-table tr:last-child td{border-bottom:none;}
+    .total-row td{border-top:2px solid #475569!important;font-weight:800;}
+
+    /* ── History ── */
+    .history-item{background:rgba(15,20,35,var(--panel-alpha));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.3);position:relative;}
+    .history-item:active{opacity:.75;}
+    .history-item-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+    .history-menu-btn{background:none;border:none;color:var(--sub);font-size:15px;font-weight:900;cursor:pointer;padding:0 5px;border-radius:5px;line-height:1.6;letter-spacing:2px;flex-shrink:0;}
+    .history-menu-btn:active{background:rgba(255,255,255,0.08);}
+    .history-date{font-size:12px;color:var(--sub);}
+    .history-menu-drop{position:absolute;top:38px;right:8px;background:#1e293b;border:1px solid #334155;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.55);z-index:200;min-width:110px;overflow:hidden;}
+    .history-menu-drop button{display:block;width:100%;padding:11px 14px;background:none;border:none;color:#ef4444;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;text-align:left;}
+    .history-menu-drop button:active{background:rgba(239,68,68,0.12);}
+    .history-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+    .history-meta{font-size:13px;color:var(--sub);}
+    .empty-state{text-align:center;padding:60px 20px;color:var(--sub);}
+    .empty-icon{font-size:52px;margin-bottom:12px;}
+
+    /* ── Player Management ── */
+    .player-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+    .player-card{display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .avatar-box{width:80px;height:80px;border-radius:12px;border:2px dashed var(--border);overflow:hidden;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;transition:border-color .15s;}
+    .avatar-box:hover{border-color:var(--accent);}
+    .avatar-box.has-img{border-style:solid;}
+    .av-bg{position:absolute;inset:0;}
+    .av-initial{position:absolute;font-size:20px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);z-index:1;pointer-events:none;}
+    .av-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;pointer-events:none;}
+    .av-edit{position:absolute;bottom:3px;right:3px;background:rgba(0,0,0,.6);border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;z-index:3;color:#fff;}
+    .player-name-edit{width:100%;background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;padding:7px 8px;color:var(--text);font-size:14px;font-family:inherit;outline:none;text-align:center;}
+    .player-name-edit:focus{border-color:var(--accent);}
+
+    /* ── Avatar circle ── */
+    .avatar-sm{border-radius:50%;flex-shrink:0;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+    .avatar-sm .av-initial{font-size:12px;}
+
+    /* ── Setup Player Selection ── */
+    .player-sel-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .player-sel-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:rgba(15,23,42,0.5);transition:all .15s;position:relative;user-select:none;}
+    .player-sel-card.sel-on{border-color:var(--accent);background:rgba(245,158,11,0.12);}
+    .player-sel-card.sel-off{opacity:0.35;}
+    .player-sel-name{font-size:12px;font-weight:700;color:var(--text);}
+    .sel-check{position:absolute;top:4px;right:6px;font-size:13px;color:var(--accent);font-weight:800;}
+
+    /* ── Opacity label row ── */
+    .opacity-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+
+    /* ── History nav (홈버튼 + 탭) ── */
+    .history-nav{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+    .tab-bar{display:flex;gap:6px;flex:1;}
+    .tab-btn{flex:1;padding:9px 4px;border:1px solid var(--border);border-radius:8px;background:rgba(30,41,59,0.65);color:var(--sub);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;text-align:center;transition:all .15s;}
+    .tab-btn.tab-active{background:var(--accent);color:#000;border-color:var(--accent);}
+
+    /* ── Map legend ── */
+    .map-legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--sub);margin-bottom:8px;}
+    .legend-dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:middle;}
+
+    /* ── Tile map grid ── */
+    .map-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(7,54px) 22px 54px;gap:4px;margin-bottom:12px;}
+    .map-tile{border:2px solid #334155;border-radius:7px;padding:3px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:rgba(15,20,35,0.72);transition:all .15s;text-align:center;user-select:none;position:relative;}
+    .map-tile:active{opacity:.72;}
+    .map-tile.map-tile-zero{opacity:.45;}
+    .map-tile.map-tile-active{border-color:var(--accent)!important;background:rgba(245,158,11,0.18);}
+    .map-tile-label{font-size:10px;font-weight:700;color:var(--text);line-height:1.25;word-break:keep-all;}
+    .map-tile-count{font-size:10px;font-weight:800;color:var(--accent);margin-top:2px;}
+
+    /* ── Player rank bar ── */
+    .player-rank-bar{font-size:11px;color:var(--sub);text-align:center;line-height:1.8;}
+  </style>
+</head>
+<body>
+
+<!-- Korean Traditional Room Background SVG -->
+<svg id="bg-svg" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#150a03"/>
+      <stop offset="100%" stop-color="#2a1408"/>
+    </linearGradient>
+    <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0d05"/>
+      <stop offset="100%" stop-color="#0d0703"/>
+    </linearGradient>
+    <linearGradient id="shojiGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f0ddb0" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#e8d09a" stop-opacity="0.62"/>
+    </linearGradient>
+    <radialGradient id="lanternGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.45"/>
+      <stop offset="55%" stop-color="#f59e0b" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fffde7" stop-opacity="0.9"/>
+      <stop offset="55%" stop-color="#fff9c4" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#fff9c4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vigGrad" cx="50%" cy="45%" r="72%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.68"/>
+    </radialGradient>
+    <linearGradient id="sunBeam" x1="1" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="tableGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c4a1a"/>
+      <stop offset="100%" stop-color="#4a2c0e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wall -->
+  <rect width="1000" height="560" fill="url(#wallGrad)"/>
+
+  <!-- Ceiling beam -->
+  <rect x="0" y="35" width="1000" height="9" fill="#5c3010" opacity="0.9"/>
+
+  <!-- Sunlight beam from right -->
+  <polygon points="780,0 1000,0 1000,320 560,560" fill="url(#sunBeam)"/>
+
+  <!-- === Shoji Panel 1: Plum Blossom === -->
+  <g transform="translate(28,55)">
+    <rect width="178" height="285" rx="4" fill="#5c3010"/>
+    <rect x="5" y="5" width="168" height="275" rx="2" fill="url(#shojiGrad)"/>
+    <line x1="5" y1="96" x2="173" y2="96" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="5" y1="188" x2="173" y2="188" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="89" y1="5" x2="89" y2="280" stroke="#8b6530" stroke-width="2.5"/>
+    <!-- Plum branch -->
+    <path d="M28 278 Q58 205 68 148 Q78 105 63 58" stroke="#3d2008" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M63 162 Q88 142 112 152" stroke="#3d2008" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M68 118 Q46 96 36 86" stroke="#3d2008" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M55 200 Q72 180 95 185" stroke="#3d2008" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- Blossoms -->
+    <circle cx="63" cy="57" r="9" fill="#ec4899" opacity="0.75"/>
+    <circle cx="57" cy="63" r="7" fill="#f472b6" opacity="0.65"/>
+    <circle cx="70" cy="63" r="7" fill="#f472b6" opacity="0.65"/>
+    <circle cx="112" cy="151" r="8" fill="#ec4899" opacity="0.7"/>
+    <circle cx="106" cy="157" r="6" fill="#f472b6" opacity="0.6"/>
+    <circle cx="36" cy="86" r="7" fill="#f472b6" opacity="0.65"/>
+    <circle cx="30" cy="80" r="5" fill="#ec4899" opacity="0.55"/>
+    <circle cx="95" cy="184" r="6" fill="#ec4899" opacity="0.6"/>
+    <!-- Blossom dots -->
+    <circle cx="63" cy="57" r="3" fill="#fcd34d" opacity="0.9"/>
+    <circle cx="112" cy="151" r="3" fill="#fcd34d" opacity="0.9"/>
+  </g>
+
+  <!-- === Shoji Panel 2: Moon + Night === -->
+  <g transform="translate(228,55)">
+    <rect width="178" height="285" rx="4" fill="#5c3010"/>
+    <rect x="5" y="5" width="168" height="275" rx="2" fill="#182845" opacity="0.88"/>
+    <line x1="5" y1="96" x2="173" y2="96" stroke="#3a2d18" stroke-width="2.5"/>
+    <line x1="5" y1="188" x2="173" y2="188" stroke="#3a2d18" stroke-width="2.5"/>
+    <line x1="89" y1="5" x2="89" y2="280" stroke="#3a2d18" stroke-width="2.5"/>
+    <!-- Moon glow -->
+    <circle cx="115" cy="68" r="50" fill="url(#moonGlow)"/>
+    <!-- Moon crescent -->
+    <circle cx="115" cy="68" r="30" fill="#fffde7"/>
+    <circle cx="128" cy="60" r="24" fill="#182845"/>
+    <!-- Stars -->
+    <circle cx="28" cy="28" r="2" fill="#fff" opacity="0.85"/>
+    <circle cx="52" cy="15" r="1.5" fill="#fff" opacity="0.75"/>
+    <circle cx="18" cy="52" r="1.5" fill="#fff" opacity="0.65"/>
+    <circle cx="40" cy="118" r="1" fill="#fff" opacity="0.55"/>
+    <circle cx="68" cy="98" r="1.5" fill="#fff" opacity="0.65"/>
+    <circle cx="148" cy="38" r="1.5" fill="#fff" opacity="0.7"/>
+    <circle cx="160" cy="120" r="1" fill="#fff" opacity="0.5"/>
+    <!-- Mountain silhouette -->
+    <polygon points="5,275 55,178 85,210 115,160 148,192 173,275" fill="#0e1b30"/>
+    <!-- Reflection on water hint -->
+    <rect x="5" y="240" width="168" height="35" fill="#1e2d4a" opacity="0.6"/>
+    <line x1="20" y1="250" x2="95" y2="250" stroke="#fff" stroke-width="1" opacity="0.15"/>
+    <line x1="30" y1="260" x2="80" y2="260" stroke="#fff" stroke-width="1" opacity="0.1"/>
+  </g>
+
+  <!-- === Shoji Panel 3: Pine Tree === -->
+  <g transform="translate(428,55)">
+    <rect width="178" height="285" rx="4" fill="#5c3010"/>
+    <rect x="5" y="5" width="168" height="275" rx="2" fill="url(#shojiGrad)"/>
+    <line x1="5" y1="96" x2="173" y2="96" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="5" y1="188" x2="173" y2="188" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="89" y1="5" x2="89" y2="280" stroke="#8b6530" stroke-width="2.5"/>
+    <!-- Pine trunk -->
+    <rect x="84" y="205" width="11" height="68" rx="2" fill="#3d2008"/>
+    <!-- Pine layers (bottom to conceptually top) -->
+    <polygon points="89,32 22,138 156,138" fill="#1a4a2e" opacity="0.88"/>
+    <polygon points="89,82 18,168 160,168" fill="#1f5c38" opacity="0.88"/>
+    <polygon points="89,132 14,210 164,210" fill="#1a4a2e" opacity="0.88"/>
+    <!-- Snow on branches -->
+    <polygon points="89,32 65,95 113,95" fill="#e8f4fd" opacity="0.45"/>
+    <polygon points="89,82 60,130 118,130" fill="#e8f4fd" opacity="0.35"/>
+  </g>
+
+  <!-- === Shoji Panel 4: Bamboo === -->
+  <g transform="translate(628,55)">
+    <rect width="178" height="285" rx="4" fill="#5c3010"/>
+    <rect x="5" y="5" width="168" height="275" rx="2" fill="url(#shojiGrad)"/>
+    <line x1="5" y1="96" x2="173" y2="96" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="5" y1="188" x2="173" y2="188" stroke="#8b6530" stroke-width="2.5"/>
+    <line x1="89" y1="5" x2="89" y2="280" stroke="#8b6530" stroke-width="2.5"/>
+    <!-- Bamboo stalks -->
+    <rect x="30" y="18" width="13" height="258" rx="6" fill="#2d6b27" opacity="0.82"/>
+    <rect x="52" y="18" width="13" height="258" rx="6" fill="#368830" opacity="0.82"/>
+    <rect x="82" y="18" width="13" height="258" rx="6" fill="#2d6b27" opacity="0.75"/>
+    <rect x="118" y="18" width="13" height="258" rx="6" fill="#368830" opacity="0.82"/>
+    <rect x="140" y="18" width="11" height="258" rx="5" fill="#2d6b27" opacity="0.65"/>
+    <!-- Nodes -->
+    <rect x="28" y="96" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="28" y="188" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="50" y="78" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="50" y="162" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="80" y="104" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="80" y="192" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="116" y="86" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <rect x="116" y="172" width="17" height="5" rx="2.5" fill="#1e4c1a" opacity="0.9"/>
+    <!-- Leaves -->
+    <ellipse cx="60" cy="22" rx="22" ry="6" transform="rotate(-32 60 22)" fill="#368830" opacity="0.8"/>
+    <ellipse cx="98" cy="18" rx="22" ry="6" transform="rotate(22 98 18)" fill="#2d6b27" opacity="0.8"/>
+    <ellipse cx="132" cy="26" rx="18" ry="5" transform="rotate(-18 132 26)" fill="#368830" opacity="0.75"/>
+    <ellipse cx="42" cy="18" rx="16" ry="5" transform="rotate(12 42 18)" fill="#2d6b27" opacity="0.7"/>
+  </g>
+
+  <!-- Wall base board -->
+  <rect x="0" y="338" width="1000" height="7" fill="#8b5e3c" opacity="0.8"/>
+
+  <!-- Floor -->
+  <rect x="0" y="345" width="1000" height="215" fill="url(#floorGrad)"/>
+
+  <!-- Floor planks horizontal -->
+  <line x1="0" y1="375" x2="1000" y2="375" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="405" x2="1000" y2="405" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="435" x2="1000" y2="435" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="465" x2="1000" y2="465" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="495" x2="1000" y2="495" stroke="#1a0b04" stroke-width="2.5"/>
+  <line x1="0" y1="525" x2="1000" y2="525" stroke="#1a0b04" stroke-width="2.5"/>
+  <!-- Vertical plank joints (offset per row) -->
+  <line x1="250" y1="345" x2="250" y2="405" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="500" y1="345" x2="500" y2="405" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="750" y1="345" x2="750" y2="405" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="130" y1="405" x2="130" y2="465" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="380" y1="405" x2="380" y2="465" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="620" y1="405" x2="620" y2="465" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="870" y1="405" x2="870" y2="465" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="200" y1="465" x2="200" y2="560" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="460" y1="465" x2="460" y2="560" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="700" y1="465" x2="700" y2="560" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+  <line x1="940" y1="465" x2="940" y2="560" stroke="#1a0b04" stroke-width="1" opacity="0.45"/>
+
+  <!-- Hanging Lantern (center, top) -->
+  <circle cx="500" cy="18" r="105" fill="url(#lanternGlow)"/>
+  <line x1="500" y1="0" x2="500" y2="22" stroke="#5c3010" stroke-width="3.5"/>
+  <!-- Lantern cap -->
+  <rect x="480" y="18" width="40" height="8" rx="3" fill="#8b1a10"/>
+  <!-- Lantern body -->
+  <rect x="475" y="25" width="50" height="38" rx="7" fill="#c0392b"/>
+  <!-- Lantern inner glow -->
+  <rect x="480" y="29" width="40" height="30" rx="5" fill="#f59e0b" opacity="0.75"/>
+  <!-- Lantern ribs -->
+  <line x1="495" y1="25" x2="495" y2="63" stroke="#8b1a10" stroke-width="2" opacity="0.6"/>
+  <line x1="505" y1="25" x2="505" y2="63" stroke="#8b1a10" stroke-width="2" opacity="0.6"/>
+  <line x1="515" y1="25" x2="515" y2="63" stroke="#8b1a10" stroke-width="2" opacity="0.6"/>
+  <!-- Lantern bottom cap -->
+  <rect x="480" y="61" width="40" height="7" rx="3" fill="#8b1a10"/>
+  <!-- Tassel -->
+  <line x1="492" y1="68" x2="490" y2="82" stroke="#c0392b" stroke-width="2.5"/>
+  <line x1="500" y1="68" x2="500" y2="84" stroke="#c0392b" stroke-width="2.5"/>
+  <line x1="508" y1="68" x2="510" y2="82" stroke="#c0392b" stroke-width="2.5"/>
+  <circle cx="490" cy="83" r="3" fill="#c0392b"/>
+  <circle cx="500" cy="85" r="3" fill="#c0392b"/>
+  <circle cx="510" cy="83" r="3" fill="#c0392b"/>
+
+  <!-- Low table (center floor) -->
+  <!-- Table shadow -->
+  <ellipse cx="500" cy="425" rx="135" ry="18" fill="#000" opacity="0.35"/>
+  <!-- Table top surface -->
+  <ellipse cx="500" cy="402" rx="125" ry="22" fill="url(#tableGrad)"/>
+  <ellipse cx="500" cy="399" rx="125" ry="22" fill="url(#tableGrad)"/>
+  <!-- Table rim highlight -->
+  <ellipse cx="500" cy="398" rx="123" ry="20" fill="none" stroke="#a0692a" stroke-width="2" opacity="0.6"/>
+  <!-- Table legs -->
+  <rect x="400" y="408" width="9" height="22" rx="3" fill="#3d2008"/>
+  <rect x="591" y="408" width="9" height="22" rx="3" fill="#3d2008"/>
+  <rect x="420" y="408" width="9" height="20" rx="3" fill="#3d2008"/>
+  <rect x="571" y="408" width="9" height="20" rx="3" fill="#3d2008"/>
+
+  <!-- Hwatu Cards on table -->
+  <rect x="452" y="383" width="17" height="24" rx="2.5" fill="#111" transform="rotate(-12 460 395)"/>
+  <rect x="453" y="384" width="15" height="22" rx="1.5" fill="#dc2626" transform="rotate(-12 460 395)" opacity="0.92"/>
+  <circle cx="460" cy="393" r="4" fill="#fcd34d" transform="rotate(-12 460 395)" opacity="0.9"/>
+
+  <rect x="476" y="380" width="17" height="24" rx="2.5" fill="#111" transform="rotate(6 484 392)"/>
+  <rect x="477" y="381" width="15" height="22" rx="1.5" fill="#111" transform="rotate(6 484 392)"/>
+  <circle cx="484" cy="390" r="5" fill="#22c55e" transform="rotate(6 484 392)" opacity="0.9"/>
+
+  <rect x="500" y="378" width="17" height="24" rx="2.5" fill="#111" transform="rotate(-4 508 390)"/>
+  <rect x="501" y="379" width="15" height="22" rx="1.5" fill="#f59e0b" transform="rotate(-4 508 390)" opacity="0.92"/>
+
+  <rect x="524" y="381" width="17" height="24" rx="2.5" fill="#111" transform="rotate(10 532 393)"/>
+  <rect x="525" y="382" width="15" height="22" rx="1.5" fill="#1d4ed8" transform="rotate(10 532 393)" opacity="0.92"/>
+  <circle cx="532" cy="391" r="3.5" fill="#fff" transform="rotate(10 532 393)" opacity="0.7"/>
+
+  <!-- Tea set -->
+  <ellipse cx="558" cy="393" rx="13" ry="9" fill="#5a3010"/>
+  <ellipse cx="558" cy="390" rx="13" ry="9" fill="#7a4520"/>
+  <ellipse cx="558" cy="388" rx="11" ry="7" fill="#182845" opacity="0.85"/>
+  <!-- Steam -->
+  <path d="M553 385 Q555 380 553 375" stroke="#aaa" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M558 384 Q560 378 558 373" stroke="#aaa" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+  <!-- Cushions -->
+  <!-- Left cushion -->
+  <ellipse cx="265" cy="440" rx="58" ry="19" fill="#4c1d95" opacity="0.55"/>
+  <ellipse cx="265" cy="437" rx="58" ry="19" fill="#7c3aed" opacity="0.52"/>
+  <ellipse cx="265" cy="435" rx="55" ry="16" fill="#8b5cf6" opacity="0.4"/>
+  <!-- Right cushion -->
+  <ellipse cx="735" cy="440" rx="58" ry="19" fill="#065f46" opacity="0.55"/>
+  <ellipse cx="735" cy="437" rx="58" ry="19" fill="#0f766e" opacity="0.52"/>
+  <ellipse cx="735" cy="435" rx="55" ry="16" fill="#14b8a6" opacity="0.4"/>
+  <!-- Top-center small cushion -->
+  <ellipse cx="500" cy="355" rx="48" ry="14" fill="#9f1239" opacity="0.4"/>
+  <ellipse cx="500" cy="353" rx="48" ry="14" fill="#be185d" opacity="0.35"/>
+
+  <!-- Vignette -->
+  <rect width="1000" height="560" fill="url(#vigGrad)"/>
+
+  <!-- Bottom darkening -->
+  <rect x="0" y="500" width="1000" height="60" fill="black" opacity="0.28"/>
+</svg>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="container">
+    <div class="app-header">
+      <div class="app-title">🎴 나이롱뽕</div>
+      <div class="app-subtitle">뽕 치는 그 짜릿함</div>
+    </div>
+    <button class="btn btn-primary" onclick="goSetup()">🃏 새 게임 시작</button>
+    <button class="btn btn-secondary" onclick="goHistory()">📋 게임 이력</button>
+    <button class="btn btn-secondary" onclick="goSettings()">⚙️ 설정</button>
+    <button class="btn btn-secondary" id="admin-btn" onclick="toggleAdminMode()">🔒 관리자</button>
+  </div>
+</div>
+
+<!-- SETTINGS (플레이어 관리 + 투명도) -->
+<div class="screen" id="screen-settings">
+  <div class="container">
+    <div class="app-header">
+      <div class="app-title">설정</div>
+    </div>
+
+    <!-- 투명도 슬라이더 -->
+    <div class="card">
+      <div class="section-label" style="margin-bottom:12px">배경 투명도</div>
+      <div class="opacity-row">
+        <label class="input-label" style="margin-bottom:0">패널 불투명도</label>
+        <span id="opacity-val" style="font-size:14px;font-weight:800;color:var(--accent)">82%</span>
+      </div>
+      <input type="range" id="opacity-slider" min="10" max="95" value="82" oninput="setOpacity(this.value)">
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#475569">
+        <span>투명</span><span>불투명</span>
+      </div>
+    </div>
+
+    <!-- 플레이어 관리 -->
+    <div class="card">
+      <div class="section-label" style="margin-bottom:4px">플레이어 관리</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:14px">이름과 사진을 수정할 수 있어요</div>
+      <div class="player-grid" id="player-grid"></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="savePlayerEdits()">저장</button>
+    <button class="btn btn-secondary" data-scr="home" onclick="showScreen(this.dataset.scr)">← 홈</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="screen" id="screen-setup">
+  <div class="container">
+    <div class="app-header"><div class="app-title">게임 설정</div></div>
+    <div class="card">
+      <div class="section-label" style="margin-bottom:12px">게임 정보</div>
+      <div class="input-group">
+        <label class="input-label">날짜</label>
+        <input type="date" id="setup-date">
+      </div>
+      <div class="input-group" style="margin-bottom:0">
+        <label class="input-label">장소</label>
+        <input type="text" id="setup-location" placeholder="예: 홍대 OO 카페">
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-label">참여 플레이어</div>
+        <span id="setup-sel-count" style="font-size:13px;font-weight:700;color:var(--accent)">6명 참석</span>
+      </div>
+      <div class="player-sel-grid" id="setup-player-select"></div>
+    </div>
+    <div class="card">
+      <div class="section-label" style="margin-bottom:12px">게임 수</div>
+      <div class="input-group" style="margin-bottom:0">
+        <label class="input-label">총 게임 수 (비워두면 무제한)</label>
+        <input type="number" id="setup-rounds" min="1" placeholder="무제한">
+      </div>
+    </div>
+    <div class="flex-row">
+      <button class="btn btn-secondary" data-scr="home" onclick="showScreen(this.dataset.scr)">← 뒤로</button>
+      <button class="btn btn-primary" onclick="startGame()">게임 시작 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="screen-game">
+  <div class="container">
+    <div class="app-header" style="padding-top:12px">
+      <div class="app-title">🎴 나이롱뽕</div>
+      <div class="game-info-bar" id="game-info-bar"></div>
+    </div>
+
+    <!-- 순위 행 (맨 위) -->
+    <div class="card" style="padding:12px 10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="section-label">현재 순위</div>
+        <span id="round-done-label" style="font-size:11px;color:#64748b"></span>
+      </div>
+      <div class="ranking-row" id="ranking-row"></div>
+    </div>
+
+    <!-- 점수 입력 카드 -->
+    <div class="card" id="score-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="section-label">라운드 점수 입력</div>
+        <span class="round-badge" id="round-badge">1R</span>
+      </div>
+      <div class="score-grid" id="score-inputs"></div>
+      <button class="btn btn-primary" style="margin-bottom:0" onclick="submitRound()">라운드 확정 ✓</button>
+    </div>
+
+    <!-- 라운드 기록 -->
+    <div class="card" id="history-card" style="display:none">
+      <div class="section-label" style="margin-bottom:10px">라운드별 기록</div>
+      <div style="overflow-x:auto"><table class="round-table" id="round-table"></table></div>
+    </div>
+
+    <button class="btn btn-secondary" id="end-btn" onclick="confirmEnd()">게임 종료</button>
+  </div>
+</div>
+
+<!-- HISTORY LIST -->
+<div class="screen" id="screen-history">
+  <div class="container">
+    <div class="app-header"><div class="app-title">게임 이력</div></div>
+    <div class="history-nav">
+      <button class="btn btn-secondary btn-sm" data-scr="home" onclick="showScreen(this.dataset.scr)">← 홈</button>
+      <div class="tab-bar">
+        <button class="tab-btn tab-active" id="tab-list" onclick="switchHistoryTab('list')">목록</button>
+        <button class="tab-btn" id="tab-map" onclick="switchHistoryTab('map')">🗺 지도</button>
+      </div>
+    </div>
+    <div id="history-list"></div>
+    <div id="map-section" style="display:none">
+      <div class="map-legend">
+        <span><span class="legend-dot" style="background:#8b5cf6"></span>특별·자치시</span>
+        <span><span class="legend-dot" style="background:#3b82f6"></span>광역시</span>
+        <span><span class="legend-dot" style="background:#f59e0b"></span>특례시</span>
+        <span><span class="legend-dot" style="background:#475569"></span>도·지역</span>
+      </div>
+      <div class="map-grid" id="map-container"></div>
+      <div id="map-game-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY DETAIL -->
+<div class="screen" id="screen-detail">
+  <div class="container">
+    <div class="app-header"><div class="app-title">게임 결과</div></div>
+    <button class="btn btn-secondary btn-sm" style="margin-bottom:16px" onclick="showScreen('history')">← 이력</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- PIN Modal -->
+<div id="pin-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:900;align-items:center;justify-content:center;">
+  <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px 24px;width:min(340px,90vw);text-align:center">
+    <div style="font-size:20px;font-weight:800;margin-bottom:8px">🔐 관리자 PIN</div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:18px">저장 권한이 있는 관리자만 입력하세요</div>
+    <input type="password" id="pin-input" placeholder="PIN" maxlength="20"
+      style="width:100%;background:rgba(15,23,42,0.7);border:1px solid #334155;border-radius:8px;padding:12px;color:#f1f5f9;font-size:22px;text-align:center;outline:none;letter-spacing:6px;font-family:inherit"
+      onkeydown="if(event.key==='Enter')confirmPin()">
+    <div id="pin-error" style="color:#ef4444;font-size:13px;margin-top:10px;min-height:20px"></div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-secondary" style="flex:1;margin-bottom:0;padding:12px" onclick="closePinOverlay()">취소</button>
+      <button class="btn btn-primary" style="flex:1;margin-bottom:0;padding:12px" onclick="confirmPin()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;color:#f1f5f9;z-index:1000;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5)"></div>
+
+<script>
+__SCRIPT__
+</script>
+</body>
+</html>

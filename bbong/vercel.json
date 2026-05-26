@@ -1,0 +1,5 @@
+{
+  "buildCommand": "node build-html.js",
+  "outputDirectory": ".",
+  "framework": null
+}
