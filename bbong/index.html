@@ -366,9 +366,6 @@ var TILE_STYLE = {
   sc: {border:'#f59e0b'},
   re: {border:'#475569'}
 };
-var TILE_COLOR_RGB = {
-  sp:'139,92,246', me:'59,130,246', sc:'245,158,11', re:'71,85,105'
-};
 
 var DEFAULT_PLAYERS = [
   {id:0, name:'황',    color:'#f59e0b', image:null},
@@ -387,7 +384,6 @@ var setupSelected = [0,1,2,3,4,5];
 var historyTab = 'list';
 var mapActiveTile = null;
 var openHistoryMenu = null;
-var panelAlpha = 0.82;
 
 // ── Cloud / Admin constants ────────────────────────────────
 var API_URL = '/api/games';
@@ -665,8 +661,7 @@ function savePlayerEdits() {
 // ── Opacity / Settings ────────────────────────────────────
 function setOpacity(val) {
   var v = Math.max(10, Math.min(95, parseInt(val)));
-  panelAlpha = v / 100;
-  document.documentElement.style.setProperty('--panel-alpha', panelAlpha.toFixed(2));
+  document.documentElement.style.setProperty('--panel-alpha', (v / 100).toFixed(2));
   var el = document.getElementById('opacity-val');
   if (el) el.textContent = v + '%';
   localStorage.setItem('panelOpacity', v);
@@ -675,8 +670,7 @@ function loadOpacity() {
   var saved = localStorage.getItem('panelOpacity');
   if (saved) {
     var v = parseInt(saved);
-    panelAlpha = v / 100;
-    document.documentElement.style.setProperty('--panel-alpha', panelAlpha.toFixed(2));
+    document.documentElement.style.setProperty('--panel-alpha', (v / 100).toFixed(2));
   }
 }
 function loadOpacitySlider() {
@@ -904,12 +898,9 @@ function renderHistoryMap() {
     var isActive = mapActiveTile === t.id;
     var isZero = cnt === 0;
     var borderColor = isActive ? 'var(--accent)' : st.border;
-    var pa = panelAlpha;
     var bgColor = isActive
-      ? 'rgba(245,158,11,' + (pa * 0.22).toFixed(2) + ')'
-      : (isZero
-        ? 'rgba(15,20,35,' + pa.toFixed(2) + ')'
-        : 'rgba(' + TILE_COLOR_RGB[t.type] + ',' + (pa * 0.22).toFixed(2) + ')');
+      ? 'rgba(245,158,11,0.22)'
+      : (isZero ? 'rgba(15,20,35,0.45)' : 'rgba(15,20,35,0.8)');
     var cls = 'map-tile' + (isActive ? ' map-tile-active' : '') + (isZero ? ' map-tile-zero' : '');
     html += '<div class="' + cls + '"'
       + ' style="grid-column:' + t.gc + ';grid-row:' + t.gr
