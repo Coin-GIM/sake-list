@@ -43,10 +43,13 @@ var MAP_TILES = [
    keys:['제주','서귀포','Jeju']},
 ];
 var TILE_STYLE = {
-  sp: {border:'#8b5cf6', bg:'rgba(139,92,246,0.18)'},
-  me: {border:'#3b82f6', bg:'rgba(59,130,246,0.18)'},
-  sc: {border:'#f59e0b', bg:'rgba(245,158,11,0.18)'},
-  re: {border:'#475569', bg:'rgba(71,85,105,0.22)'}
+  sp: {border:'#8b5cf6'},
+  me: {border:'#3b82f6'},
+  sc: {border:'#f59e0b'},
+  re: {border:'#475569'}
+};
+var TILE_COLOR_RGB = {
+  sp:'139,92,246', me:'59,130,246', sc:'245,158,11', re:'71,85,105'
 };
 
 var DEFAULT_PLAYERS = [
@@ -66,6 +69,7 @@ var setupSelected = [0,1,2,3,4,5];
 var historyTab = 'list';
 var mapActiveTile = null;
 var openHistoryMenu = null;
+var panelAlpha = 0.82;
 
 // ── Cloud / Admin constants ────────────────────────────────
 var API_URL = '/api/games';
@@ -343,7 +347,8 @@ function savePlayerEdits() {
 // ── Opacity / Settings ────────────────────────────────────
 function setOpacity(val) {
   var v = Math.max(10, Math.min(95, parseInt(val)));
-  document.documentElement.style.setProperty('--panel-alpha', (v / 100).toFixed(2));
+  panelAlpha = v / 100;
+  document.documentElement.style.setProperty('--panel-alpha', panelAlpha.toFixed(2));
   var el = document.getElementById('opacity-val');
   if (el) el.textContent = v + '%';
   localStorage.setItem('panelOpacity', v);
@@ -352,7 +357,8 @@ function loadOpacity() {
   var saved = localStorage.getItem('panelOpacity');
   if (saved) {
     var v = parseInt(saved);
-    document.documentElement.style.setProperty('--panel-alpha', (v / 100).toFixed(2));
+    panelAlpha = v / 100;
+    document.documentElement.style.setProperty('--panel-alpha', panelAlpha.toFixed(2));
   }
 }
 function loadOpacitySlider() {
@@ -546,6 +552,14 @@ function renderRoundTable() {
 }
 
 // ── History ────────────────────────────────────────────────
+function saveComment(idx, value) {
+  var list = loadHistory();
+  var i = parseInt(idx);
+  if (!list[i]) return;
+  list[i].comment = value.trim();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  if (isAdminMode()) pushToCloud(list);
+}
 function saveGame(g) {
   var l = loadHistory();
   l.unshift(g);
@@ -572,7 +586,12 @@ function renderHistoryMap() {
     var isActive = mapActiveTile === t.id;
     var isZero = cnt === 0;
     var borderColor = isActive ? 'var(--accent)' : st.border;
-    var bgColor = isActive ? 'rgba(245,158,11,0.18)' : (isZero ? 'rgba(15,20,35,0.55)' : st.bg);
+    var pa = panelAlpha;
+    var bgColor = isActive
+      ? 'rgba(245,158,11,' + (pa * 0.22).toFixed(2) + ')'
+      : (isZero
+        ? 'rgba(15,20,35,' + pa.toFixed(2) + ')'
+        : 'rgba(' + TILE_COLOR_RGB[t.type] + ',' + (pa * 0.22).toFixed(2) + ')');
     var cls = 'map-tile' + (isActive ? ' map-tile-active' : '') + (isZero ? ' map-tile-zero' : '');
     html += '<div class="' + cls + '"'
       + ' style="grid-column:' + t.gc + ';grid-row:' + t.gr
@@ -648,6 +667,7 @@ function renderHistoryList() {
       + '</div>'
       + '<div class="history-title">📍 ' + esc(g.location) + '</div>'
       + '<div class="history-meta">' + g.rounds.length + '라운드 · ' + g.players.length + '명 · 🥇 ' + esc(w.name) + ' (' + fmtScore(g.totals[w.name]) + ')</div>'
+      + '<input class="game-comment-input" type="text" maxlength="60" placeholder="✏️ 한 줄 게임평..." value="' + esc(g.comment || '') + '" data-idx="' + idx + '" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'){this.blur()}" onblur="saveComment(this.dataset.idx,this.value)">'
       + '</div>';
   }).join('');
 }
@@ -690,7 +710,9 @@ function showDetail(idx) {
   }
   var html = '<div class="card"><div class="section-label" style="margin-bottom:10px">게임 정보</div>'
     + '<div style="font-size:15px;margin-bottom:6px">📅 ' + fmtDate(g.date) + '</div>'
-    + '<div style="font-size:15px">📍 ' + esc(g.location) + '</div></div>'
+    + '<div style="font-size:15px">📍 ' + esc(g.location) + '</div>'
+    + (g.comment ? '<div style="font-size:13px;color:var(--sub);margin-top:8px">💬 ' + esc(g.comment) + '</div>' : '')
+    + '</div>'
     + '<div class="card"><div class="section-label" style="margin-bottom:12px">🏆 최종 순위</div>';
   sorted.forEach(function(p,i){
     var t = g.totals[p.name];
