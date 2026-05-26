@@ -1,5 +1,8 @@
 {
   "buildCommand": "node build-html.js",
   "outputDirectory": ".",
-  "framework": null
+  "framework": null,
+  "functions": {
+    "api/upload.js": { "maxDuration": 30 }
+  }
 }

@@ -287,7 +287,35 @@ function handleImgUpload(idx, event) {
     document.getElementById('av-img-' + idx).style.display = 'block';
     document.getElementById('av-init-' + idx).style.display = 'none';
     document.getElementById('av-box-' + idx).classList.add('has-img');
+    if (isAdminMode()) {
+      uploadToDrive(idx, dataUrl);
+    } else {
+      pinCallback = function() { uploadToDrive(idx, dataUrl); };
+      openPinOverlay();
+    }
   });
+}
+function uploadToDrive(idx, dataUrl) {
+  var base64 = dataUrl.split(',')[1];
+  var mimeType = dataUrl.split(';')[0].replace('data:', '') || 'image/jpeg';
+  showToast('☁️ 이미지 업로드 중...');
+  var pin = sessionStorage.getItem(ADMIN_PIN_KEY);
+  fetch('/api/upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Pin': pin },
+    body: JSON.stringify({ image: base64, name: 'avatar-p' + idx + '-' + Date.now() + '.jpg', mimeType: mimeType })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.url) throw new Error('no url');
+      var img = document.getElementById('av-img-' + idx);
+      if (img) img.src = d.url;
+      var pl = getPlayers();
+      pl[idx].image = d.url;
+      storePlayers(pl);
+      showToast('✅ 이미지 저장 완료');
+    })
+    .catch(function() { showToast('⚠️ 이미지 업로드 실패'); });
 }
 function compressImage(file, cb) {
   var reader = new FileReader();
@@ -314,7 +342,7 @@ function savePlayerEdits() {
     var ne = document.getElementById('pname-' + i);
     var ie = document.getElementById('av-img-' + i);
     if (ne) { var n = ne.value.trim(); if (n) p.name = n; }
-    if (ie && ie.src && ie.style.display !== 'none' && ie.src.startsWith('data:')) p.image = ie.src;
+    if (ie && ie.src && ie.style.display !== 'none' && (ie.src.startsWith('data:') || ie.src.startsWith('https://'))) p.image = ie.src;
   });
   storePlayers(pl);
   alert('저장됐습니다!');
