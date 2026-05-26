@@ -384,6 +384,7 @@ var setupSelected = [0,1,2,3,4,5];
 var historyTab = 'list';
 var mapActiveTile = null;
 var openHistoryMenu = null;
+var pinCallback = null;
 
 // ── Cloud / Admin constants ────────────────────────────────
 var API_URL = '/api/games';
@@ -483,6 +484,7 @@ function openPinOverlay() {
 function closePinOverlay() {
   var el = document.getElementById('pin-overlay');
   if (el) el.style.display = 'none';
+  pinCallback = null;
 }
 function confirmPin() {
   var inp = document.getElementById('pin-input');
@@ -501,6 +503,7 @@ function confirmPin() {
         closePinOverlay();
         updateAdminBtn();
         showToast('✅ 관리자 모드 활성화');
+        if (pinCallback) { var cb = pinCallback; pinCallback = null; cb(); }
       } else {
         if (err) err.textContent = '❌ PIN이 올바르지 않습니다';
         if (inp) inp.style.borderColor = '#ef4444';
@@ -817,7 +820,12 @@ function confirmEnd() {
     if (confirm('아직 기록된 라운드가 없습니다. 종료할까요?')) showScreen('home');
     return;
   }
-  if (confirm(G.rounds.length + '라운드까지의 기록을 저장하고 종료할까요?')) endGame();
+  if (isAdminMode()) {
+    if (confirm(G.rounds.length + '라운드까지의 기록을 저장하고 종료할까요?')) endGame();
+    return;
+  }
+  pinCallback = function() { endGame(); };
+  openPinOverlay();
 }
 function endGame() {
   G.finished = true;
