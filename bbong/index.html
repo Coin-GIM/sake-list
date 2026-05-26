@@ -152,8 +152,6 @@
     <button class="btn btn-primary" onclick="goSetup()">🃏 새 게임 시작</button>
     <button class="btn btn-secondary" onclick="goHistory()">📋 게임 이력</button>
     <button class="btn btn-secondary" onclick="goSettings()">⚙️ 설정</button>
-    <button class="btn btn-secondary" id="admin-btn" onclick="toggleAdminMode()">🔒 관리자</button>
-    <button class="btn btn-secondary" id="sync-btn" onclick="syncToCloud()" style="display:none">☁️ 지금 동기화</button>
   </div>
 </div>
 
@@ -512,28 +510,6 @@ function confirmPin() {
     .catch(function() {
       if (err) err.textContent = '❌ 서버 연결 실패';
     });
-}
-function syncToCloud() {
-  if (!isAdminMode()) return;
-  var list = loadHistory();
-  if (list.length === 0) { showToast('업로드할 게임 기록이 없습니다'); return; }
-  pushToCloud(list);
-}
-function updateAdminBtn() {
-  var btn = document.getElementById('admin-btn');
-  var syncBtn = document.getElementById('sync-btn');
-  if (!btn) return;
-  if (isAdminMode()) {
-    btn.textContent = '🔓 관리자 ON';
-    btn.style.borderColor = '#22c55e';
-    btn.style.color = '#22c55e';
-    if (syncBtn) syncBtn.style.display = 'block';
-  } else {
-    btn.textContent = '🔒 관리자';
-    btn.style.borderColor = '';
-    btn.style.color = '';
-    if (syncBtn) syncBtn.style.display = 'none';
-  }
 }
 function showToast(msg) {
   var el = document.getElementById('toast');
@@ -1083,7 +1059,6 @@ if (!localStorage.getItem(PLAYERS_KEY)) {
 }
 loadOpacity();
 syncFromCloud();
-updateAdminBtn();
 document.addEventListener('click', function() {
   if (openHistoryMenu) {
     var el = document.getElementById(openHistoryMenu);
