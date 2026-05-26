@@ -580,9 +580,7 @@ function renderHistoryMap() {
     var isActive = mapActiveTile === t.id;
     var isZero = cnt === 0;
     var borderColor = isActive ? 'var(--accent)' : st.border;
-    var bgColor = isActive
-      ? 'rgba(245,158,11,0.22)'
-      : (isZero ? 'rgba(15,20,35,0.45)' : 'rgba(15,20,35,0.8)');
+    var bgColor = isActive ? 'rgba(245,158,11,0.35)' : 'rgba(15,20,35,0.9)';
     var cls = 'map-tile' + (isActive ? ' map-tile-active' : '') + (isZero ? ' map-tile-zero' : '');
     html += '<div class="' + cls + '"'
       + ' style="grid-column:' + t.gc + ';grid-row:' + t.gr
