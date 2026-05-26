@@ -192,17 +192,26 @@ function confirmPin() {
       if (err) err.textContent = '❌ 서버 연결 실패';
     });
 }
+function syncToCloud() {
+  if (!isAdminMode()) return;
+  var list = loadHistory();
+  if (list.length === 0) { showToast('업로드할 게임 기록이 없습니다'); return; }
+  pushToCloud(list);
+}
 function updateAdminBtn() {
   var btn = document.getElementById('admin-btn');
+  var syncBtn = document.getElementById('sync-btn');
   if (!btn) return;
   if (isAdminMode()) {
     btn.textContent = '🔓 관리자 ON';
     btn.style.borderColor = '#22c55e';
     btn.style.color = '#22c55e';
+    if (syncBtn) syncBtn.style.display = 'block';
   } else {
     btn.textContent = '🔒 관리자';
     btn.style.borderColor = '';
     btn.style.color = '';
+    if (syncBtn) syncBtn.style.display = 'none';
   }
 }
 function showToast(msg) {
