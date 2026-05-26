@@ -3,3 +3,5 @@ node_modules/
 # Google 서비스 계정 JSON (절대 커밋 금지)
 nybb-497521-c71313031e1d.json
 *-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].json
+# 원본 대용량 이미지
+wallpaper01.png

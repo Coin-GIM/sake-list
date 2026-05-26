@@ -6,6 +6,7 @@
     "googleapis": "^144.0.0"
   },
   "devDependencies": {
+    "sharp": "^0.34.5",
     "xlsx": "^0.18.5"
   }
 }
