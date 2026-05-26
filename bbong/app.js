@@ -564,9 +564,16 @@ function saveComment(idx, value) {
   var list = loadHistory();
   var i = parseInt(idx);
   if (!list[i]) return;
-  list[i].comment = value.trim();
+  var trimmed = value.trim();
+  if (list[i].comment === trimmed) return; // 변경 없으면 스킵
+  list[i].comment = trimmed;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  if (isAdminMode()) pushToCloud(list);
+  if (isAdminMode()) {
+    pushToCloud(list);
+  } else {
+    pinCallback = function() { pushToCloud(loadHistory()); };
+    openPinOverlay();
+  }
 }
 function saveGame(g) {
   var l = loadHistory();
