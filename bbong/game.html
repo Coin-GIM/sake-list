@@ -450,7 +450,7 @@ function renderHumanHand(){
   document.getElementById('human-accum').textContent=GS.players[0].totalScore+'점';
 }
 function countTwoCardPlayers(){
-  return GS.players.filter(function(_,i){return GS.hands[i].length===2;}).length;
+  return GS.players.filter(function(_,i){return GS.hands[i].length===2&&GS.naturals.indexOf(i)<0;}).length;
 }
 function recheckBagaji(playerIdx){
   var hand=GS.hands[playerIdx];
@@ -840,7 +840,7 @@ function showResult(){
   // 스톱 바가지: 스톱 선언자보다 낮은 점수가 있으면 +20
   if(GS.stopPenalty && GS.stopBy!==null){
     var si=GS.stopBy, ssc=results[si].sc;
-    var beaten=results.some(function(r,i){return i!==si&&r.sc<ssc;});
+    var beaten=results.some(function(r,i){return i!==si&&GS.naturals.indexOf(i)<0&&r.sc<ssc;});
     if(beaten){results[si].sc+=20; results[si].sp.push('스톱바가지 +20');}
   }
   var sorted=results.slice().sort(function(a,b){return a.sc-b.sc;});
