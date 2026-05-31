@@ -292,17 +292,20 @@ function startGame(){
   }
   GS={players:players,round:1};
   dealRound(); showScreen('game'); renderGame();
+  if(GS.cur!==0){var s=GS.cur;setTimeout(function(){botDoDiscard(s);},BOT_DELAY);}
 }
 function dealRound(){
   GS.deck=shuffle(buildDeck());
   GS.hands=GS.players.map(function(){return [];});
-  GS.discard=[]; GS.phase='draw'; GS.cur=0; GS.firstTurn=true;
+  var starter=(GS.nextStarter!=null)?GS.nextStarter:0;
+  GS.nextStarter=null;
+  GS.discard=[]; GS.phase='discard'; GS.cur=starter; GS.firstTurn=true;
   GS.stopBy=null; GS.stopPenalty=false; GS.naturals=[]; GS.bbongTarget=null;
   GS.bbongPlayer=null; GS.bbongMainCur=null; GS.bagaji=null; GS.naturalPlayer=null; GS.bagajiTriggeredBy=null;
   GS.deckRecycled=false;
   selCard=null; clearBT();
   for(var r=0;r<5;r++) for(var p=0;p<GS.players.length;p++) GS.hands[p].push(GS.deck.pop());
-  GS.discard.push(GS.deck.pop());
+  GS.hands[starter].push(GS.deck.pop()); // 선 6장
   GS.hands.forEach(function(h){h.sort(function(a,b){return a.month-b.month;});});
 }
 
@@ -846,10 +849,11 @@ function showResult(){
   // 스톱 바가지: 스톱 선언자보다 낮은 점수가 있으면 +20
   if(GS.stopPenalty && GS.stopBy!==null){
     var si=GS.stopBy, ssc=results[si].sc;
-    var beaten=results.some(function(r,i){return i!==si&&GS.naturals.indexOf(i)<0&&r.sc<ssc;});
+    var beaten=results.some(function(r,i){return i!==si&&GS.naturals.indexOf(i)<0&&r.sc<=ssc;});
     if(beaten){results[si].sc+=20; results[si].sp.push('스톱바가지 +20');}
   }
   var sorted=results.slice().sort(function(a,b){return a.sc-b.sc;});
+  GS.nextStarter=results.indexOf(sorted[0]);
   sorted[0].p.wins++; results.forEach(function(r){r.p.totalScore+=r.sc;});
   var sn=GS.stopBy!==null?GS.players[GS.stopBy].name:null;
   document.getElementById('res-title').textContent=(sn?sn+' ':'')+'라운드 '+GS.round+' 결과';
@@ -875,7 +879,7 @@ function showResult(){
   document.getElementById('res-content').innerHTML=h;
   showScreen('result');
 }
-function nextRound(){GS.round++;dealRound();showScreen('game');renderGame();}
+function nextRound(){GS.round++;dealRound();showScreen('game');renderGame();if(GS.cur!==0){var s=GS.cur;setTimeout(function(){botDoDiscard(s);},BOT_DELAY);}}
 function quitGame(){if(confirm('게임을 그만두겠습니까?'))goHome();}
 function goHome(){clearBT();GS=null;showScreen('setup');}
 
