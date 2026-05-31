@@ -7,7 +7,7 @@
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f1f5f9;--sub:#94a3b8;--accent:#f59e0b;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,'Malgun Gothic','맑은 고딕',sans-serif;min-height:100vh;user-select:none;}
+body{background:transparent;color:var(--text);font-family:-apple-system,'Malgun Gothic','맑은 고딕',sans-serif;min-height:100vh;user-select:none;}
 .container{max-width:500px;margin:0 auto;padding:10px;}
 .screen{display:none;}.screen.active{display:block;}
 .header{text-align:center;padding:14px 0 8px;}
@@ -98,6 +98,10 @@ input[type=text]:focus{border-color:var(--accent);}
 </head>
 <body>
 
+<!-- Background -->
+<img src="wallpaper01.jpg" style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;pointer-events:none;">
+<div style="position:fixed;inset:0;background:radial-gradient(ellipse 150% 90% at 50% 45%, transparent 0%, rgba(0,0,0,0.7) 100%);z-index:-1;pointer-events:none;"></div>
+
 <!-- SETUP -->
 <div class="screen active" id="screen-setup">
 <div class="container">
@@ -129,7 +133,7 @@ input[type=text]:focus{border-color:var(--accent);}
   <div class="status-msg" id="status-msg"></div>
   <div class="panel" style="padding:10px 12px" id="bots-panel"></div>
   <!-- Piles + 방사형 버린패 -->
-  <div class="pile-row">
+  <div class="pile-row panel" style="margin-bottom:8px;padding:10px 12px;">
     <div class="pile-col">
       <div class="hc fd" onclick="humanDrawDeck()" id="deck-vis" style="cursor:pointer"><div class="mid">패</div></div>
       <div class="pile-lbl">패</div>
