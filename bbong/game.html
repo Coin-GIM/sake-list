@@ -126,7 +126,7 @@ input[type=text]:focus{border-color:var(--accent);}
       <div class="ranking-lbl" id="ranking-lbl"></div>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
-      <button class="view-toggle-btn" id="view-toggle-btn" onclick="toggleViewMode()">🔢 숫자</button>
+      <button class="view-toggle-btn" id="view-toggle-btn" onclick="toggleViewMode()">🃏 이미지</button>
       <div style="font-size:12px;font-weight:700;color:var(--accent)" id="deck-cnt">패: 42장</div>
     </div>
   </div>
@@ -224,7 +224,7 @@ function hwatSVGSized(m,w){
     +' '+bx+'px '+by+'px/'+bw+'px '+bh+'px no-repeat;border-radius:'+Math.max(2,Math.round(w*0.07))+'px"></div>';
 }
 var BCOLS   = ['#3b82f6','#22c55e','#ec4899','#a855f7','#14b8a6'];
-var viewMode='number';
+var viewMode='image';
 var BOT_DELAY = 1000;
 
 // ── Deck helpers ─────────────────────────────────────────────
