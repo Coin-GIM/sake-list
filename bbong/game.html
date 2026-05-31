@@ -840,7 +840,7 @@ function showResult(){
     var sp=isNat?['자연']:isTT?['또이또이']:[];
     if(!isNat&&GS.hands[i].length===6){var sp6=getSpecials6(GS.hands[i]);if(sp6.length)sp=sp6;}
     if(GS.bagajiTriggeredBy!==null&&i===GS.bagajiTriggeredBy){sc+=20;sp.push('바가지 +20');}
-    if(i===GS.stopBy&&!isNat&&!isTT&&GS.hands[i].length===6){
+    if(!isNat&&!isTT&&GS.hands[i].length===6){
       var rs=handScore(GS.hands[i]);
       if(rs>=60||rs<=10||checkStraight(GS.hands[i])){sc=-rs;}
     }
