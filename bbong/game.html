@@ -474,7 +474,7 @@ function recheckBagaji(playerIdx){
 function renderActions(){
   var phase=GS.phase, isH=GS.cur===0;
   var isDraw=phase==='draw'&&isH;
-  var isDisc=(phase==='discard'&&isH)||(phase==='bbong-extra'&&GS.bbongPlayer===0)||(phase==='natural-extra'&&GS.naturalPlayer===0);
+  var isDisc=(phase==='discard'&&isH)||(phase==='bbong-extra'&&GS.bbongPlayer===0);
   var isBW=phase==='bbong-window';
   var isNat3=phase==='natural-3'&&isH;
   var isNat6=phase==='discard'&&isH&&GS.hands[0].length===6&&checkNatural(GS.hands[0]);
@@ -502,7 +502,7 @@ function renderStatus(){
     var hl=GS.hands[0].length;
     if(hl===6){var sp=getSpecials6(GS.hands[0]);
       msg=sp.length?'🎴 '+sp.join('/')+'!! 버릴 패를 선택하세요':'버릴 패를 선택하세요 (6장→5장)';}
-    else if(hl===3) msg='뽕 후 추가 버리기 (3장→2장)';
+    else if(hl===3) msg='버릴 패를 선택하세요 (3장→2장)';
     else msg='버릴 패를 선택하세요';
   } else if(phase==='bbong-window'){
     if(canBbong(0)) msg='🎴 '+GS.bbongTarget.month+'뽕 가능! 내 패에 2장 있습니다 → 뽕 버튼을 누르세요';
@@ -511,8 +511,6 @@ function renderStatus(){
     msg='뽕!! 추가로 1장 더 버리세요 → 손에 2장 남습니다';
   } else if(phase==='natural-3'){
     msg='🎯 자연!! 3장이 모두 같은 달입니다. 자연 선언하세요!';
-  } else if(phase==='natural-extra'&&GS.naturalPlayer===0){
-    msg='자연! 🎯 추가로 1장 더 버리세요 → 손에 2장 남습니다';
   }
   document.getElementById('status-msg').textContent=msg;
 }
@@ -569,25 +567,31 @@ function checkDrawWin(playerIdx){
     }
     if(checkNatural(hand)){
       if(isH){
-        showToast('자연 가능! 🎯 자연 선언 또는 패 버리기 선택');
+        showToast('자연! 🎯 자연 선언 또는 패 버리기 선택');
         GS.phase='discard'; selCard=null;
         updatePiles(); renderHumanHand(); renderActions(); renderStatus();
       } else {
-        // Bot: auto-declare — discard 3 natural cards + 1 extra
-        if(GS.naturals.indexOf(playerIdx)<0) GS.naturals.push(playerIdx);
+        // Bot: discard 3 matching natural cards only
         var nc=cntByMonth(hand), nm=null;
         Object.keys(nc).forEach(function(k){if(nc[k]>=3)nm=parseInt(k);});
         var nrm=0;
         GS.hands[playerIdx]=GS.hands[playerIdx].filter(function(card){
           if(card.month===nm&&nrm<3){nrm++;GS.discard.push(card);return false;}return true;});
         var rh=GS.hands[playerIdx];
-        var ndisc=rh.reduce(function(mx,c){return c.month>mx.month?c:mx;});
-        rh.splice(rh.indexOf(ndisc),1);GS.discard.push(ndisc);
         rh.sort(function(a,b){return a.month-b.month;});
-        showToast(name+' 자연! 🎯 '+nm+'월 3장+1장 버렸습니다');
+        // Check 자연자연: remaining 3 also all same month
+        if(rh.length===3&&checkNatural(rh)){
+          GS.discard.push.apply(GS.discard,rh);
+          GS.hands[playerIdx]=[];
+          if(GS.naturals.indexOf(playerIdx)<0) GS.naturals.push(playerIdx);
+          GS.stopBy=playerIdx;
+          updatePiles();updateDiscardHistory();renderBots();
+          triggerEnd(name+' 자연자연!! 🎯🎯');
+          return;
+        }
+        showToast(name+' 자연! 🎯 '+nm+'월 3장 버렸습니다');
         updatePiles();updateDiscardHistory();renderBots();
-        recheckBagaji(playerIdx);
-        afterDiscard(playerIdx,ndisc);
+        botDoDiscard(playerIdx);
       }
       return;
     }
@@ -694,17 +698,26 @@ function humanDeclareNatural(){
   var ok3=GS.phase==='natural-3';
   if(!ok6&&!ok3) return;
   if(ok6){
-    // 6-card: auto-discard 3 natural cards then extra pick phase
+    // 6-card: discard 3 matching natural cards, check 자연자연
     var c=cntByMonth(GS.hands[0]),nm=null;
     Object.keys(c).forEach(function(k){if(c[k]>=3)nm=parseInt(k);});
     var rm=0;
     GS.hands[0]=GS.hands[0].filter(function(card){
       if(card.month===nm&&rm<3){rm++;GS.discard.push(card);return false;}return true;});
     GS.hands[0].sort(function(a,b){return a.month-b.month;});
-    if(GS.naturals.indexOf(0)<0) GS.naturals.push(0);
-    GS.naturalPlayer=0; GS.phase='natural-extra'; selCard=null;
-    showToast('자연! 🎯 '+nm+'월 3장 버렸습니다 — 1장 더 선택해서 버리세요');
-    updatePiles();updateDiscardHistory();renderHumanHand();renderActions();renderStatus();
+    updatePiles();updateDiscardHistory();renderHumanHand();
+    if(GS.hands[0].length===3&&checkNatural(GS.hands[0])){
+      GS.discard.push.apply(GS.discard,GS.hands[0]);
+      GS.hands[0]=[];
+      if(GS.naturals.indexOf(0)<0) GS.naturals.push(0);
+      GS.stopBy=0;
+      updatePiles();updateDiscardHistory();renderHumanHand();
+      triggerEnd(GS.players[0].name+' 자연자연!! 🎯🎯');
+      return;
+    }
+    showToast('자연! 🎯 '+nm+'월 3장 버렸습니다 — 1장 더 버리세요');
+    GS.phase='discard'; selCard=null;
+    renderActions();renderStatus();
   } else {
     // 3-card: game ends immediately
     GS.discard.push.apply(GS.discard,GS.hands[0]);
@@ -725,7 +738,7 @@ function humanDrawDeck(){
   checkDrawWin(0);
 }
 function humanSelectCard(idx){
-  var ok=(GS.phase==='discard'&&GS.cur===0)||(GS.phase==='bbong-extra'&&GS.bbongPlayer===0)||(GS.phase==='natural-extra'&&GS.naturalPlayer===0);
+  var ok=(GS.phase==='discard'&&GS.cur===0)||(GS.phase==='bbong-extra'&&GS.bbongPlayer===0);
   if(!ok) return;
   selCard=(selCard===idx)?null:idx; renderHumanHand();
 }
@@ -743,13 +756,6 @@ function humanConfirmDiscard(){
   } else if(GS.phase==='bbong-extra'&&GS.bbongPlayer===0){
     GS.bbongTarget=null; GS.bbongPlayer=null;
     GS.cur=GS.bbongMainCur;
-    updatePiles(); updateDiscardHistory(); renderBots(); renderHumanHand();
-    renderActions();
-    afterDiscard(0, disc);
-    if(GS.phase!=='result') recheckBagaji(0);
-  } else if(GS.phase==='natural-extra'&&GS.naturalPlayer===0){
-    GS.naturalPlayer=null;
-    GS.hands[0].sort(function(a,b){return a.month-b.month;});
     updatePiles(); updateDiscardHistory(); renderBots(); renderHumanHand();
     renderActions();
     afterDiscard(0, disc);
