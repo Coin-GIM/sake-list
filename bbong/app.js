@@ -87,6 +87,9 @@ function goSetup() {
   showScreen('setup');
   autoFillLocation();
 }
+function goPlayGame() { showScreen('playgame'); }
+function closePlayGame() { showScreen('home'); }
+
 function goHistory() {
   historyTab = 'list';
   mapActiveTile = null;

@@ -151,7 +151,19 @@
     </div>
     <button class="btn btn-primary" onclick="goSetup()">🃏 새 게임 시작</button>
     <button class="btn btn-secondary" onclick="goHistory()">📋 게임 이력</button>
+    <button class="btn btn-secondary" onclick="goPlayGame()">🎮 손풀기</button>
     <button class="btn btn-secondary" onclick="goSettings()">⚙️ 설정</button>
+  </div>
+</div>
+
+<!-- PLAY GAME (iframe) -->
+<div class="screen" id="screen-playgame">
+  <div style="position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(15,20,35,0.9);border-bottom:1px solid #334155;flex-shrink:0">
+      <button class="btn btn-secondary btn-sm" style="margin-bottom:0" onclick="closePlayGame()">← 홈</button>
+      <div style="font-size:16px;font-weight:800;color:var(--accent)">🎮 손풀기</div>
+    </div>
+    <iframe id="game-iframe" src="game.html" style="flex:1;border:none;width:100%;background:var(--bg)"></iframe>
   </div>
 </div>
 
