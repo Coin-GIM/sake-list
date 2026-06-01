@@ -296,7 +296,7 @@ function startGame(){
   }
   GS={players:players,round:1};
   dealRound(); showScreen('game'); renderGame();
-  if(GS.cur!==0){var s=GS.cur;setTimeout(function(){botDoDiscard(s);},BOT_DELAY);}
+  if(GS.cur!==0){var s=GS.cur;setTimeout(function(){checkDrawWin(s);},BOT_DELAY);}
 }
 function dealRound(){
   GS.deck=shuffle(buildDeck());
@@ -847,7 +847,7 @@ function showResult(){
     if(GS.bagajiTriggeredBy!==null&&i===GS.bagajiTriggeredBy){sc+=20;sp.push('바가지 +20');}
     if(!isNat&&!isTT&&GS.hands[i].length===6){
       var rs=handScore(GS.hands[i]);
-      if(rs>=60||rs<=10||checkStraight(GS.hands[i])){sc=-rs;}
+      if(rs>=60||rs<=10||checkStraight(GS.hands[i])||sp6.indexOf('총통')>=0){sc=-rs;}
     }
     return {p:p,hand:GS.hands[i],sc:sc,sp:sp};
   });
@@ -884,7 +884,7 @@ function showResult(){
   document.getElementById('res-content').innerHTML=h;
   showScreen('result');
 }
-function nextRound(){GS.round++;dealRound();showScreen('game');renderGame();if(GS.cur!==0){var s=GS.cur;setTimeout(function(){botDoDiscard(s);},BOT_DELAY);}}
+function nextRound(){GS.round++;dealRound();showScreen('game');renderGame();if(GS.cur!==0){var s=GS.cur;setTimeout(function(){checkDrawWin(s);},BOT_DELAY);}}
 function quitGame(){if(confirm('게임을 그만두겠습니까?'))goHome();}
 function goHome(){clearBT();GS=null;showScreen('setup');}
 
