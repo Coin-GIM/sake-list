@@ -305,7 +305,7 @@ function dealRound(){
   GS.nextStarter=null;
   GS.discard=[]; GS.phase='discard'; GS.cur=starter; GS.firstTurn=true;
   GS.stopBy=null; GS.stopPenalty=false; GS.naturals=[]; GS.bbongTarget=null;
-  GS.bbongPlayer=null; GS.bbongMainCur=null; GS.bagaji=null; GS.naturalPlayer=null; GS.bagajiTriggeredBy=null;
+  GS.bbongPlayer=null; GS.bbongMainCur=null; GS.bagaji=[]; GS.naturalPlayer=null; GS.bagajiTriggeredBy=null;
   GS.deckRecycled=false;
   selCard=null; clearBT();
   for(var r=0;r<5;r++) for(var p=0;p<GS.players.length;p++) GS.hands[p].push(GS.deck.pop());
@@ -362,7 +362,7 @@ function renderDiscardFan(){
   var area=document.getElementById('disc-fan-area');
   if(!area||!GS) return;
   document.getElementById('disc-hist-label').textContent='버린 패 ('+GS.discard.length+'장)';
-  document.getElementById('bagaji-indicator').style.display=GS.bagaji?'inline-block':'none';
+  document.getElementById('bagaji-indicator').style.display=GS.bagaji.length>0?'inline-block':'none';
   if(!GS.discard.length){
     area.style.width='180px';area.style.height='210px';
     area.innerHTML='<span class="disc-empty" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">아직 없음</span>';
@@ -463,20 +463,23 @@ function recheckBagaji(playerIdx){
   var hand=GS.hands[playerIdx];
   if(hand.length!==2) return;
   var name=playerIdx===0?'나':GS.players[playerIdx].name;
+  var existingIdx=-1;
+  for(var bi=0;bi<GS.bagaji.length;bi++){if(GS.bagaji[bi].player===playerIdx){existingIdx=bi;break;}}
   if(hand[0].month===hand[1].month){
     var newMonth=hand[0].month;
-    if(!GS.bagaji||GS.bagaji.player!==playerIdx||GS.bagaji.month!==newMonth){
-      GS.bagaji={player:playerIdx,month:newMonth};
+    if(existingIdx<0||GS.bagaji[existingIdx].month!==newMonth){
+      if(existingIdx>=0) GS.bagaji.splice(existingIdx,1);
+      GS.bagaji.push({player:playerIdx,month:newMonth});
       if(playerIdx===0) showToast(newMonth+'월 바가지!! 🪣 함정 설치!');
       else showToast('🪣 바가지!! '+name+' 함정 설치!');
     }
   } else {
-    if(GS.bagaji&&GS.bagaji.player===playerIdx){
-      GS.bagaji=null;
+    if(existingIdx>=0){
+      GS.bagaji.splice(existingIdx,1);
       showToast('바가지 해제 🔓');
     }
   }
-  document.getElementById('bagaji-indicator').style.display=GS.bagaji?'inline-block':'none';
+  document.getElementById('bagaji-indicator').style.display=GS.bagaji.length>0?'inline-block':'none';
 }
 function renderActions(){
   var phase=GS.phase, isH=GS.cur===0;
@@ -634,12 +637,15 @@ function checkDrawWin(playerIdx){
 // ── afterDiscard (called after any player's discard, NO win checks here) ──
 function afterDiscard(fromPlayerIdx, discardedCard){
   GS.firstTurn=false;
-  // Check 바가지 trigger
-  if(GS.bagaji&&GS.bagaji.player!==fromPlayerIdx&&discardedCard.month===GS.bagaji.month){
-    var hld=GS.players[GS.bagaji.player].name;
-    var vic=GS.players[fromPlayerIdx].name;
-    GS.stopBy=GS.bagaji.player; GS.bagajiTriggeredBy=fromPlayerIdx;
-    triggerEnd('🪣 바가지 발동!!\n'+vic+' → '+hld+' 승!!'); return;
+  // Check 바가지 trigger - loop through all active bagaji (supports multiple simultaneous)
+  for(var bi=0;bi<GS.bagaji.length;bi++){
+    var bj=GS.bagaji[bi];
+    if(bj.player!==fromPlayerIdx&&discardedCard.month===bj.month){
+      var hld=GS.players[bj.player].name;
+      var vic=GS.players[fromPlayerIdx].name;
+      GS.stopBy=bj.player; GS.bagajiTriggeredBy=fromPlayerIdx;
+      triggerEnd('🪣 바가지 발동!!\n'+vic+' → '+hld+' 승!!'); return;
+    }
   }
   // Enter 뽕 window
   enterBbongWindow(fromPlayerIdx, discardedCard);
@@ -813,7 +819,7 @@ function botDoDiscard(idx){
 // ── Turn management ───────────────────────────────────────────
 function nextTurn(){
   if(GS.phase==='result') return;
-  if(GS.deck.length===0&&GS.deckRecycled){triggerEnd('패 소진\n라운드 종료');return;}
+  if(GS.deck.length===0){if(!tryRecycle())return;}
   var from=GS.cur, next=(from+1)%GS.players.length, tries=0;
   while(GS.naturals.indexOf(next)>=0&&tries<GS.players.length){next=(next+1)%GS.players.length;tries++;}
   GS.cur=next; GS.phase='draw';
