@@ -48,7 +48,7 @@
     .score-card-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .score-card-ranks{font-size:10px;color:var(--sub);white-space:nowrap;}
     .score-card-total{font-size:12px;font-weight:800;}
-    .score-card-input{width:100%;background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;padding:9px 6px;color:var(--text);font-size:20px;font-family:inherit;text-align:center;outline:none;}
+    .score-card-input{background:rgba(15,23,42,0.7);border:1px solid var(--border);border-radius:8px;padding:9px 6px;color:var(--text);font-size:20px;font-family:inherit;text-align:center;outline:none;}
     .score-card-input:focus{border-color:var(--accent);}
 
     /* ── Rank rows (result / history) ── */
@@ -811,7 +811,7 @@ function renderScoreInputs() {
     html += '</div>';
     html += '<div style="display:flex;gap:5px;align-items:stretch">';
     html += '<button type="button" onclick="toggleNeg(' + i + ')" style="padding:0 14px;background:#334155;color:#f1f5f9;border:1px solid #475569;border-radius:8px;font-size:22px;font-weight:900;cursor:pointer;flex-shrink:0;font-family:inherit;line-height:1" title="부호 전환">-</button>';
-    html += '<input class="score-input-field score-card-input" type="text" id="si-' + i + '" placeholder="0" inputmode="decimal" style="flex:1;min-width:0;width:auto">';
+    html += '<input class="score-input-field score-card-input" type="text" id="si-' + i + '" placeholder="0" style="flex:1;min-width:0">';
     html += '</div>';
     html += '</div>';
   });
