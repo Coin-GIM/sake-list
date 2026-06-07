@@ -481,11 +481,23 @@ function renderScoreInputs() {
     html += '<div class="score-card-total ' + scoreClass(t) + '">' + fmtScore(t) + '</div>';
     html += '</div>';
     html += '</div>';
-    html += '<input class="score-input-field score-card-input" type="number" id="si-' + i + '" placeholder="0" inputmode="decimal">';
+    html += '<div style="display:flex;gap:5px;align-items:stretch">';
+    html += '<button type="button" onclick="toggleNeg(' + i + ')" style="padding:0 14px;background:#334155;color:#f1f5f9;border:1px solid #475569;border-radius:8px;font-size:22px;font-weight:900;cursor:pointer;flex-shrink:0;font-family:inherit;line-height:1" title="부호 전환">-</button>';
+    html += '<input class="score-input-field score-card-input" type="text" id="si-' + i + '" placeholder="0" style="flex:1;min-width:0">';
+    html += '</div>';
     html += '</div>';
   });
   document.getElementById('score-inputs').innerHTML = html;
   setTimeout(function() { var el = document.getElementById('si-0'); if (el) el.focus(); }, 80);
+}
+
+function toggleNeg(i) {
+  var el = document.getElementById('si-' + i);
+  var v = el.value.trim();
+  if (v === '' || v === '0') { el.value = ''; el.focus(); return; }
+  var n = parseFloat(v);
+  if (!isNaN(n)) el.value = (-n).toString();
+  el.focus();
 }
 
 function submitRound() {
@@ -493,7 +505,7 @@ function submitRound() {
   G.players.forEach(function(p, i) {
     var el = document.getElementById('si-' + i);
     if (!el || el.value.trim() === '') { allFilled = false; return; }
-    scores[p.name] = parseInt(el.value) || 0;
+    scores[p.name] = parseInt(el.value.replace(/−/g, '-')) || 0;
   });
   if (!allFilled) { alert('모든 플레이어의 점수를 입력해주세요.'); return; }
   G.rounds.push({ round: G.currentRound, scores: scores });
