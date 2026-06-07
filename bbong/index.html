@@ -37,8 +37,8 @@
     .ranking-row{display:flex;gap:4px;padding:4px 0 2px;justify-content:space-around;}
     .rank-chip{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0;}
     .rank-chip-medal{font-size:14px;line-height:1;}
-    .rank-chip-name{font-size:10px;font-weight:700;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-    .rank-chip-score{font-size:11px;font-weight:800;}
+    .rank-chip-name{font-size:13px;font-weight:700;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+    .rank-chip-score{font-size:12px;font-weight:800;}
 
     /* ── Score Input Grid ── */
     .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
@@ -809,11 +809,23 @@ function renderScoreInputs() {
     html += '<div class="score-card-total ' + scoreClass(t) + '">' + fmtScore(t) + '</div>';
     html += '</div>';
     html += '</div>';
-    html += '<input class="score-input-field score-card-input" type="number" id="si-' + i + '" placeholder="0" inputmode="decimal">';
+    html += '<div style="display:flex;gap:5px;align-items:stretch">';
+    html += '<button type="button" onclick="toggleNeg(' + i + ')" style="padding:0 14px;background:#334155;color:var(--text);border:1px solid #475569;border-radius:8px;font-size:22px;font-weight:900;cursor:pointer;flex-shrink:0;font-family:inherit;line-height:1">−</button>';
+    html += '<input class="score-input-field score-card-input" type="number" id="si-' + i + '" placeholder="0" inputmode="decimal" style="flex:1;min-width:0">';
+    html += '</div>';
     html += '</div>';
   });
   document.getElementById('score-inputs').innerHTML = html;
   setTimeout(function() { var el = document.getElementById('si-0'); if (el) el.focus(); }, 80);
+}
+
+function toggleNeg(i) {
+  var el = document.getElementById('si-' + i);
+  var v = el.value.trim();
+  if (v === '' || v === '0') { el.value = ''; el.focus(); return; }
+  var n = parseFloat(v);
+  if (!isNaN(n)) el.value = (-n).toString();
+  el.focus();
 }
 
 function submitRound() {
