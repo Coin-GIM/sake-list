@@ -67,6 +67,36 @@
     #img-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,.88); display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
     #img-modal img { max-width: 92vw; max-height: 90vh; border-radius: 10px; box-shadow: 0 8px 40px rgba(0,0,0,.6); object-fit: contain; }
 
+    /* 상세 팝업 */
+    #detail-modal { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,.6); display: none; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 30px 14px; }
+    #detail-modal.open { display: flex; }
+    .dm-card { background: #fff; border-radius: 18px; max-width: 420px; width: 100%; margin: auto; overflow: hidden; box-shadow: 0 12px 50px rgba(0,0,0,.35); position: relative; }
+    .dm-close { position: absolute; top: 10px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,.4); color: #fff; border: none; font-size: 18px; cursor: pointer; z-index: 2; line-height: 1; }
+    .dm-row { display: flex; align-items: stretch; }
+    .dm-img-wrap { width: 25%; flex: 0 0 25%; background: #F0E8D8; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .dm-img-wrap img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+    .dm-img-ph { font-size: 40px; opacity: .25; }
+    .dm-body { width: 75%; flex: 1; min-width: 0; padding: 44px 16px 20px; }
+    .dm-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+    .dm-region { font-size: 12px; font-weight: 700; color: var(--red); background: #F5E9DA; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .dm-price { font-size: 16px; font-weight: 700; color: var(--red); white-space: nowrap; }
+    .dm-brewery { font-size: 12.5px; color: var(--muted); font-weight: 600; margin-top: 8px; }
+    .dm-name { font-size: 18px; font-weight: 700; line-height: 1.35; margin: 4px 0 12px; }
+    .dm-pills { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+    .dm-pill { background: #F5EFE4; border: 1px solid var(--border); border-radius: 10px; padding: 6px 11px; font-size: 12.5px; color: var(--text); }
+    .dm-pill b { color: var(--muted); font-weight: 700; margin-right: 5px; }
+    .dm-desc { font-size: 13.5px; line-height: 1.6; color: var(--text); background: #FBF7F0; border-radius: 12px; padding: 12px 14px; white-space: pre-wrap; }
+    .dm-desc.dm-empty { color: var(--muted); font-style: italic; }
+    .dm-drink-sec { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); }
+    .dm-drink-ttl { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+    .dm-drink-input { width: 100%; min-height: 64px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; resize: vertical; color: var(--text); }
+    .dm-drink-input:focus { outline: none; border-color: var(--red); }
+    .dm-drink-save { margin-top: 8px; padding: 9px 16px; background: var(--red); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .dm-drink-save:disabled { background: var(--muted); }
+    .dm-drink-msg { font-size: 12px; font-weight: 600; height: 16px; margin-top: 6px; }
+    .dm-drink-view { font-size: 13px; line-height: 1.6; color: var(--text); background: #FBF7F0; border-radius: 10px; padding: 10px 12px; white-space: pre-wrap; }
+    .dm-drink-view.dm-empty { color: var(--muted); font-style: italic; }
+
     /* Tab bar */
     .tab-bar { background: #fff; border-bottom: 1.5px solid var(--border); display: flex; position: sticky; top: 47px; z-index: 100; }
     .tab-btn { flex: 1; padding: 11px 0 9px; border: none; background: none; font-size: 14.5px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: color .2s, border-color .2s; }
@@ -85,12 +115,12 @@
 
     /* Card Grid */
     .grid { max-width: 1120px; margin: 14px auto 0; padding: 0 16px 60px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
-    .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(123,30,30,.07); display: flex; overflow: hidden; transition: box-shadow .2s, transform .2s; position: relative; height: 108px; }
+    .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(123,30,30,.07); display: flex; overflow: hidden; transition: box-shadow .2s, transform .2s; position: relative; height: 108px; cursor: pointer; }
     .stock-badge { position: absolute; top: 8px; right: 10px; font-size: 11px; font-weight: 700; color: var(--muted); background: rgba(247,242,234,.95); border: 1px solid var(--border); border-radius: 8px; padding: 2px 7px; pointer-events: none; }
     .stock-badge.multi { color: var(--red); border-color: var(--gold); background: rgba(255,248,230,.97); }
     .card:hover { box-shadow: 0 7px 24px rgba(123,30,30,.16); transform: translateY(-3px); }
     .card-img { width: 64px; flex-shrink: 0; background: #F0E8D8; border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; align-self: stretch; }
-    .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .card-img-ph { font-size: 30px; opacity: .22; }
     .card-body { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
     .card-name { font-size: 15px; font-weight: 700; line-height: 1.35; }
@@ -160,9 +190,10 @@
     .inp-search-wrap input:focus { outline:none; border-color:var(--red); }
     .inp-search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:15px; color:var(--muted); pointer-events:none; }
     .inp-list-meta { font-size:13px; color:var(--muted); font-weight:600; margin-bottom:8px; }
-    .inp-list-wrap { overflow-x:auto; border-radius:14px; border:1px solid var(--border); background:#fff; }
+    .inp-list-wrap { overflow:auto; max-height:calc(100vh - 250px); min-height:200px; border-radius:14px; border:1px solid var(--border); background:#fff; }
     .inp-list-wrap table { width:100%; border-collapse:collapse; min-width:540px; }
     .inp-list-wrap thead { position:sticky; top:0; z-index:10; }
+    .inp-td-desc { max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .inp-list-wrap th { background:var(--red); color:#fff; padding:10px 12px; font-size:12px; font-weight:700; text-align:left; white-space:nowrap; }
     .inp-list-wrap td { padding:9px 12px; font-size:13px; border-bottom:1px solid var(--border); vertical-align:middle; cursor:pointer; }
     .inp-list-wrap tr:last-child td { border-bottom:none; }
@@ -336,6 +367,17 @@
 <!-- 이미지 확대 모달 -->
 <div id="img-modal" style="display:none" onclick="this.style.display='none'">
   <img id="img-modal-img" src="" alt="">
+</div>
+
+<!-- 사케 상세 팝업 -->
+<div id="detail-modal" onclick="if(event.target===this)closeDetail()">
+  <div class="dm-card">
+    <button class="dm-close" onclick="closeDetail()">✕</button>
+    <div class="dm-row">
+      <div class="dm-img-wrap" id="dm-img-wrap"></div>
+      <div class="dm-body" id="dm-body"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Header -->
@@ -659,6 +701,13 @@
 지역: [일본 현 이름 한국어]
 일본주도: [수치, 모르면 공백]
 열처리: [생주/생주 (무여과)/1회 열처리/1회 열처리 (나마즈메)/1회 열처리 (저알코올)/1회 열처리 (빙온숙성)/2회 열처리 중 하나, 모르면 공백]
+주조회사: [양조장 이름, 모르면 공백]
+산도: [수치, 모르면 공백]
+쌀의 종류: [사용된 쌀 품종, 모르면 공백]
+정미도: [정미율 %, 모르면 공백]
+풍미: [한 줄 풍미 요약, 모르면 공백]
+설명: [2~3문장 소개, 모르면 공백]
+용량: [720ml/1800ml/500ml 중 하나, 모르면 720ml]
 보유: 1</pre>
       <button class="inp-guide-copy" id="inp-copy-btn" onclick="inpCopyPrompt()">프롬프트 복사</button>
     </div>
@@ -684,9 +733,11 @@
           <option>혼죠죠</option><option>보통주</option><option>무라벨</option>
         </select>
       </div>
+      <div class="inp-field"><label>주조회사 (선택)</label><input id="inp-f-brewery" type="text" placeholder="아사히주조"></div>
       <div class="inp-field"><label>제조년월</label><input id="inp-f-date" type="text" placeholder="2026.04"></div>
       <div class="inp-field"><label>지역</label><input id="inp-f-region" type="text" placeholder="나가사키"></div>
       <div class="inp-field"><label>일본주도</label><input id="inp-f-smv" type="text" placeholder="+3~+4"></div>
+      <div class="inp-field"><label>산도 (선택)</label><input id="inp-f-acidity" type="text" placeholder="1.4"></div>
       <div class="inp-field"><label>열처리</label>
         <select id="inp-f-heat">
           <option value="">— 선택 —</option>
@@ -696,6 +747,10 @@
           <option>2회 열처리</option>
         </select>
       </div>
+      <div class="inp-field"><label>쌀의 종류 (선택)</label><input id="inp-f-rice" type="text" placeholder="야마다니시키"></div>
+      <div class="inp-field"><label>정미도 (선택)</label><input id="inp-f-polish" type="text" placeholder="50%"></div>
+      <div class="inp-field"><label>풍미 (선택)</label><input id="inp-f-flavor" type="text" placeholder="旨口系"></div>
+      <div class="inp-field"><label>설명 (선택)</label><textarea id="inp-f-desc" rows="3" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-family:inherit;resize:vertical" placeholder="사케 소개 문구"></textarea></div>
       <div class="inp-field">
         <label>이미지 (선택)</label>
         <div style="display:flex;gap:8px">
@@ -704,6 +759,12 @@
         </div>
       </div>
       <div class="inp-field"><label>보유</label><input id="inp-f-stock" type="number" value="1" min="0" max="99"></div>
+      <div class="inp-field"><label>용량</label>
+        <select id="inp-f-volume">
+          <option>720ml</option><option>1800ml</option><option>500ml</option>
+        </select>
+      </div>
+      <div class="inp-field"><label>구매금액 (선택)</label><input id="inp-f-price" type="text" placeholder="12,000원"></div>
     </div>
 
     <button class="inp-save" id="inp-save-btn" onclick="inpSave()">구글 시트에 저장</button>
@@ -716,17 +777,21 @@
       <span class="inp-search-icon">🔍</span>
       <input type="text" id="inp-list-search" placeholder="이름 · 지역 · 구분 검색…" oninput="inpFilterList()">
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div id="inp-list-toolbar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;background:var(--bg);z-index:95">
       <div class="inp-list-meta" id="inp-list-count">-</div>
-      <button onclick="inpListLoaded=false;inpLoadList()" style="padding:6px 12px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">↺ 새로고침</button>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button onclick="inpScrollTbl(-1)" style="width:30px;height:30px;border:1.5px solid var(--border);background:#fff;border-radius:8px;font-size:14px;cursor:pointer;color:var(--red);font-weight:700;font-family:inherit">◀</button>
+        <button onclick="inpScrollTbl(1)" style="width:30px;height:30px;border:1.5px solid var(--border);background:#fff;border-radius:8px;font-size:14px;cursor:pointer;color:var(--red);font-weight:700;font-family:inherit">▶</button>
+        <button onclick="inpListLoaded=false;inpLoadList()" style="padding:6px 12px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">↺ 새로고침</button>
+      </div>
     </div>
-    <div class="inp-list-wrap">
+    <div class="inp-list-wrap" id="inp-list-wrap">
       <table>
         <thead>
-          <tr><th style="text-align:center;width:52px">이미지</th><th>이름</th><th>구분</th><th>제조년월</th><th>지역</th><th>일본주도</th><th>열처리</th><th>보유</th></tr>
+          <tr><th style="text-align:center;width:52px">이미지</th><th>이름</th><th>구분</th><th>제조년월</th><th>지역</th><th>일본주도</th><th>열처리</th><th>보유</th><th>용량</th><th>구매금액</th><th>주조회사</th><th>산도</th><th>쌀의 종류</th><th>정미도</th><th>풍미</th><th>설명</th></tr>
         </thead>
         <tbody id="inp-tbl-body">
-          <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">목록 편집 탭을 열면 불러옵니다</td></tr>
+          <tr><td colspan="16" style="text-align:center;padding:30px;color:var(--muted)">목록 편집 탭을 열면 불러옵니다</td></tr>
         </tbody>
       </table>
     </div>
@@ -846,6 +911,7 @@ const PREFS = [
 
 if('scrollRestoration' in history) history.scrollRestoration='manual';
 let allRows = [], activeFilter = '', selectedPref = null, pinInput = '', dateSort = 0, isWriterMode = false;
+let ROW_SHEET_MAP = new WeakMap(), ROW_BY_SR = {};
 
 /* ===== 주막 탭 ===== */
 var mkDeals=[], mkSite='', mkSortKey='', mkSortDir=0, mkLoaded=false;
@@ -1104,7 +1170,10 @@ async function loadData(){
   try{
     var res=await fetchWithTimeout(CSV_URL,15000);
     if(!res.ok) throw new Error('HTTP '+res.status);
-    var rows=parseCSV(await res.text()).slice(1).filter(function(r){return r[0];});
+    var raw=parseCSV(await res.text()).slice(1);
+    ROW_SHEET_MAP=new WeakMap(); ROW_BY_SR={};
+    raw.forEach(function(r,i){ var sr=i+2; ROW_SHEET_MAP.set(r,sr); ROW_BY_SR[sr]=r; });
+    var rows=raw.filter(function(r){return r[0];});
     allRows=rows;
     buildFilters();
     renderList();
@@ -1153,6 +1222,83 @@ var CAT_COLOR={'준마이다이긴죠':['#4A235A','#D7BDE2'],'준마이긴죠':[
 function catStyle(cat){ var c=CAT_COLOR[cat]||['#7A6050','#F5F0E8']; return 'color:'+c[0]+';background:'+c[1]; }
 
 function showImg(url){ document.getElementById('img-modal-img').src=url; document.getElementById('img-modal').style.display='flex'; }
+
+/* Detail popup */
+function openDetail(el){
+  var r; try{ r=JSON.parse(decodeURIComponent(el.dataset.row)); }catch(e){ return; }
+  var sr=el.dataset.sr?parseInt(el.dataset.sr):null;
+  var ctx=el.dataset.ctx||'';
+  showDetail(r,ctx,sr);
+}
+function closeDetail(){ document.getElementById('detail-modal').classList.remove('open'); }
+function showDetail(r,ctx,sr){
+  var name=r[0],cat=r[1],date=r[2],region=r[3],smvRaw=r[4],heat=r[5],imgUrl=r[6];
+  var stockVal=parseInt(r[7]); var stock=isNaN(stockVal)?1:stockVal;
+  var price=r[8]||'', drinkingNote=r[9]||'', brewery=r[10]||'', acidity=r[11]||'', rice=r[12]||'', polish=r[13]||'', flavor=r[14]||'', desc=r[15]||'', volume=r[16]||'';
+  var smv=(!smvRaw||/^#/.test(smvRaw))?'-':(/^\d+$/.test(smvRaw.trim())?'+'+smvRaw.trim():smvRaw);
+
+  var imgWrap=document.getElementById('dm-img-wrap');
+  if(imgUrl){
+    imgWrap.innerHTML='<img id="dm-img" src="'+h(imgUrl)+'" alt="">';
+    var dmImg=document.getElementById('dm-img');
+    dmImg.onclick=function(){ showImg(imgUrl); };
+    dmImg.onerror=function(){ imgWrap.innerHTML='<div class="dm-img-ph">🍶</div>'; };
+  } else {
+    imgWrap.innerHTML='<div class="dm-img-ph">🍶</div>';
+  }
+
+  var pills=['<span class="dm-pill"><b>일본주도</b>'+h(smv)+'</span>'];
+  if(acidity) pills.push('<span class="dm-pill"><b>산도</b>'+h(acidity)+'</span>');
+  if(rice)    pills.push('<span class="dm-pill"><b>쌀의 종류</b>'+h(rice)+'</span>');
+  if(polish)  pills.push('<span class="dm-pill"><b>정미도</b>'+h(polish)+'</span>');
+  if(cat)     pills.push('<span class="dm-pill"><b>특정명칭</b>'+h(cat)+'</span>');
+  if(heat)    pills.push('<span class="dm-pill"><b>열처리</b>'+h(heat)+'</span>');
+  if(flavor)  pills.push('<span class="dm-pill"><b>풍미</b>'+h(flavor)+'</span>');
+  if(date)    pills.push('<span class="dm-pill"><b>제조년월</b>'+h(date)+'</span>');
+  pills.push('<span class="dm-pill"><b>용량</b>'+h(volume||'720ml')+'</span>');
+  pills.push('<span class="dm-pill"><b>보유</b>'+stock+'</span>');
+
+  var html=''
+    +'<div class="dm-top">'
+      +'<span class="dm-region">'+(region?'📍 '+h(region):'-')+'</span>'
+      +(price?'<span class="dm-price">'+h(price)+'</span>':'')
+    +'</div>'
+    +(brewery?'<div class="dm-brewery">'+h(brewery)+'</div>':'')
+    +'<div class="dm-name">'+h(name)+'</div>'
+    +'<div class="dm-pills">'+pills.join('')+'</div>'
+    +(desc?'<div class="dm-desc">'+h(desc)+'</div>':'<div class="dm-desc dm-empty">아직 등록된 설명이 없습니다</div>');
+
+  if(ctx==='drunk'){
+    html+='<div class="dm-drink-sec"><div class="dm-drink-ttl">🍶 시음평</div>';
+    if(isWriterMode && sr){
+      html+='<textarea id="dm-drink-input" class="dm-drink-input" placeholder="마셔본 소감을 적어보세요">'+h(drinkingNote)+'</textarea>'
+        +'<div class="dm-drink-msg" id="dm-drink-msg"></div>'
+        +'<button class="dm-drink-save" id="dm-drink-save-btn" onclick="saveDrinkingNote('+sr+')">저장</button>';
+    } else {
+      html+=drinkingNote?'<div class="dm-drink-view">'+h(drinkingNote)+'</div>':'<div class="dm-drink-view dm-empty">아직 작성된 시음평이 없습니다</div>';
+    }
+    html+='</div>';
+  }
+
+  document.getElementById('dm-body').innerHTML=html;
+  document.getElementById('detail-modal').classList.add('open');
+}
+function saveDrinkingNote(sr){
+  var input=document.getElementById('dm-drink-input'); if(!input) return;
+  var val=input.value.trim();
+  var btn=document.getElementById('dm-drink-save-btn'), msg=document.getElementById('dm-drink-msg');
+  btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
+  inpSheetsUpdateCell('J'+sr, val).then(function(){
+    var row=ROW_BY_SR[sr];
+    if(row){ while(row.length<=9) row.push(''); row[9]=val; }
+    msg.style.color='var(--green)'; msg.textContent='✓ 저장 완료!';
+    btn.disabled=false; btn.textContent='저장';
+    renderDrunk();
+  }).catch(function(e){
+    msg.style.color='#922B21'; msg.textContent='✗ '+(e.name==='AbortError'?'타임아웃':e.message);
+    btn.disabled=false; btn.textContent='저장';
+  });
+}
 function updateHdCount(){
   var isDrunk=document.getElementById('tab-drunk').style.display!=='none';
   var isMarket=document.getElementById('tab-market').style.display!=='none';
@@ -1175,15 +1321,17 @@ function toggleDateSort(){
 }
 
 /* Card HTML */
-function cardHTML(r){
+function cardHTML(r,ctx){
   var name=r[0],cat=r[1],date=r[2],region=r[3],smvRaw=r[4],heat=r[5],imgUrl=r[6];
   var stockVal=parseInt(r[7]); var stock=isNaN(stockVal)?1:stockVal;
   var smv=(!smvRaw||/^#/.test(smvRaw))?'-':(/^\d+$/.test(smvRaw.trim())?'+'+smvRaw.trim():smvRaw);
-  var imgHtml=imgUrl?'<img src="'+h(imgUrl)+'" alt="" loading="lazy" onclick="showImg(\''+h(imgUrl)+'\')" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';
+  var imgHtml=imgUrl?'<img src="'+h(imgUrl)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';
   var badgeCls=stock>1?' multi':'';
   var stockBadge='<div class="stock-badge'+badgeCls+'">보유 '+stock+'</div>';
   var tags=[region&&'<span class="tag">📍 '+h(region)+'</span>',date&&'<span class="tag">📅 '+h(date)+'</span>','<span class="tag">💧 '+h(smv)+'</span>',heat&&'<span class="tag">🌡️ '+h(heat)+'</span>'].filter(Boolean).join('');
-  return '<div class="card"><div class="card-img">'+imgHtml+'<div class="card-img-ph" '+(imgUrl?'style="display:none"':'')+'>🍶</div></div><div class="card-body"><div class="card-name">'+h(name)+'</div>'+(cat?'<span class="cat-badge" style="'+catStyle(cat)+'">'+h(cat)+'</span>':'')+(tags?'<div class="card-tags">'+tags+'</div>':'')+'</div>'+stockBadge+'</div>';
+  var rowEnc=encodeURIComponent(JSON.stringify(r));
+  var sr=ROW_SHEET_MAP.get(r)||'';
+  return '<div class="card" data-row="'+rowEnc+'" data-sr="'+sr+'" data-ctx="'+(ctx||'')+'" onclick="openDetail(this)"><div class="card-img">'+imgHtml+'<div class="card-img-ph" '+(imgUrl?'style="display:none"':'')+'>🍶</div></div><div class="card-body"><div class="card-name">'+h(name)+'</div>'+(cat?'<span class="cat-badge" style="'+catStyle(cat)+'">'+h(cat)+'</span>':'')+(tags?'<div class="card-tags">'+tags+'</div>':'')+'</div>'+stockBadge+'</div>';
 }
 
 /* List */
@@ -1217,7 +1365,7 @@ function renderList(){
     });
   }
   var grid=document.getElementById('card-grid');
-  grid.innerHTML=rows.length?rows.map(cardHTML).join(''):'<div class="no-result">🔍 검색 결과가 없습니다</div>';
+  grid.innerHTML=rows.length?rows.map(function(r){return cardHTML(r);}).join(''):'<div class="no-result">🔍 검색 결과가 없습니다</div>';
 }
 
 /* Drunk */
@@ -1229,7 +1377,7 @@ function renderDrunk(){
   var grid=document.getElementById('drunk-grid');
   var empty=document.getElementById('drunk-empty');
   if(rows.length){
-    grid.innerHTML=rows.map(cardHTML).join('');
+    grid.innerHTML=rows.map(function(r){return cardHTML(r,'drunk');}).join('');
     grid.style.display='grid'; empty.style.display='none';
   } else {
     grid.innerHTML=''; grid.style.display='none'; empty.style.display='block';
@@ -1274,7 +1422,7 @@ function selectPref(ko){
   var rows=(_prefRowsMap[ko]||[]).slice().sort(function(a,b){return a[0].localeCompare(b[0],'ko');});
   document.getElementById('map-result-title').textContent=ko;
   document.getElementById('map-result-count').textContent=rows.length+'종';
-  document.getElementById('map-card-grid').innerHTML=rows.map(cardHTML).join('');
+  document.getElementById('map-card-grid').innerHTML=rows.map(function(r){return cardHTML(r);}).join('');
   var el=document.getElementById('map-result'); el.style.display='block';
   setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},60);
 }
@@ -1324,6 +1472,11 @@ function submitWrite(e){
 /* ===== 입력 탭 ===== */
 var INP_CAT_OPTS  = ['준마이다이긴죠','준마이긴죠','다이긴죠','긴죠','도쿠베츠준마이','준마이','혼죠죠','보통주','무라벨'];
 var INP_HEAT_OPTS = ['생주','생주 (무여과)','1회 열처리','1회 열처리 (나마즈메)','1회 열처리 (저알코올)','1회 열처리 (빙온숙성)','2회 열처리'];
+var INP_VOLUME_OPTS = ['720ml','1800ml','500ml'];
+function inpScrollTbl(dir){
+  var el=document.getElementById('inp-list-wrap'); if(!el) return;
+  el.scrollBy({left:dir*160,behavior:'smooth'});
+}
 var inpAllRows=[], inpListLoaded=false, inpModalState=null;
 
 function inpShowSub(sub){
@@ -1353,6 +1506,13 @@ var INP_KEY_MAP=[
   {field:'heat',   keys:['열처리','히이레','heat']},
   {field:'img',    keys:['이미지','image','img','사진']},
   {field:'stock',  keys:['보유','재고','수량','stock']},
+  {field:'brewery',keys:['주조회사','양조장','brewery']},
+  {field:'acidity',keys:['산도','acidity']},
+  {field:'rice',   keys:['쌀의 종류','쌀 종류','쌀종류','rice']},
+  {field:'polish', keys:['정미도','정미율','polish']},
+  {field:'flavor', keys:['풍미','flavor']},
+  {field:'desc',   keys:['설명','소개','description']},
+  {field:'volume', keys:['용량','ml','volume']},
 ];
 function inpExtractKV(line){
   var t=line.match(/^\|\s*([^|\-\:]{1,20}?)\s*\|\s*([^|]+?)\s*\|?\s*$/);
@@ -1361,7 +1521,7 @@ function inpExtractKV(line){
   if(c) return {k:c[1].trim(),v:c[2].trim()};
   return null;
 }
-function inpNormDate(v){ var m=v.match(/(\d{4})[년\s\.]\s*(\d{1,2})[월]?/); return m?m[1]+'.'+('0'+m[2]).slice(-2):v; }
+function inpNormDate(v){ var m=v.match(/(\d{2,4})\s*[.년]\s*(\d{1,2})\s*월?/); return m?m[1].slice(-2)+'.'+('0'+m[2]).slice(-2):v; }
 function inpNormRegion(v){ var m=v.match(/^([가-힣]{2,5})[도부현]/); return m?m[1]:v; }
 function inpNormCat(v){
   if(v.includes('준마이다이긴')||v.includes('순미대음')) return '준마이다이긴죠';
@@ -1371,6 +1531,12 @@ function inpNormCat(v){
   if(v.includes('도쿠베츠준마이')||v.includes('특별순미')) return '도쿠베츠준마이';
   if(v.includes('준마이')||v.includes('순미')||v.includes('純米')) return '준마이';
   return v;
+}
+function inpNormVolume(v){
+  if(/1800|1\.8/.test(v)) return '1800ml';
+  if(/500/.test(v)) return '500ml';
+  if(/720/.test(v)) return '720ml';
+  return '720ml';
 }
 function inpSelectOpt(id,val){
   if(!val) return; var sel=document.getElementById(id);
@@ -1395,13 +1561,21 @@ function inpParse(){
   if(data.img)    document.getElementById('inp-f-img').value    = data.img;
   if(data.cat)    inpSelectOpt('inp-f-cat',  inpNormCat(data.cat));
   if(data.heat)   inpSelectOpt('inp-f-heat', data.heat);
+  if(data.brewery) document.getElementById('inp-f-brewery').value = data.brewery;
+  if(data.acidity) document.getElementById('inp-f-acidity').value = data.acidity;
+  if(data.rice)    document.getElementById('inp-f-rice').value    = data.rice;
+  if(data.polish)  document.getElementById('inp-f-polish').value  = data.polish;
+  if(data.flavor)  document.getElementById('inp-f-flavor').value  = data.flavor;
+  if(data.desc)    document.getElementById('inp-f-desc').value    = data.desc;
+  if(data.volume)  inpSelectOpt('inp-f-volume', inpNormVolume(data.volume));
   if(Object.keys(data).length===0) alert('파싱 실패\n키:값 또는 마크다운 테이블 형식이 필요합니다.');
 }
 function inpClearAll(){
   document.getElementById('inp-paste').value='';
-  ['inp-f-name','inp-f-date','inp-f-region','inp-f-smv','inp-f-img'].forEach(function(id){document.getElementById(id).value='';});
+  ['inp-f-name','inp-f-date','inp-f-region','inp-f-smv','inp-f-img','inp-f-price','inp-f-brewery','inp-f-acidity','inp-f-rice','inp-f-polish','inp-f-flavor','inp-f-desc'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('inp-f-cat').selectedIndex=0;
   document.getElementById('inp-f-heat').selectedIndex=0;
+  document.getElementById('inp-f-volume').selectedIndex=0;
   document.getElementById('inp-f-stock').value='1';
   document.getElementById('inp-save-msg').textContent='';
 }
@@ -1417,7 +1591,7 @@ async function inpSheetsUpdateCell(cellRange, value){
 
 async function inpSheetsAppendRow(rowValues){
   var token=await inpGetDriveToken();
-  var url='https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+encodeURIComponent(INP_SHEET_NAME+'!A:H')+':append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS';
+  var url='https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+encodeURIComponent(INP_SHEET_NAME+'!A:Q')+':append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS';
   var res=await fetch(url,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({values:[rowValues]})});
   if(!res.ok){var e=await res.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'HTTP '+res.status);}
 }
@@ -1428,7 +1602,11 @@ async function inpSave(){
   var row=[name,document.getElementById('inp-f-cat').value,document.getElementById('inp-f-date').value.trim(),
     document.getElementById('inp-f-region').value.trim(),document.getElementById('inp-f-smv').value.trim(),
     document.getElementById('inp-f-heat').value,document.getElementById('inp-f-img').value.trim(),
-    document.getElementById('inp-f-stock').value||'1'];
+    document.getElementById('inp-f-stock').value||'1',document.getElementById('inp-f-price').value.trim(),
+    '',document.getElementById('inp-f-brewery').value.trim(),document.getElementById('inp-f-acidity').value.trim(),
+    document.getElementById('inp-f-rice').value.trim(),document.getElementById('inp-f-polish').value.trim(),
+    document.getElementById('inp-f-flavor').value.trim(),document.getElementById('inp-f-desc').value.trim(),
+    document.getElementById('inp-f-volume').value];
   var btn=document.getElementById('inp-save-btn'), msg=document.getElementById('inp-save-msg');
   btn.disabled=true; btn.textContent='저장 중…'; msg.textContent='';
   try{
@@ -1460,7 +1638,7 @@ function inpParseCSV(text){
 }
 
 async function inpLoadList(){
-  document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">불러오는 중…</td></tr>';
+  document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="16" style="text-align:center;padding:30px;color:var(--muted)">불러오는 중…</td></tr>';
   try{
     var res=await fetchWithTimeout(CSV_URL,15000);
     if(!res.ok) throw new Error('HTTP '+res.status);
@@ -1470,7 +1648,7 @@ async function inpLoadList(){
     inpRenderList(inpAllRows);
   } catch(e){
     var msg=e.name==='AbortError'?'응답 시간 초과 — 다시 시도해주세요':e.message;
-    document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="8" style="text-align:center;color:#922B21;padding:30px">불러오기 실패: '+msg+'</td></tr>';
+    document.getElementById('inp-tbl-body').innerHTML='<tr><td colspan="16" style="text-align:center;color:#922B21;padding:30px">불러오기 실패: '+msg+'</td></tr>';
     inpListLoaded=false;
   }
 }
@@ -1490,9 +1668,12 @@ function inpRenderList(rows){
     var r=item.data, sr=item.sheetRow;
     var imgUrl=r[6]||'';
     var imgCell='<td style="text-align:center;width:52px;cursor:pointer" onclick="inpOpenImgModal('+sr+')">'+(imgUrl?'<img class="inp-tbl-img" src="'+inpHe(imgUrl)+'" onerror="this.replaceWith(document.createTextNode(\'📷\'))" alt="">':'<span style="font-size:20px;opacity:.35">📷</span>')+'</td>';
-    var cols=[0,1,2,3,4,5,7].map(function(ci){
+    var cols=[0,1,2,3,4,5,7,16,8,10,11,12,13,14,15].map(function(ci){
       var v=r[ci]||''; var cls=v?'':'inp-td-empty';
-      return '<td class="'+cls+'" onclick="inpOpenEdit('+sr+','+ci+')">'+(v?inpHe(v):'—')+'</td>';
+      var shown=v;
+      if(ci===15&&v){ cls+=' inp-td-desc'; shown=v.length>6?v.slice(0,6)+'…':v; }
+      if(ci===14&&v){ cls+=' inp-td-desc'; shown=v.length>5?v.slice(0,5)+'…':v; }
+      return '<td class="'+cls+'" onclick="inpOpenEdit('+sr+','+ci+')" title="'+inpHe(v)+'">'+(shown?inpHe(shown):'—')+'</td>';
     });
     return '<tr>'+imgCell+cols.join('')+'</tr>';
   }).join('');
@@ -1501,8 +1682,8 @@ function inpRenderList(rows){
 function inpOpenEdit(sheetRow,colIdx){
   var item=inpAllRows.find(function(r){return r.sheetRow===sheetRow;});
   if(!item) return;
-  var cols=['이름','구분','제조년월','지역','일본주도','열처리','이미지URL','보유'];
-  var letters=['A','B','C','D','E','F','G','H'];
+  var cols=['이름','구분','제조년월','지역','일본주도','열처리','이미지URL','보유','구매금액','시음평','주조회사','산도','쌀의 종류','정미도','풍미','설명','용량'];
+  var letters=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q'];
   var cur=item.data[colIdx]||'';
   inpModalState={sheetRow:sheetRow, colIdx:colIdx, letter:letters[colIdx]};
   document.getElementById('inp-modal-title-text').textContent=cols[colIdx]+' 수정 ('+item.data[0]+')';
@@ -1514,6 +1695,10 @@ function inpOpenEdit(sheetRow,colIdx){
     html+='<select id="inp-m-input"><option value="">—</option>'+INP_HEAT_OPTS.map(function(o){ return '<option'+(o===cur?' selected':'')+'>'+inpHe(o)+'</option>'; }).join('')+'</select>';
   } else if(colIdx===7){
     html+='<input id="inp-m-input" type="number" value="'+inpHe(cur)+'" min="0" max="99">';
+  } else if(colIdx===15){
+    html+='<textarea id="inp-m-input" rows="3" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-family:inherit;resize:vertical">'+inpHe(cur)+'</textarea>';
+  } else if(colIdx===16){
+    html+='<select id="inp-m-input">'+INP_VOLUME_OPTS.map(function(o){ return '<option'+(o===cur?' selected':'')+'>'+inpHe(o)+'</option>'; }).join('')+'</select>';
   } else {
     html+='<input id="inp-m-input" type="text" value="'+inpHe(cur)+'">';
   }
