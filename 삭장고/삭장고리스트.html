@@ -229,6 +229,21 @@
     .g-sec-bd { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
     .g-muted { font-size: 14px; line-height: 1.7; color: var(--muted); }
     .g-tip { font-size: 12.5px; color: var(--muted); line-height: 1.6; background: #FBF7F0; border-radius: 12px; padding: 12px 14px; border-left: 3px solid var(--gold); }
+    .glass-rec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .glass-rec { background: #FBF7F0; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; color: var(--text); }
+    .glass-rec strong { display: block; color: var(--red); font-size: 12px; margin-bottom: 4px; }
+    .glass-rec a { color: var(--red); font-weight: 700; text-decoration: none; border-bottom: 1px solid rgba(123,30,30,.25); }
+    .glass-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .glass-card { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #fff; display: flex; flex-direction: column; min-height: 100%; }
+    .glass-img { width: 100%; height: 132px; background: #F8F1E8; border-bottom: 1px solid var(--border); overflow: hidden; }
+    .glass-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .glass-body { padding: 12px 13px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .glass-name { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+    .glass-name strong { font-size: 15px; color: var(--text); }
+    .glass-name span { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .glass-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .glass-tag { font-size: 11px; font-weight: 700; color: #6A3C2D; background: #FFF3E6; border: 1px solid #EAD4B8; border-radius: 999px; padding: 3px 7px; }
+    .glass-desc { font-size: 12.5px; color: #4E382F; line-height: 1.55; }
     .rice-wrap { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
     .rice-svg-box { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .rice-svg-box p { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; }
@@ -276,6 +291,8 @@
       .smv-tbl{font-size:12px;}
       .smv-tbl th,.smv-tbl td{padding:6px 8px;}
       .grade-req{display:none;}
+      .glass-rec-grid,.glass-grid{grid-template-columns:1fr;}
+      .glass-img{height:150px;}
     }
 
     /* ===== 주막 탭 ===== */
@@ -464,6 +481,7 @@
       <button class="g-nav-btn" onclick="gScroll('g-grade')">🏅 사케 등급</button>
       <button class="g-nav-btn" onclick="gScroll('g-smv')">💧 일본주도</button>
       <button class="g-nav-btn" onclick="gScroll('g-heat')">🌡️ 열처리</button>
+      <button class="g-nav-btn" onclick="gScroll('g-glass')">🍷 사케잔</button>
     </div>
   </div>
   <div class="g-page">
@@ -606,6 +624,82 @@
           </div>
         </div>
         <div class="g-tip">생주(나마) 계열은 맛의 변화가 빠르므로 구입 후 최대한 빨리 마시는 것이 좋다. 개봉 후엔 냉장 보관하고 1~2주 내 음용 권장.</div>
+      </div>
+    </div>
+
+    <!-- 사케잔 -->
+    <div class="g-sec" id="g-glass">
+      <div class="g-sec-hd"><h3>사케잔</h3><span class="jp">Glassware</span></div>
+      <div class="g-sec-bd">
+        <p class="g-muted">같은 사케라도 잔의 입구, 깊이, 재질, 향이 모이는 방식에 따라 과일향이 또렷해지거나 쌀의 감칠맛이 도드라진다.</p>
+        <div class="glass-rec-grid">
+          <div class="glass-rec"><strong>향 좋은 사케</strong><a href="#g-glass-wine" onclick="gScroll('g-glass-wine');return false;">와인글라스</a>, <a href="#g-glass-tulip" onclick="gScroll('g-glass-tulip');return false;">튤립형 글라스</a></div>
+          <div class="glass-rec"><strong>데워 마시는 사케</strong><a href="#g-glass-ochoko" onclick="gScroll('g-glass-ochoko');return false;">오초코</a>, <a href="#g-glass-guinomi" onclick="gScroll('g-glass-guinomi');return false;">구이노미</a></div>
+          <div class="glass-rec"><strong>묵직한 준마이/숙성 사케</strong><a href="#g-glass-guinomi" onclick="gScroll('g-glass-guinomi');return false;">구이노미</a></div>
+          <div class="glass-rec"><strong>전통 분위기</strong><a href="#g-glass-masu" onclick="gScroll('g-glass-masu');return false;">마스</a>, <a href="#g-glass-sakazuki" onclick="gScroll('g-glass-sakazuki');return false;">사카즈키</a></div>
+          <div class="glass-rec"><strong>비교 시음</strong><a href="#g-glass-kikichoko" onclick="gScroll('g-glass-kikichoko');return false;">키키초코</a></div>
+        </div>
+
+        <div class="glass-grid">
+          <div class="glass-card" id="g-glass-wine">
+            <div class="glass-img"><img src="assets/sake-glasses/wine-glass.jpg" alt="와인글라스"></div>
+            <div class="glass-body">
+              <div class="glass-name"><strong>와인글라스</strong><span>Wine glass</span></div>
+              <div class="glass-tags"><span class="glass-tag">긴조</span><span class="glass-tag">다이긴죠</span><span class="glass-tag">나마자케</span></div>
+              <div class="glass-desc">볼 안에서 향이 크게 피어나 멜론, 배, 사과 같은 긴조향을 느끼기 쉽다. 향 중심 사케에 좋다.</div>
+            </div>
+          </div>
+          <div class="glass-card" id="g-glass-tulip">
+            <div class="glass-img"><img src="assets/sake-glasses/tulip-glass.jpg" alt="튤립형 글라스"></div>
+            <div class="glass-body">
+              <div class="glass-name"><strong>튤립형 글라스</strong><span>Tulip glass</span></div>
+              <div class="glass-tags"><span class="glass-tag">준마이긴죠</span><span class="glass-tag">향·맛 균형</span><span class="glass-tag">범용</span></div>
+              <div class="glass-desc">입구가 살짝 좁아 향을 모으면서도 과하지 않다. 산미, 단맛, 여운의 균형을 보기 좋은 기본 추천잔.</div>
+            </div>
+          </div>
+          <div class="glass-card" id="g-glass-ochoko">
+            <div class="glass-img"><img src="assets/sake-glasses/ochoko.jpg" alt="오초코"></div>
+            <div class="glass-body">
+              <div class="glass-name"><strong>오초코</strong><span>Ochoko</span></div>
+              <div class="glass-tags"><span class="glass-tag">준마이</span><span class="glass-tag">혼죠죠</span><span class="glass-tag">온주</span></div>
+              <div class="glass-desc">작은 도자기 잔. 향을 크게 모으기보다 쌀맛, 감칠맛, 부드러운 단맛을 한 모금씩 즐기기 좋다.</div>
+            </div>
+          </div>
+          <div class="glass-card" id="g-glass-guinomi">
+            <div class="glass-img"><img src="assets/sake-glasses/guinomi.jpg" alt="구이노미"></div>
+            <div class="glass-body">
+              <div class="glass-name"><strong>구이노미</strong><span>Guinomi</span></div>
+              <div class="glass-tags"><span class="glass-tag">야마하이</span><span class="glass-tag">키모토</span><span class="glass-tag">숙성</span></div>
+              <div class="glass-desc">오초코보다 넉넉해 바디감, 쌀의 농도감, 산미와 깊은 여운을 보기 좋다. 묵직한 준마이와 숙성 사케에 잘 맞는다.</div>
+            </div>
+          </div>
+          <div class="glass-card" id="g-glass-masu">
+            <div class="glass-img"><img src="assets/sake-glasses/masu.jpg" alt="마스"></div>
+            <div class="glass-body">
+              <div class="glass-name"><strong>마스</strong><span>Masu</span></div>
+              <div class="glass-tags"><span class="glass-tag">전통</span><span class="glass-tag">축하</span><span class="glass-tag">분위기</span></div>
+              <div class="glass-desc">나무 사각잔. 히노키나 삼나무 계열의 향이 더해져 의식감과 장소감을 만든다. 섬세한 다이긴죠 향 감상에는 덜 맞다.</div>
+            </div>
+          </div>
+          <div class="glass-card" id="g-glass-sakazuki">
+            <div class="glass-img"><img src="assets/sake-glasses/sakazuki.jpg" alt="사카즈키"></div>
+            <div class="glass-body">
+              <div class="glass-name"><strong>사카즈키</strong><span>Sakazuki</span></div>
+              <div class="glass-tags"><span class="glass-tag">의례</span><span class="glass-tag">축하</span><span class="glass-tag">전통</span></div>
+              <div class="glass-desc">넓고 얕은 의례용 잔. 향이 넓게 퍼지고 한 모금의 상징성이 커서 축하 자리나 전통 분위기에 어울린다.</div>
+            </div>
+          </div>
+          <div class="glass-card" id="g-glass-kikichoko">
+            <div class="glass-img"><img src="assets/sake-glasses/kikichoko.png" alt="키키초코"></div>
+            <div class="glass-body">
+              <div class="glass-name"><strong>키키초코</strong><span>Kikichoko</span></div>
+              <div class="glass-tags"><span class="glass-tag">비교 시음</span><span class="glass-tag">색 확인</span><span class="glass-tag">투명도</span></div>
+              <div class="glass-desc">파란 동심원이 있는 감정용 잔. 사케의 색조와 투명도를 확인하기 좋지만 향을 모으는 용도는 아니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="g-tip">앱에서 추천 잔을 고를 때는 향 중심이면 글라스 계열, 식사·온주·준마이 계열이면 도자기 잔, 분위기 중심이면 마스·사카즈키로 안내하면 이해가 쉽다.</div>
       </div>
     </div>
 
@@ -1201,12 +1295,13 @@ function showTab(tab){
 }
 
 /* Guide nav */
-var gSecs=['g-polish','g-grade','g-smv','g-heat'];
+var gSecs=['g-polish','g-grade','g-smv','g-heat','g-glass'];
 function gScroll(id){
   var el=document.getElementById(id); if(!el)return;
   window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-130,behavior:'smooth'});
   document.querySelectorAll('.g-nav-btn').forEach(function(b){b.classList.remove('active');});
   var i=gSecs.indexOf(id);
+  if(i<0 && id.indexOf('g-glass-')===0)i=gSecs.indexOf('g-glass');
   var btns=document.querySelectorAll('.g-nav-btn');
   if(btns[i])btns[i].classList.add('active');
 }
